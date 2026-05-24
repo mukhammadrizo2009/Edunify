@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     # Uchinchi tomon
     'crispy_forms',
     'crispy_bootstrap5',
+    'social_django',           # Google OAuth
 
     # Loyiha
     'users',
@@ -50,6 +51,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'social_django.middleware.SocialAuthExceptionMiddleware',  # Google OAuth
 ]
 
 ROOT_URLCONF = 'config.urls'
@@ -65,6 +67,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',   # Google OAuth
+                'social_django.context_processors.login_redirect',
             ],
         },
     },
@@ -145,6 +149,38 @@ CRISPY_TEMPLATE_PACK = 'bootstrap5'
 # ── GEMINI AI ─────────────────────────────────────
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
 
+# ── GOOGLE OAUTH ──────────────────────────────────────────
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY    = os.getenv('GOOGLE_OAUTH2_KEY', '')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('GOOGLE_OAUTH2_SECRET', '')
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    'openid',
+    'https://www.googleapis.com/auth/userinfo.email',
+    'https://www.googleapis.com/auth/userinfo.profile',
+]
+
+SOCIAL_AUTH_LOGIN_REDIRECT_URL    = '/users/dashboard/'
+SOCIAL_AUTH_LOGIN_ERROR_URL       = '/users/login/'
+SOCIAL_AUTH_NEW_USER_REDIRECT_URL = '/users/dashboard/'
+
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.auth_allowed',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'social_core.pipeline.user.create_user',
+    'users.pipeline.set_student_role',    # Yangi user = student
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+)
+
 # ── PRODUCTION SECURITY (DEBUG=False da ishlaydi) ─
 if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
@@ -152,3 +188,14 @@ if not DEBUG:
     X_FRAME_OPTIONS = 'DENY'
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+    # Google OAuth productionда HTTPS redirect ishlatadi
+    SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
+
+# ── CSRF TRUSTED ORIGINS ──────────────────────────
+CSRF_TRUSTED_ORIGINS = [
+    'https://edunify.online',
+    'https://www.edunify.online',
+    'https://*.onrender.com',
+    'https://*.railway.app',
+]

@@ -1,32 +1,512 @@
 {% extends 'base.html' %}
-{% load crispy_forms_tags %}
+{% load static %}
 
-{% block title %}Tizimga Kirish - Edunify{% endblock %}
+{% block title %}Kirish — Edunify{% endblock %}
+
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  /* ── Page ── */
+  .auth-page {
+    min-height: calc(100vh - var(--navbar-h, 64px) - 60px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+
+  /* ── Card ── */
+  .auth-card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 2.25rem 2rem;
+    box-shadow: 0 16px 48px rgba(11, 29, 58, 0.08);
+  }
+
+  /* ── Logo ── */
+  .auth-logo {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 1.85rem;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .auth-logo-img {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    object-fit: cover;
+    flex-shrink: 0;
+    display: block;
+  }
+
+  .auth-logo-divider {
+    width: 1.5px;
+    height: 22px;
+    background: var(--border-color);
+    margin: 0 12px;
+    flex-shrink: 0;
+    border-radius: 2px;
+  }
+
+  .auth-logo-name {
+    font-family: 'Space Grotesk', 'Outfit', sans-serif;
+    font-size: 1.32rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--color-primary);
+    line-height: 1;
+  }
+
+  /* ── Google button ── */
+  .btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    width: 100%;
+    padding: 0.7rem 1rem;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 11px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.15s;
+    font-family: 'Inter', sans-serif;
+    margin-bottom: 1.1rem;
+  }
+  .btn-google:hover {
+    border-color: var(--border-hover);
+    background: var(--bg-darker);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(11, 29, 58, 0.06);
+  }
+
+  /* ── Divider ── */
+  .auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.1rem;
+  }
+  .auth-divider::before,
+  .auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-color);
+  }
+  .auth-divider span {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  /* ── Field group ── */
+  .field-group { margin-bottom: 0.9rem; }
+
+  .field-group > label {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 0.38rem;
+  }
+
+  .field-wrap { position: relative; }
+
+  .auth-input {
+    display: block;
+    width: 100%;
+    padding: 0.68rem 0.9rem;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    border: 1.5px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+  }
+  .auth-input::placeholder {
+    color: var(--text-muted);
+    opacity: 0.55;
+  }
+  .auth-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 11%, transparent);
+    background: var(--bg-card);
+  }
+  .auth-input.is-invalid {
+    border-color: #ef4444;
+    box-shadow: none;
+  }
+  .auth-input.is-invalid:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+  }
+  .auth-input--pw { padding-right: 2.6rem; }
+
+  /* ── Password toggle ── */
+  .pw-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+    transition: color 0.15s;
+    border-radius: 4px;
+  }
+  .pw-toggle:hover { color: var(--color-primary); }
+  .pw-toggle:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 1px;
+  }
+
+  /* ── Error ── */
+  .field-error {
+    font-size: 0.76rem;
+    color: #dc2626;
+    margin-top: 0.3rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    line-height: 1.4;
+  }
+  .field-error i { margin-top: 1px; flex-shrink: 0; }
+
+  /* ── Non-field error ── */
+  .form-error-box {
+    background: rgba(239, 68, 68, 0.07);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 10px;
+    padding: 0.65rem 0.9rem;
+    font-size: 0.82rem;
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 0.85rem;
+  }
+
+  /* ── Submit ── */
+  .btn-submit {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.78rem;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+    color: #fff;
+    border: none;
+    border-radius: 11px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.2s, box-shadow 0.2s;
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    position: relative;
+  }
+  .btn-submit:hover:not(:disabled) {
+    opacity: 0.92;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(24, 90, 219, 0.26);
+  }
+  .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+  .btn-submit .btn-spinner {
+    display: none;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  .btn-submit.loading .btn-spinner { display: block; }
+  .btn-submit.loading .btn-label  { opacity: 0.6; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── Footer ── */
+  .auth-foot {
+    text-align: center;
+    margin-top: 1.1rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+  .auth-foot a {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .auth-foot a:hover { text-decoration: underline; }
+
+  /* ── Toast ── */
+  .g-toast {
+    position: fixed;
+    top: calc(var(--navbar-h, 64px) + 12px);
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 13px 14px;
+    min-width: 280px;
+    max-width: 320px;
+    box-shadow: 0 8px 28px rgba(11, 29, 58, 0.12);
+    opacity: 0;
+    transform: translateX(calc(100% + 24px));
+    transition: opacity 0.28s ease, transform 0.32s cubic-bezier(0.34, 1.4, 0.64, 1);
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .g-toast.show {
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+  .g-toast-icon {
+    flex-shrink: 0;
+    width: 34px;
+    height: 34px;
+    background: var(--bg-darker);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .g-toast-body { flex: 1; min-width: 0; }
+  .g-toast-title {
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 1px;
+    font-family: 'Outfit', sans-serif;
+  }
+  .g-toast-msg {
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+  .g-toast-close {
+    flex-shrink: 0;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 2px;
+    font-size: 1rem;
+    line-height: 1;
+    transition: color 0.15s;
+    align-self: flex-start;
+    border-radius: 4px;
+  }
+  .g-toast-close:hover { color: var(--text-main); }
+  .g-toast-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2.5px;
+    width: 100%;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+    transform-origin: left;
+    transform: scaleX(1);
+  }
+  .g-toast-bar.shrink {
+    transition: transform 3.5s linear;
+    transform: scaleX(0);
+  }
+
+  @media (max-width: 480px) {
+    .auth-card { padding: 1.75rem 1.25rem; }
+    .g-toast { right: 12px; left: 12px; max-width: none; min-width: 0; }
+  }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center py-5">
-    <div class="col-md-5">
-        <div class="glass-card">
-            <div class="text-center mb-4">
-                <i class="bi bi-shield-lock text-gradient display-4"></i>
-                <h3 class="mt-2 font-heading">Tizimga Kirish</h3>
-                <p class="text-muted small">Edunify online ta'lim tizimiga kiring</p>
-            </div>
-            
-            <form method="post" novalidate>
-                {% csrf_token %}
-                {{ form|crispy }}
-                <button type="submit" class="btn btn-purple w-100 py-3 mt-4">
-                    <i class="bi bi-box-arrow-in-right me-2"></i> Tizimga kirish
-                </button>
-            </form>
-            
-            <div class="text-center mt-4">
-                <p class="text-muted small mb-0">
-                    Hisobingiz yo'qmi? <a href="{% url 'register' %}" class="text-decoration-none text-gradient fw-bold">Ro'yxatdan o'ting</a>
-                </p>
-            </div>
-        </div>
+<div class="auth-page">
+  <div class="auth-card">
+
+    <!-- Logo -->
+    <div class="auth-logo">
+      <img class="auth-logo-img" src="{% static 'images/edunify-logo.jpg' %}" alt="">
+      <div class="auth-logo-divider" aria-hidden="true"></div>
+      <span class="auth-logo-name">Edunify</span>
     </div>
+
+    <!-- Google OAuth -->
+    <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn-google" aria-label="Google orqali kirish">
+      <svg width="18" height="18" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+        <path d="M43.6 20.5H42V20.4H24V27.6H35.2C33.6 32 29.2 35.2 24 35.2C17.4 35.2 12 29.8 12 23.2C12 16.6 17.4 11.2 24 11.2C27 11.2 29.8 12.4 31.8 14.2L36.8 9.2C33.6 6.4 29 4.4 24 4.4C13.4 4.4 4.8 13 4.8 23.6C4.8 34.2 13.4 42.8 24 42.8C34.6 42.8 43.2 34.2 43.2 23.6C43.2 22.5 43 21.5 43.6 20.5Z" fill="#FFC107"/>
+        <path d="M7.2 15.2L13 19.4C14.6 15.4 18.8 12.6 24 12.6C27 12.6 29.8 13.8 31.8 15.6L36.8 10.6C33.6 7.8 29 6 24 6C16.6 6 10.2 9.8 7.2 15.2Z" fill="#FF3D00"/>
+        <path d="M24 42.8C28.8 42.8 33.2 41 36.4 38.2L30.8 33.6C29 34.8 26.6 35.6 24 35.6C19 35.6 14.6 32.4 13 27.8L7 32.2C10 37.8 16.4 42.8 24 42.8Z" fill="#4CAF50"/>
+        <path d="M43.6 20.5H42V20.4H24V27.6H35.2C34.4 29.8 33 31.6 31 32.8L36.6 37.4C36.2 37.8 43.2 32.6 43.2 23.6C43.2 22.5 43 21.5 43.6 20.5Z" fill="#1976D2"/>
+      </svg>
+      Google orqali kirish
+    </a>
+
+    <div class="auth-divider"><span>yoki</span></div>
+
+    <!-- Non-field errors (wrong credentials) -->
+    {% if form.non_field_errors %}
+      {% for e in form.non_field_errors %}
+        <div class="form-error-box">
+          <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>{{ e }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post" id="loginForm">
+      {% csrf_token %}
+
+      <!-- Identifier: username or email -->
+      <div class="field-group">
+        <label for="id_identifier">Foydalanuvchi nomi yoki email</label>
+        <div class="field-wrap">
+          <input class="auth-input {% if form.identifier.errors %}is-invalid{% endif %}"
+            type="text" name="identifier" id="id_identifier"
+            value="{{ form.identifier.value|default:'' }}"
+            placeholder="username yoki email"
+            autocomplete="username"
+            required>
+        </div>
+        {% for e in form.identifier.errors %}
+          <div class="field-error"><i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>{{ e }}</div>
+        {% endfor %}
+      </div>
+
+      <!-- Password -->
+      <div class="field-group">
+        <label for="id_password">Parol</label>
+        <div class="field-wrap">
+          <input class="auth-input auth-input--pw {% if form.password.errors %}is-invalid{% endif %}"
+            type="password" name="password" id="id_password"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            required>
+          <button type="button" class="pw-toggle" onclick="togglePw('id_password', this)"
+            tabindex="-1" aria-label="Parolni ko'rsatish/yashirish">
+            <i class="bi bi-eye" aria-hidden="true"></i>
+          </button>
+        </div>
+        {% for e in form.password.errors %}
+          <div class="field-error"><i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>{{ e }}</div>
+        {% endfor %}
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">
+        <div class="btn-spinner" aria-hidden="true"></div>
+        <span class="btn-label">Kirish</span>
+      </button>
+    </form>
+
+    <p class="auth-foot">
+      Hisobingiz yo'qmi? <a href="{% url 'register' %}">Ro'yxatdan o'tish</a>
+    </p>
+  </div>
 </div>
+
+<!-- Toast -->
+<div class="g-toast" id="gToast" role="status" aria-live="polite" aria-atomic="true">
+  <div class="g-toast-icon" aria-hidden="true">
+    <svg width="18" height="18" viewBox="0 0 48 48" fill="none">
+      <path d="M43.6 20.5H42V20.4H24V27.6H35.2C33.6 32 29.2 35.2 24 35.2C17.4 35.2 12 29.8 12 23.2C12 16.6 17.4 11.2 24 11.2C27 11.2 29.8 12.4 31.8 14.2L36.8 9.2C33.6 6.4 29 4.4 24 4.4C13.4 4.4 4.8 13 4.8 23.6C4.8 34.2 13.4 42.8 24 42.8C34.6 42.8 43.2 34.2 43.2 23.6C43.2 22.5 43 21.5 43.6 20.5Z" fill="#FFC107"/>
+      <path d="M7.2 15.2L13 19.4C14.6 15.4 18.8 12.6 24 12.6C27 12.6 29.8 13.8 31.8 15.6L36.8 10.6C33.6 7.8 29 6 24 6C16.6 6 10.2 9.8 7.2 15.2Z" fill="#FF3D00"/>
+      <path d="M24 42.8C28.8 42.8 33.2 41 36.4 38.2L30.8 33.6C29 34.8 26.6 35.6 24 35.6C19 35.6 14.6 32.4 13 27.8L7 32.2C10 37.8 16.4 42.8 24 42.8Z" fill="#4CAF50"/>
+      <path d="M43.6 20.5H42V20.4H24V27.6H35.2C34.4 29.8 33 31.6 31 32.8L36.6 37.4C36.2 37.8 43.2 32.6 43.2 23.6C43.2 22.5 43 21.5 43.6 20.5Z" fill="#1976D2"/>
+    </svg>
+  </div>
+  <div class="g-toast-body">
+    <div class="g-toast-title">Tez orada!</div>
+    <div class="g-toast-msg">Google login hozirda ishlab chiqilmoqda.</div>
+  </div>
+  <button class="g-toast-close" onclick="closeToast()" aria-label="Yopish">
+    <i class="bi bi-x" aria-hidden="true"></i>
+  </button>
+  <div class="g-toast-bar" id="gBar"></div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  'use strict';
+
+  /* navbar height */
+  var nav = document.querySelector('nav') || document.querySelector('.glass-nav');
+  if (nav) document.documentElement.style.setProperty('--navbar-h', nav.offsetHeight + 'px');
+
+  /* Toast */
+  var toast = document.getElementById('gToast');
+  var bar   = document.getElementById('gBar');
+  var timer;
+
+  document.getElementById('googleBtn').addEventListener('click', function () {
+    bar.classList.remove('shrink');
+    bar.style.transition = 'none';
+    void bar.offsetWidth;
+    toast.classList.add('show');
+    requestAnimationFrame(function () { bar.classList.add('shrink'); });
+    clearTimeout(timer);
+    timer = setTimeout(closeToast, 3500);
+  });
+
+  window.closeToast = function () {
+    toast.classList.remove('show');
+    clearTimeout(timer);
+  };
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeToast();
+  });
+
+  /* Password toggle */
+  window.togglePw = function (id, btn) {
+    var inp = document.getElementById(id);
+    var ic  = btn.querySelector('i');
+    var hidden = inp.type === 'password';
+    inp.type = hidden ? 'text' : 'password';
+    ic.classList.toggle('bi-eye',       !hidden);
+    ic.classList.toggle('bi-eye-slash',  hidden);
+    btn.setAttribute('aria-label', hidden ? 'Parolni yashirish' : "Parolni ko'rsatish");
+  };
+
+  /* Submit loading */
+  var form = document.getElementById('loginForm');
+  var btn  = document.getElementById('submitBtn');
+
+  form.addEventListener('submit', function () {
+    if (form.checkValidity()) {
+      btn.classList.add('loading');
+      btn.disabled = true;
+    }
+  });
+
+  window.addEventListener('pageshow', function () {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  });
+}());
+</script>
 {% endblock %}

@@ -15,6 +15,10 @@ services:
           property: connectionString
       - key: GEMINI_API_KEY
         sync: false          # Render dashboarddan qo'lda kiritiladi
+      - key: GOOGLE_OAUTH2_KEY
+        sync: false          # Render dashboarddan qo'lda kiritiladi
+      - key: GOOGLE_OAUTH2_SECRET
+        sync: false          # Render dashboarddan qo'lda kiritiladi
 
 databases:
   - name: edunify-db

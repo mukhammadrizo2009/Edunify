@@ -10,11 +10,11 @@ def register_view(request):
     if request.user.is_authenticated:
         return redirect('dashboard')
     if request.method == 'POST':
-        form = RegisterForm(request.POST, request.FILES)
+        form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, 'Muvaffaqiyatli ro\'yxatdan o\'tdingiz!')
+            messages.success(request, 'Muvaffaqiyatli ro\'yxatdan o\'tdingiz! Xush kelibsiz 🎉')
             return redirect('dashboard')
     else:
         form = RegisterForm()
@@ -26,14 +26,24 @@ def login_view(request):
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            user = authenticate(request, username=username, password=password)
-            if user:
+            identifier = form.cleaned_data['identifier'].strip()
+            password   = form.cleaned_data['password']
+
+            # Try username first, then email
+            user = authenticate(request, username=identifier, password=password)
+            if user is None:
+                # Try by email
+                try:
+                    matched = CustomUser.objects.get(email__iexact=identifier)
+                    user = authenticate(request, username=matched.username, password=password)
+                except CustomUser.DoesNotExist:
+                    user = None
+
+            if user is not None:
                 login(request, user)
                 return redirect('dashboard')
             else:
-                messages.error(request, 'Username yoki parol noto\'g\'ri!')
+                form.add_error(None, 'Username/email yoki parol noto\'g\'ri.')
     else:
         form = LoginForm()
     return render(request, 'users/login.html', {'form': form})

@@ -9,6 +9,7 @@ urlpatterns = [
     path('users/', include('users.urls')),
     path('quiz/', include('quiz.urls')),
     path('ai/', include('ai_assistant.urls')),
+    path('auth/', include('social_django.urls', namespace='social')),  # Google OAuth
 ]
 
 if settings.DEBUG:
