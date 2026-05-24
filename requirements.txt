@@ -1,0 +1,10 @@
+django==5.0
+pillow
+python-dotenv
+google-genai
+django-crispy-forms
+crispy-bootstrap5
+gunicorn
+whitenoise
+psycopg2-binary
+dj-database-url

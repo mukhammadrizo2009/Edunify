@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Kurslar — Edunify{% endblock %}
+
+{% block content %}
+<!-- Page header -->
+<div class="text-center mb-5">
+    <div class="lp-section-label mb-2">O'quv dasturi</div>
+    <h1 class="lp-section-title mb-2">Bizning Kurslarimiz</h1>
+    <p class="text-muted">Maktab fanlari bo'yicha eng sara va qiziqarli darslar to'plami.</p>
+</div>
+
+<!-- Category filters -->
+<div class="d-flex flex-wrap justify-content-center gap-2 mb-5">
+    <a href="{% url 'course_list' %}"
+       class="btn-filter {% if not request.GET.category %}active{% endif %}">
+        📂 Barchasi
+    </a>
+    {% for cat in categories %}
+        <a href="?category={{ cat.pk }}"
+           class="btn-filter {% if request.GET.category == cat.pk|stringformat:'i' %}active{% endif %}">
+            {{ cat.icon }} {{ cat.name }}
+        </a>
+    {% endfor %}
+</div>
+
+<!-- Courses grid -->
+<div class="row g-4">
+    {% if courses %}
+        {% for course in courses %}
+            <div class="col-md-6 col-lg-4">
+                <div class="glass-card h-100 d-flex flex-column p-0 overflow-hidden" style="min-height: 360px;">
+
+                    <!-- Thumbnail -->
+                    <div class="position-relative" style="height: 175px; flex-shrink: 0;">
+                        {% if course.thumbnail %}
+                            <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}"
+                                 class="w-100 h-100" style="object-fit: cover;">
+                        {% else %}
+                            <div class="w-100 h-100 d-flex align-items-center justify-content-center course-thumb-placeholder">
+                                <i class="bi bi-journal-code" style="font-size: 3rem; color: var(--color-primary); opacity: .6;"></i>
+                            </div>
+                        {% endif %}
+                        <span class="position-absolute top-0 start-0 m-3 badge"
+                              style="background: var(--glass-bg); backdrop-filter: blur(8px);
+                                     border: 1px solid var(--border-color); color: var(--text-main);
+                                     padding: .35rem .7rem; border-radius: 8px; font-size: .72rem;">
+                            {{ course.category.name }}
+                        </span>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="p-4 flex-grow-1 d-flex flex-column justify-content-between">
+                        <div>
+                            <h4 class="font-heading mb-2" style="font-size: 1.05rem;">
+                                {% if lang == 'tj' and course.title_tj %}{{ course.title_tj }}
+                                {% elif lang == 'ru' and course.title_ru %}{{ course.title_ru }}
+                                {% elif lang == 'en' and course.title_en %}{{ course.title_en }}
+                                {% else %}{{ course.title }}{% endif %}
+                            </h4>
+                            <p class="text-muted small mb-0">
+                                {% if lang == 'tj' and course.description_tj %}{{ course.description_tj|truncatewords:14 }}
+                                {% elif lang == 'ru' and course.description_ru %}{{ course.description_ru|truncatewords:14 }}
+                                {% elif lang == 'en' and course.description_en %}{{ course.description_en|truncatewords:14 }}
+                                {% else %}{{ course.description|truncatewords:14 }}{% endif %}
+                            </p>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="d-flex align-items-center justify-content-between pt-3 mt-3"
+                             style="border-top: 1px solid var(--border-color);">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-person-circle text-gradient"></i>
+                                <span class="text-muted small">{{ course.teacher.username }}</span>
+                            </div>
+                            <a href="{% url 'course_detail' course.pk %}"
+                               class="btn btn-sm btn-purple rounded-pill px-3">O'rganish</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12 text-center py-5">
+            <i class="bi bi-emoji-frown display-3 text-muted d-block mb-3"></i>
+            <h5 class="text-muted">Hozircha bu kategoriya bo'yicha kurslar mavjud emas.</h5>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

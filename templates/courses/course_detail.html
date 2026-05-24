@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ course.title }} - Edunify{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Course Info Card -->
+    <div class="col-lg-8">
+        <div class="glass-card mb-4">
+            <span class="badge bg-purple-glow mb-3">{{ course.category.name }}</span>
+            <h1 class="font-heading text-gradient mb-3">
+                {% if lang == 'tj' and course.title_tj %}{{ course.title_tj }}
+                {% elif lang == 'ru' and course.title_ru %}{{ course.title_ru }}
+                {% elif lang == 'en' and course.title_en %}{{ course.title_en }}
+                {% else %}{{ course.title }}{% endif %}
+            </h1>
+            
+            <p class="text-muted leading-relaxed">
+                {% if lang == 'tj' and course.description_tj %}{{ course.description_tj }}
+                {% elif lang == 'ru' and course.description_ru %}{{ course.description_ru }}
+                {% elif lang == 'en' and course.description_en %}{{ course.description_en }}
+                {% else %}{{ course.description }}{% endif %}
+            </p>
+            
+            <div class="row pt-3 mt-4 g-3" style="border-top: 1px solid var(--border-color);">
+                <div class="col-6 col-md-3">
+                    <div class="text-muted small">Muallif</div>
+                    <div class="fw-bold"><i class="bi bi-person-fill me-1"></i> {{ course.teacher.username }}</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="text-muted small">Darslar soni</div>
+                    <div class="fw-bold"><i class="bi bi-play-circle-fill me-1"></i> {{ course.get_lessons_count }} ta</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="text-muted small">Yozilganlar</div>
+                    <div class="fw-bold"><i class="bi bi-people-fill me-1"></i> {{ course.get_enrolled_count }} o'quvchi</div>
+                </div>
+                <div class="col-6 col-md-3">
+                    <div class="text-muted small">Yaratilgan sana</div>
+                    <div class="fw-bold"><i class="bi bi-calendar-event me-1"></i> {{ course.created_at|date:"d.m.Y" }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lessons List -->
+        <div class="glass-card">
+            <h3 class="font-heading mb-4"><i class="bi bi-list-stars me-2 text-gradient"></i> Kurs Darslari</h3>
+            {% if lessons %}
+                <div class="list-group list-group-flush bg-transparent">
+                    {% for lesson in lessons %}
+                        <div class="list-group-item bg-transparent border-secondary py-3 px-0 d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="badge bg-darker border border-secondary text-muted rounded-circle p-2" style="width: 35px; height: 35px; display: inline-flex; align-items: center; justify-content: center;">
+                                    {{ forloop.counter }}
+                                </span>
+                                <div>
+                                    <h5 class="mb-0">
+                                        {% if lang == 'tj' and lesson.title_tj %}{{ lesson.title_tj }}
+                                        {% elif lang == 'ru' and lesson.title_ru %}{{ lesson.title_ru }}
+                                        {% elif lang == 'en' and lesson.title_en %}{{ lesson.title_en }}
+                                        {% else %}{{ lesson.title }}{% endif %}
+                                    </h5>
+                                </div>
+                            </div>
+                            
+                            {% if is_enrolled %}
+                                <a href="{% url 'lesson_detail' lesson.pk %}" class="btn btn-purple btn-sm">O'qish <i class="bi bi-arrow-right-short ms-1"></i></a>
+                            {% else %}
+                                <span class="text-muted"><i class="bi bi-lock-fill"></i> Qulflangan</span>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-muted text-center py-4">Bu kursga darslar hali qo'shilmagan.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Sidebar action -->
+    <div class="col-lg-4">
+        <div class="glass-card text-center sticky-top" style="top: 90px; z-index: 1;">
+            {% if course.thumbnail %}
+                <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="w-100 rounded-3 mb-4" style="max-height: 200px; object-fit: cover;">
+            {% else %}
+                <div class="w-100 rounded-3 mb-4 py-5 d-flex align-items-center justify-content-center bg-darker border border-secondary">
+                    <i class="bi bi-journal-code display-1 text-muted"></i>
+                </div>
+            {% endif %}
+            
+            {% if is_enrolled %}
+                <div class="alert alert-success mb-0 rounded-3">
+                    <i class="bi bi-patch-check-fill me-2"></i> Siz ushbu kursga yozilgansiz!
+                </div>
+            {% else %}
+                <h4 class="mb-3">Bepul Qatnashish</h4>
+                <p class="text-muted small mb-4">Hoziroq darslarga a'zo bo'ling va o'rganishni boshlang!</p>
+                <a href="{% url 'enroll' course.pk %}" class="btn btn-purple w-100 py-3 font-heading fs-5">
+                    <i class="bi bi-pencil-square me-2"></i> Kursga A'zo Bo'lish
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

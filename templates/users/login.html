@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Tizimga Kirish - Edunify{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-5">
+    <div class="col-md-5">
+        <div class="glass-card">
+            <div class="text-center mb-4">
+                <i class="bi bi-shield-lock text-gradient display-4"></i>
+                <h3 class="mt-2 font-heading">Tizimga Kirish</h3>
+                <p class="text-muted small">Edunify online ta'lim tizimiga kiring</p>
+            </div>
+            
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button type="submit" class="btn btn-purple w-100 py-3 mt-4">
+                    <i class="bi bi-box-arrow-in-right me-2"></i> Tizimga kirish
+                </button>
+            </form>
+            
+            <div class="text-center mt-4">
+                <p class="text-muted small mb-0">
+                    Hisobingiz yo'qmi? <a href="{% url 'register' %}" class="text-decoration-none text-gradient fw-bold">Ro'yxatdan o'ting</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

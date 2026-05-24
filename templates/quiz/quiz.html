@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ quiz.title }} - Edunify{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-lg-8">
+        <div class="glass-card">
+            <div class="text-center mb-4">
+                <i class="bi bi-question-circle text-gradient display-4"></i>
+                <h2 class="font-heading mt-2">{{ quiz.title }}</h2>
+                <p class="text-muted small">Barcha savollarga javob bering va natijangizni tekshiring.</p>
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="start_time" value="{{ start_time }}">
+                
+                {% for question in questions %}
+                    <div class="mb-5 border-bottom border-secondary pb-4">
+                        <h5 class="mb-3 font-heading">
+                            {{ forloop.counter }}-Savol: 
+                            {% if lang == 'tj' and question.text_tj %}{{ question.text_tj }}
+                            {% elif lang == 'ru' and question.text_ru %}{{ question.text_ru }}
+                            {% elif lang == 'en' and question.text_en %}{{ question.text_en }}
+                            {% else %}{{ question.text }}{% endif %}
+                        </h5>
+                        
+                        <div class="quiz-options-group">
+                            <label class="quiz-option">
+                                <input type="radio" name="question_{{ question.id }}" value="A" required>
+                                <span>A) {{ question.option_a }}</span>
+                            </label>
+                            
+                            <label class="quiz-option">
+                                <input type="radio" name="question_{{ question.id }}" value="B" required>
+                                <span>B) {{ question.option_b }}</span>
+                            </label>
+                            
+                            <label class="quiz-option">
+                                <input type="radio" name="question_{{ question.id }}" value="C" required>
+                                <span>C) {{ question.option_c }}</span>
+                            </label>
+                            
+                            <label class="quiz-option">
+                                <input type="radio" name="question_{{ question.id }}" value="D" required>
+                                <span>D) {{ question.option_d }}</span>
+                            </label>
+                        </div>
+                    </div>
+                {% endfor %}
+                
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-purple btn-lg px-5 py-3 font-heading">
+                        <i class="bi bi-send-check me-2"></i> Javoblarni Yuborish
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const options = document.querySelectorAll(".quiz-option");
+        
+        options.forEach(option => {
+            const radio = option.querySelector('input[type="radio"]');
+            
+            // Option ustiga bosilganda tanlash
+            option.addEventListener("click", function() {
+                const group = option.closest(".quiz-options-group");
+                group.querySelectorAll(".quiz-option").forEach(opt => {
+                    opt.classList.remove("selected");
+                });
+                
+                option.classList.add("selected");
+            });
+            
+            if (radio.checked) {
+                option.classList.add("selected");
+            }
+        });
+    });
+</script>
+{% endblock %}

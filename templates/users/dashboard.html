@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Boshqaruv Paneli — Edunify{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+
+    <!-- ── PROFIL KARTASI ── -->
+    <div class="col-lg-4">
+        <div class="glass-card text-center py-5 h-100">
+            {% if user.avatar %}
+                <img src="{{ user.avatar.url }}" alt="avatar"
+                     class="rounded-circle mb-3 border border-purple border-3 shadow"
+                     style="width: 110px; height: 110px; object-fit: cover;">
+            {% else %}
+                <div class="d-inline-flex p-4 rounded-circle bg-purple-glow mb-3">
+                    <i class="bi bi-person-circle display-4" style="color:#fff;"></i>
+                </div>
+            {% endif %}
+
+            <h3 class="font-heading mb-1">{{ user.username }}</h3>
+            <span class="badge bg-purple-glow text-white mb-3 px-3 py-2 rounded-pill">
+                {{ user.get_role_display }}
+            </span>
+            <p class="text-muted small px-3 mb-4">
+                {% if user.bio %}{{ user.bio }}{% else %}Bio ma'lumotlar qo'shilmagan.{% endif %}
+            </p>
+
+            <div class="border-top pt-3 mt-3 text-start px-3" style="border-color: var(--border-color) !important;">
+                {% if user.phone %}
+                    <div class="text-muted small mb-2">
+                        <i class="bi bi-telephone-fill me-2 text-gradient"></i> {{ user.phone }}
+                    </div>
+                {% endif %}
+                <div class="text-muted small mb-2">
+                    <i class="bi bi-envelope-fill me-2 text-gradient"></i> {{ user.email }}
+                </div>
+                <div class="text-muted small">
+                    <i class="bi bi-calendar-event-fill me-2 text-gradient"></i>
+                    Qo'shilgan sana: {{ user.date_joined|date:"d.m.Y" }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── ASOSIY KONTENT ── -->
+    <div class="col-lg-8">
+
+        <!-- Kurslar -->
+        <div class="glass-card mb-4">
+            <h4 class="font-heading mb-4">
+                <i class="bi bi-book-half me-2 text-gradient"></i> Mening Kurslarim
+            </h4>
+
+            {% if enrolled_courses %}
+                <div class="row g-3">
+                    {% for enrollment in enrolled_courses %}
+                        <div class="col-md-6">
+                            <div class="h-100 d-flex flex-column justify-content-between p-3 rounded-3"
+                                 style="background: var(--bg-darker); border: 1px solid var(--border-color);">
+                                <div>
+                                    <h5 class="mb-1" style="font-size: 1rem;">{{ enrollment.course.title }}</h5>
+                                    <p class="text-muted small mb-3">
+                                        {{ enrollment.course.description|truncatewords:15 }}
+                                    </p>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge bg-dark">{{ enrollment.course.category.name }}</span>
+                                    <a href="{% url 'course_detail' enrollment.course.pk %}"
+                                       class="btn btn-sm btn-outline-purple">Darslarga o'tish</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-journal-x display-4 text-muted d-block mb-3"></i>
+                    <p class="text-muted mb-3">Siz hali birorta kursga yozilmagansiz.</p>
+                    <a href="{% url 'course_list' %}" class="btn btn-purple rounded-pill px-4">
+                        Kurslarni o'rganish
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Test natijalari -->
+        <div class="glass-card">
+            <h4 class="font-heading mb-4">
+                <i class="bi bi-journal-check me-2 text-gradient"></i> Oxirgi Test Natijalari
+            </h4>
+
+            {% if recent_results %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Test</th>
+                                <th>Natija</th>
+                                <th>Foiz</th>
+                                <th>Holat</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in recent_results %}
+                                <tr>
+                                    <td class="fw-medium">{{ result.quiz.title }}</td>
+                                    <td>{{ result.score }} / {{ result.total_questions }}</td>
+                                    <td>
+                                        <span class="fw-bold {% if result.get_percentage >= 60 %}text-success{% else %}text-danger{% endif %}">
+                                            {{ result.get_percentage }}%
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if result.is_passed %}
+                                            <span class="badge rounded-pill" style="background: rgba(16,185,129,.15); color: #10b981; border: 1px solid rgba(16,185,129,.3);">
+                                                <i class="bi bi-check-circle me-1"></i> O'tdi
+                                            </span>
+                                        {% else %}
+                                            <span class="badge rounded-pill" style="background: rgba(239,68,68,.12); color: #ef4444; border: 1px solid rgba(239,68,68,.2);">
+                                                <i class="bi bi-x-circle me-1"></i> Yiqildi
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'quiz_result' result.pk %}"
+                                           class="btn btn-sm btn-outline-purple rounded-pill py-1 px-3">
+                                            <i class="bi bi-eye-fill me-1"></i> Natija
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-clipboard-x display-4 text-muted d-block mb-3"></i>
+                    <p class="text-muted">Siz hali test topshirmagansiz.</p>
+                </div>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,559 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}AI Muallim — Edunify{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── AI CHAT PAGE ── */
+.ai-page {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 1.5rem;
+  height: calc(100vh - 140px);
+  min-height: 550px;
+}
+
+/* Sidebar */
+.ai-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.ai-sidebar__header {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  border-radius: 16px;
+  padding: 1.5rem;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.ai-sidebar__header::before {
+  content: '';
+  position: absolute;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.1);
+  right: -30px; top: -30px;
+}
+.ai-sidebar__header::after {
+  content: '';
+  position: absolute;
+  width: 70px; height: 70px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.07);
+  right: 40px; bottom: -20px;
+}
+.ai-sidebar__avatar {
+  width: 52px; height: 52px;
+  border-radius: 14px;
+  background: rgba(255,255,255,.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: .75rem;
+  position: relative; z-index: 1;
+}
+.ai-sidebar__title {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: 0 0 .25rem;
+  position: relative; z-index: 1;
+}
+.ai-sidebar__status {
+  font-size: .78rem;
+  opacity: .85;
+  display: flex; align-items: center; gap: .4rem;
+  position: relative; z-index: 1;
+}
+.ai-status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #4ade80;
+  animation: pulseDotGreen 1.5s ease-in-out infinite;
+}
+@keyframes pulseDotGreen {
+  0%,100% { box-shadow: 0 0 0 0 rgba(74,222,128,.4); }
+  50%      { box-shadow: 0 0 0 5px rgba(74,222,128,0); }
+}
+
+/* Subjects */
+.ai-subjects { display: flex; flex-direction: column; gap: .4rem; }
+.ai-subjects__title {
+  font-size: .72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text-muted);
+  padding: 0 .25rem;
+  margin-bottom: .25rem;
+}
+.ai-subject-btn {
+  display: flex; align-items: center; gap: .6rem;
+  padding: .6rem .85rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-main);
+  font-size: .84rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .18s ease;
+  text-align: left;
+  width: 100%;
+}
+.ai-subject-btn:hover {
+  border-color: var(--color-primary);
+  background: color-mix(in srgb, var(--color-primary) 6%, var(--bg-card));
+  color: var(--color-primary);
+  transform: translateX(3px);
+}
+.ai-subject-btn .icon {
+  font-size: 1rem;
+  width: 20px; text-align: center;
+}
+
+/* Limit info */
+.ai-limit-info {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1rem;
+  font-size: .8rem;
+  color: var(--text-muted);
+  margin-top: auto;
+}
+.ai-limit-bar {
+  height: 5px;
+  border-radius: 999px;
+  background: var(--bg-darker);
+  margin: .6rem 0 .4rem;
+  overflow: hidden;
+}
+.ai-limit-bar__fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  width: 0%;
+  transition: width .6s ease;
+}
+
+/* ── CHAT PANEL ── */
+.ai-chat-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,.06);
+}
+.ai-chat-panel__header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.ai-chat-panel__messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  scroll-behavior: smooth;
+}
+.ai-chat-panel__messages::-webkit-scrollbar { width: 5px; }
+.ai-chat-panel__messages::-webkit-scrollbar-track { background: transparent; }
+.ai-chat-panel__messages::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 999px;
+}
+
+/* Messages */
+.ai-msg {
+  display: flex;
+  gap: .75rem;
+  align-items: flex-start;
+  animation: msgSlideIn .3s cubic-bezier(.22,1,.36,1) forwards;
+}
+@keyframes msgSlideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.ai-msg--user { flex-direction: row-reverse; }
+.ai-msg__avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .95rem;
+}
+.ai-msg--bot  .ai-msg__avatar {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  color: #fff;
+}
+.ai-msg--user .ai-msg__avatar {
+  background: var(--bg-darker);
+  color: var(--text-main);
+}
+.ai-msg__bubble {
+  max-width: 72%;
+  padding: .85rem 1.1rem;
+  border-radius: 18px;
+  font-size: .9rem;
+  line-height: 1.6;
+}
+.ai-msg--bot  .ai-msg__bubble {
+  background: var(--bg-darker);
+  color: var(--text-main);
+  border-bottom-left-radius: 5px;
+}
+.ai-msg--user .ai-msg__bubble {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  color: #fff;
+  border-bottom-right-radius: 5px;
+}
+.ai-msg__time {
+  font-size: .7rem;
+  color: var(--text-muted);
+  margin-top: .4rem;
+  display: block;
+}
+
+/* Typing indicator */
+.ai-typing {
+  display: flex; gap: 5px; align-items: center;
+  padding: .85rem 1.1rem;
+  background: var(--bg-darker);
+  border-radius: 18px;
+  border-bottom-left-radius: 5px;
+  width: fit-content;
+}
+.ai-typing span {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  animation: typingBounce .9s ease-in-out infinite;
+}
+.ai-typing span:nth-child(2) { animation-delay: .15s; }
+.ai-typing span:nth-child(3) { animation-delay: .3s; }
+@keyframes typingBounce {
+  0%,80%,100% { transform: translateY(0); opacity: .4; }
+  40%          { transform: translateY(-6px); opacity: 1; }
+}
+
+/* Input bar */
+.ai-input-bar {
+  padding: 1rem 1.5rem 1.25rem;
+  border-top: 1px solid var(--border-color);
+  flex-shrink: 0;
+  background: var(--bg-card);
+}
+.ai-input-wrap {
+  display: flex;
+  gap: .5rem;
+  align-items: flex-end;
+  background: var(--bg-darker);
+  border: 1.5px solid var(--border-color);
+  border-radius: 14px;
+  padding: .6rem .6rem .6rem 1rem;
+  transition: border-color .2s;
+}
+.ai-input-wrap:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 12%, transparent);
+}
+.ai-input-wrap textarea {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--text-main);
+  font-size: .92rem;
+  resize: none;
+  outline: none;
+  max-height: 120px;
+  line-height: 1.5;
+  font-family: 'Inter', sans-serif;
+}
+.ai-input-wrap textarea::placeholder { color: var(--text-muted); }
+.ai-send-btn {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  border: none;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform .15s, opacity .15s;
+}
+.ai-send-btn:hover  { transform: scale(1.08); }
+.ai-send-btn:active { transform: scale(.96); }
+.ai-send-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.ai-input-hint {
+  font-size: .72rem;
+  color: var(--text-muted);
+  margin-top: .5rem;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .ai-page { grid-template-columns: 1fr; height: auto; }
+  .ai-sidebar { flex-direction: row; flex-wrap: wrap; }
+  .ai-sidebar__header { flex: 1; min-width: 200px; }
+  .ai-subjects { flex-direction: row; flex-wrap: wrap; flex: 2; }
+  .ai-subject-btn { flex: 1; min-width: 120px; }
+  .ai-chat-panel { min-height: 500px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+{% load static %}
+<div class="ai-page py-2">
+
+  <!-- ── SIDEBAR ── -->
+  <aside class="ai-sidebar">
+    <!-- Header card -->
+    <div class="ai-sidebar__header">
+      <div class="ai-sidebar__avatar">🤖</div>
+      <p class="ai-sidebar__title">AI Muallim</p>
+      <div class="ai-sidebar__status">
+        <span class="ai-status-dot"></span> Faol va tayyorl
+      </div>
+    </div>
+
+    <!-- Quick subjects -->
+    <div class="ai-subjects">
+      <div class="ai-subjects__title">Tez so'rash</div>
+      <button class="ai-subject-btn" data-question="Matematika bo'yicha yordam bering">
+        <span class="icon">📐</span> Matematika
+      </button>
+      <button class="ai-subject-btn" data-question="Fizika qonunlarini tushuntirib bering">
+        <span class="icon">⚡</span> Fizika
+      </button>
+      <button class="ai-subject-btn" data-question="Kimyo elementlari haqida so'rayman">
+        <span class="icon">🧪</span> Kimyo
+      </button>
+      <button class="ai-subject-btn" data-question="Biologiya bo'yicha savol bor">
+        <span class="icon">🌿</span> Biologiya
+      </button>
+      <button class="ai-subject-btn" data-question="Tarix bo'yicha savol bermoqchiman">
+        <span class="icon">📜</span> Tarix
+      </button>
+      <button class="ai-subject-btn" data-question="Ingliz tili grammatikasidan savol">
+        <span class="icon">🇬🇧</span> Ingliz tili
+      </button>
+    </div>
+
+    <!-- Rate limit info -->
+    <div class="ai-limit-info">
+      <div style="font-weight:600; color:var(--text-main); margin-bottom:.25rem;">
+        Kunlik limit
+      </div>
+      <div class="ai-limit-bar">
+        <div class="ai-limit-bar__fill" id="limitBar" style="width:0%"></div>
+      </div>
+      <span id="limitText">Minutiga 5 ta so'rov</span>
+    </div>
+  </aside>
+
+  <!-- ── CHAT PANEL ── -->
+  <div class="ai-chat-panel">
+    <!-- Header -->
+    <div class="ai-chat-panel__header">
+      <div class="d-flex align-items-center gap-2">
+        <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--color-primary),var(--color-accent));display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem;">🤖</div>
+        <div>
+          <div style="font-weight:700;font-size:.95rem;font-family:'Outfit',sans-serif;">AI Muallim</div>
+          <div style="font-size:.75rem;color:#4ade80;display:flex;align-items:center;gap:.3rem;">
+            <span class="ai-status-dot" style="width:6px;height:6px;"></span> Online
+          </div>
+        </div>
+      </div>
+      <button id="clearChatBtn" class="btn btn-sm rounded-pill px-3"
+              style="border:1px solid var(--border-color);background:var(--bg-darker);color:var(--text-muted);font-size:.78rem;">
+        <i class="bi bi-trash3 me-1"></i> Tozalash
+      </button>
+    </div>
+
+    <!-- Messages -->
+    <div class="ai-chat-panel__messages" id="chatMessages">
+      <!-- Welcome message -->
+      <div class="ai-msg ai-msg--bot" id="welcomeMsg">
+        <div class="ai-msg__avatar">🤖</div>
+        <div>
+          <div class="ai-msg__bubble">
+            Salom, <strong>{{ user.username }}</strong>! Men Edunify AI Muallimman 👋<br><br>
+            Matematika, Fizika, Kimyo, Biologiya, Tarix va boshqa ta'lim fanlaridan savolingizni bering — darhol javob beraman!<br><br>
+            <em style="font-size:.82rem;opacity:.8;">Maslahat: Savolni aniq va to'liq yozing.</em>
+          </div>
+          <span class="ai-msg__time">Hozir</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input bar -->
+    <div class="ai-input-bar">
+      <div class="ai-input-wrap">
+        <textarea id="aiInput" rows="1"
+          placeholder="Savolingizni yozing... (Shift+Enter — yangi qator, Enter — yuborish)"></textarea>
+        <button class="ai-send-btn" id="aiSendBtn" aria-label="Yuborish">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" fill="currentColor"/>
+          </svg>
+        </button>
+      </div>
+      <p class="ai-input-hint">
+        <i class="bi bi-shield-check me-1"></i>
+        AI faqat ta'lim mavzularida javob beradi · Xavfsiz va nazorat qilingan
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const messagesEl  = document.getElementById('chatMessages');
+  const inputEl     = document.getElementById('aiInput');
+  const sendBtn     = document.getElementById('aiSendBtn');
+  const clearBtn    = document.getElementById('clearChatBtn');
+  const limitBar    = document.getElementById('limitBar');
+  const limitText   = document.getElementById('limitText');
+  const csrfToken   = document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '';
+
+  let requestCount = 0;
+  const MAX_REQUESTS = 5;
+
+  function getTime() {
+    return new Date().toLocaleTimeString('uz-UZ', {hour:'2-digit', minute:'2-digit'});
+  }
+
+  function appendMessage(role, html) {
+    const isBot = role === 'bot';
+    const div = document.createElement('div');
+    div.className = `ai-msg ai-msg--${role}`;
+    div.innerHTML = `
+      <div class="ai-msg__avatar">${isBot ? '🤖' : '👤'}</div>
+      <div>
+        <div class="ai-msg__bubble">${html}</div>
+        <span class="ai-msg__time">${getTime()}</span>
+      </div>`;
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function showTyping() {
+    const el = document.createElement('div');
+    el.className = 'ai-msg ai-msg--bot';
+    el.id = 'typingIndicator';
+    el.innerHTML = `
+      <div class="ai-msg__avatar">🤖</div>
+      <div class="ai-typing"><span></span><span></span><span></span></div>`;
+    messagesEl.appendChild(el);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function removeTyping() {
+    document.getElementById('typingIndicator')?.remove();
+  }
+
+  function updateLimit() {
+    const pct = (requestCount / MAX_REQUESTS) * 100;
+    limitBar.style.width = pct + '%';
+    limitBar.style.background = requestCount >= MAX_REQUESTS
+      ? 'linear-gradient(90deg,#f87171,#ef4444)'
+      : 'linear-gradient(90deg,var(--color-primary),var(--color-accent))';
+    limitText.textContent = requestCount >= MAX_REQUESTS
+      ? '⚠️ Limit tugadi, 1 daqiqa kuting'
+      : `${MAX_REQUESTS - requestCount} ta so'rov qoldi`;
+  }
+
+  async function sendMessage() {
+    const question = inputEl.value.trim();
+    if (!question) return;
+    if (requestCount >= MAX_REQUESTS) {
+      appendMessage('bot', '⏳ Minutiga 5 ta so\'rov limiti tugadi. Biroz kuting.');
+      return;
+    }
+
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    sendBtn.disabled = true;
+
+    appendMessage('user', question.replace(/</g,'&lt;').replace(/>/g,'&gt;'));
+    showTyping();
+    requestCount++;
+    updateLimit();
+
+    try {
+      const res = await fetch("{% url 'ai_chat' %}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': csrfToken
+        },
+        body: JSON.stringify({ question })
+      });
+      const data = await res.json();
+      removeTyping();
+      if (data.answer) {
+        const safe = data.answer
+          .replace(/</g,'&lt;').replace(/>/g,'&gt;')
+          .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+          .replace(/\n/g,'<br>');
+        appendMessage('bot', safe);
+      } else {
+        appendMessage('bot', '❌ ' + (data.error || 'Xato yuz berdi'));
+      }
+    } catch {
+      removeTyping();
+      appendMessage('bot', '❌ Tarmoq xatosi. Internet aloqangizni tekshiring.');
+    } finally {
+      sendBtn.disabled = false;
+      inputEl.focus();
+    }
+  }
+
+  // Auto-resize textarea
+  inputEl.addEventListener('input', function () {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+  });
+
+  // Send on Enter (Shift+Enter = new line)
+  inputEl.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  sendBtn.addEventListener('click', sendMessage);
+
+  // Quick subject buttons
+  document.querySelectorAll('.ai-subject-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+      inputEl.value = this.dataset.question;
+      inputEl.focus();
+      inputEl.style.height = 'auto';
+      inputEl.style.height = inputEl.scrollHeight + 'px';
+    });
+  });
+
+  // Clear chat
+  clearBtn.addEventListener('click', function () {
+    messagesEl.innerHTML = '';
+    requestCount = 0;
+    updateLimit();
+    appendMessage('bot', 'Suhbat tozalandi. Yangi savolingizni yozing! 😊');
+  });
+
+  updateLimit();
+  inputEl.focus();
+})();
+</script>
+{% endblock %}
