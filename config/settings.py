@@ -158,6 +158,12 @@ AUTHENTICATION_BACKENDS = (
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY    = os.getenv('GOOGLE_OAUTH2_KEY', '')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('GOOGLE_OAUTH2_SECRET', '')
 
+# Redirect URI'ni qo'lda belgilash (redirect_uri_mismatch xatosini tuzatadi)
+SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = os.getenv(
+    'GOOGLE_OAUTH2_REDIRECT_URI',
+    'https://edunify-yfv2.onrender.com/auth/complete/google-oauth2/'
+)
+
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
     'openid',
     'https://www.googleapis.com/auth/userinfo.email',
