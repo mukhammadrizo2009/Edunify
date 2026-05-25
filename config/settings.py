@@ -161,7 +161,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('GOOGLE_OAUTH2_SECRET', '')
 # Redirect URI'ni qo'lda belgilash (redirect_uri_mismatch xatosini tuzatadi)
 SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = os.getenv(
     'GOOGLE_OAUTH2_REDIRECT_URI',
-    'https://edunify.online/auth/complete/google-oauth2/'
+    'https://www.edunify.online/auth/complete/google-oauth2/'
 )
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
