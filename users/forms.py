@@ -3,6 +3,60 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser
 
 
+class ProfileEditForm(forms.ModelForm):
+    first_name = forms.CharField(
+        max_length=30,
+        required=False,
+        label='Ism',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Ismingizni kiriting',
+            'autocomplete': 'given-name',
+        })
+    )
+    last_name = forms.CharField(
+        max_length=150,
+        required=False,
+        label='Familiya',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Familiyangizni kiriting',
+            'autocomplete': 'family-name',
+        })
+    )
+    bio = forms.CharField(
+        required=False,
+        label='Bio',
+        widget=forms.Textarea(attrs={
+            'class': 'form-control',
+            'placeholder': "O'zingiz haqingizda qisqacha...",
+            'rows': 3,
+        })
+    )
+    phone = forms.CharField(
+        max_length=20,
+        required=False,
+        label='Telefon raqam',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': '+998 90 123 45 67',
+            'autocomplete': 'tel',
+        })
+    )
+    avatar = forms.ImageField(
+        required=False,
+        label='Profil rasmi',
+        widget=forms.ClearableFileInput(attrs={
+            'class': 'form-control',
+            'accept': 'image/*',
+        })
+    )
+
+    class Meta:
+        model = CustomUser
+        fields = ['first_name', 'last_name', 'bio', 'phone', 'avatar']
+
+
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(
         required=True,

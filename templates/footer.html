@@ -4,13 +4,25 @@
             <div class="col-md-6 mb-3 mb-md-0">
                 <span class="fs-4 fw-bold text-gradient font-heading">Edunify</span>
                 <p class="text-muted small mt-2 mb-0">
-                    Tojikiston maktab o'quvchilari uchun sun'iy intellekt (AI) bilan ta'minlangan zamonaviy ta'lim ekotizimi.
+                    {% if lang == 'ru' %}
+                        Современная образовательная экосистема на базе искусственного интеллекта для школьников Таджикистана.
+                    {% elif lang == 'tj' %}
+                        Экосистемаи муосири таълимӣ дар асоси зехни сунъӣ барои хонандагони мактабхои Точикистон.
+                    {% else %}
+                        A modern educational ecosystem powered by Artificial Intelligence (AI) for school students in Tajikistan.
+                    {% endif %}
                 </p>
             </div>
             <div class="col-md-6 text-md-end text-center">
-                <p class="mb-1 text-muted small">&copy; 2026 Edunify. Barcha huquqlar himoyalangan.</p>
+                <p class="mb-1 text-muted small">&copy; 2026 Edunify.
+                    {% if lang == 'ru' %}Все права защищены.
+                    {% elif lang == 'tj' %}Хамаи хукукхо химоя шудаанд.
+                    {% else %}All rights reserved.{% endif %}
+                </p>
                 <p class="small text-muted mb-0">
-                    "Yosh Dasturchi Olimpiadasi 2025" doirasida Muhammad Rizo tomonidan yaratilgan.
+                    {% if lang == 'ru' %}Создано Мухаммадом Ризо в рамках олимпиады «Молодой программист 2026».
+                    {% elif lang == 'tj' %}Сохташудаи Мухаммад Ризо дар доираи олимпиадаи «Барномасози Ҷавон 2026».
+                    {% else %}Created by Muhammad Rizo within the framework of the "Young Programmer Olympiad 2026".{% endif %}
                 </p>
             </div>
         </div>

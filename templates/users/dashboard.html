@@ -1,132 +1,797 @@
 {% extends 'base.html' %}
 
-{% block title %}Boshqaruv Paneli — Edunify{% endblock %}
+{% block title %}{% if lang == 'ru' %}Панель управления{% elif lang == 'tj' %}Панели идоракунӣ{% else %}Dashboard{% endif %} — Edunify{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── DASHBOARD SPECIFIC STYLES ── */
+.dashboard-wrapper {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+@media (max-width: 991px) {
+    .dashboard-wrapper { grid-template-columns: 1fr; }
+}
+
+/* Aside (chap ustun) */
+.dashboard-aside {
+    min-width: 0;
+    isolation: isolate;
+    position: sticky;
+    top: 80px;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+@media (max-width: 991px) {
+    .dashboard-aside { position: static; }
+}
+
+/* O'ng asosiy ustun */
+.dashboard-main {
+    min-width: 0;
+    z-index: 2;
+    position: relative;
+}
+
+/* ── PROFILE SIDEBAR ── */
+.profile-sidebar {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    overflow: hidden;
+    width: 100%;
+    transition: var(--theme-transition);
+}
+.profile-cover {
+    height: 90px;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+    position: relative;
+}
+.profile-cover::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.07'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+.profile-avatar-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: -46px;
+    padding: 0 24px;
+    position: relative;
+}
+.profile-avatar-wrap .avatar-img,
+.profile-avatar-wrap .avatar-placeholder {
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    border: 4px solid var(--bg-card);
+    object-fit: cover;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+    transition: transform 0.3s ease;
+}
+.profile-avatar-wrap .avatar-placeholder {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.4rem;
+    color: #fff;
+}
+.profile-body {
+    padding: 16px 24px 24px;
+    text-align: center;
+}
+.profile-fullname {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 2px;
+    line-height: 1.3;
+}
+.profile-username {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    display: block;
+}
+.profile-role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: linear-gradient(135deg, rgba(24,90,219,.15), rgba(14,165,233,.15));
+    border: 1px solid rgba(24,90,219,.25);
+    color: var(--color-primary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 999px;
+    margin-bottom: 14px;
+}
+.profile-bio {
+    font-size: 0.83rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 18px;
+    font-style: italic;
+}
+.profile-meta {
+    border-top: 1px solid var(--border-color);
+    padding-top: 16px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.profile-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+}
+.profile-meta-item i {
+    width: 30px;
+    height: 30px;
+    background: var(--bg-darker);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    color: var(--color-primary);
+    flex-shrink: 0;
+}
+.btn-edit-profile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    color: #fff !important;
+    border: none;
+    border-radius: 12px;
+    padding: 11px 20px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    text-decoration: none;
+    margin-top: 18px;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 14px rgba(24,90,219,.25);
+}
+.btn-edit-profile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(24,90,219,.35);
+    color: #fff !important;
+}
+.btn-logout-sidebar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    background: rgba(239, 68, 68, 0.08);
+    color: #ef4444 !important;
+    border: 1.5px solid rgba(239, 68, 68, 0.2);
+    border-radius: 12px;
+    padding: 10px 20px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+.btn-logout-sidebar:hover {
+    background: rgba(239, 68, 68, 0.14);
+    border-color: rgba(239, 68, 68, 0.4);
+    transform: translateY(-1px);
+    color: #ef4444 !important;
+}
+
+/* ── CUSTOM MODAL ── */
+.custom-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+.custom-modal-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+.custom-modal-box {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 40px 36px 32px;
+    max-width: 460px;
+    width: 92%;
+    text-align: center;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.25s ease;
+    opacity: 0;
+}
+.custom-modal-overlay.active .custom-modal-box {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+}
+.custom-modal-icon {
+    font-size: 3rem;
+    line-height: 1;
+    margin-bottom: 16px;
+}
+.custom-modal-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 10px;
+}
+.custom-modal-desc {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 16px;
+}
+.custom-modal-desc strong { color: var(--text-main); }
+.custom-modal-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.8rem;
+    color: #b45309;
+    text-align: left;
+    margin-bottom: 24px;
+}
+[data-theme="dark"] .custom-modal-info { color: #fbbf24; }
+.custom-modal-info i { flex-shrink: 0; margin-top: 1px; font-size: 0.9rem; }
+.custom-modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+@media (max-width: 400px) {
+    .custom-modal-actions { flex-direction: column; }
+}
+.custom-modal-cancel {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;
+    background: var(--bg-darker);
+    border: 1.5px solid var(--border-color);
+    color: var(--text-muted) !important;
+    border-radius: 12px;
+    padding: 13px 24px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Inter', sans-serif;
+    min-width: 0;
+}
+.custom-modal-cancel:hover {
+    border-color: var(--border-hover);
+    color: var(--text-main) !important;
+    background: var(--bg-card);
+}
+.custom-modal-confirm {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;
+    background: linear-gradient(135deg, #f59e0b, #ea580c);
+    color: #fff !important;
+    border: none;
+    border-radius: 12px;
+    padding: 13px 24px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+    font-family: 'Inter', sans-serif;
+    min-width: 0;
+}
+.custom-modal-confirm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(245, 158, 11, 0.4);
+}
+
+/* ── O'QITUVCHI UPGRADE CARD (alohida) ── */
+.teacher-upgrade-card {
+    margin-top: 16px;
+    background: var(--bg-card);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 18px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: var(--theme-transition);
+}
+.teacher-upgrade-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #f59e0b, #ea580c);
+    border-radius: 18px 18px 0 0;
+}
+.teacher-upgrade-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+.teacher-upgrade-emoji {
+    font-size: 2.2rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+.teacher-upgrade-title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-main);
+    margin-bottom: 2px;
+}
+.teacher-upgrade-sub {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+.teacher-upgrade-features {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin-bottom: 16px;
+    padding: 12px;
+    background: rgba(245, 158, 11, 0.06);
+    border-radius: 10px;
+}
+.teacher-feature-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+.teacher-feature-item i {
+    color: #f59e0b;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+.become-teacher-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    width: 100%;
+    background: linear-gradient(135deg, #f59e0b, #ea580c);
+    color: #fff !important;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 14px rgba(245,158,11,.3);
+    font-family: 'Inter', sans-serif;
+}
+.become-teacher-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(245,158,11,.4);
+    opacity: 0.92;
+}
+
+/* ── STATS CARDS ── */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+@media (max-width: 600px) { .stats-row { grid-template-columns: 1fr 1fr; } }
+.stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all 0.3s ease;
+}
+.stat-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--border-hover);
+    box-shadow: 0 10px 24px var(--purple-glow);
+}
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+.stat-icon.blue   { background: rgba(24,90,219,.12);   color: #185adb; }
+.stat-icon.green  { background: rgba(16,185,129,.12);  color: #10b981; }
+.stat-icon.orange { background: rgba(245,158,11,.12);  color: #f59e0b; }
+.stat-info-label  { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; margin-bottom: 2px; }
+.stat-info-value  { font-size: 1.45rem; font-weight: 700; color: var(--text-main); font-family: 'Outfit', sans-serif; line-height: 1; }
+
+/* ── SECTION CARDS ── */
+.section-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 24px;
+    transition: var(--theme-transition);
+}
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+.section-title .section-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1rem;
+}
+
+/* ── COURSE CARDS ── */
+.course-item {
+    background: var(--bg-darker);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all 0.25s ease;
+    margin-bottom: 12px;
+    text-decoration: none;
+    color: inherit;
+}
+.course-item:last-child { margin-bottom: 0; }
+.course-item:hover {
+    border-color: var(--border-hover);
+    transform: translateX(4px);
+    box-shadow: 0 4px 16px var(--purple-glow);
+    color: inherit;
+    text-decoration: none;
+}
+.course-item-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    color: #fff;
+    flex-shrink: 0;
+}
+.course-item-title { font-weight: 600; font-size: 0.9rem; color: var(--text-main); margin-bottom: 3px; }
+.course-item-meta  { font-size: 0.78rem; color: var(--text-muted); }
+.course-item-arrow { margin-left: auto; color: var(--text-muted); font-size: 1rem; flex-shrink: 0; }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+}
+.empty-state .empty-icon {
+    width: 72px;
+    height: 72px;
+    background: var(--bg-darker);
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--text-muted);
+    margin: 0 auto 16px;
+}
+.empty-state p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px; }
+
+/* ── QUIZ RESULT TABLE ── */
+.quiz-result-row td { padding: 14px 12px !important; }
+.score-bar-wrap {
+    background: var(--bg-darker);
+    border-radius: 999px;
+    height: 6px;
+    width: 80px;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 8px;
+}
+.score-bar {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+}
+.score-bar.danger { background: linear-gradient(90deg, #ef4444, #f97316); }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row g-4">
+<div class="dashboard-wrapper">
 
-    <!-- ── PROFIL KARTASI ── -->
-    <div class="col-lg-4">
-        <div class="glass-card text-center py-5 h-100">
-            {% if user.avatar %}
-                <img src="{{ user.avatar.url }}" alt="avatar"
-                     class="rounded-circle mb-3 border border-purple border-3 shadow"
-                     style="width: 110px; height: 110px; object-fit: cover;">
-            {% else %}
-                <div class="d-inline-flex p-4 rounded-circle bg-purple-glow mb-3">
-                    <i class="bi bi-person-circle display-4" style="color:#fff;"></i>
-                </div>
-            {% endif %}
-
-            <h3 class="font-heading mb-1">{{ user.username }}</h3>
-            <span class="badge bg-purple-glow text-white mb-3 px-3 py-2 rounded-pill">
-                {{ user.get_role_display }}
-            </span>
-            <p class="text-muted small px-3 mb-4">
-                {% if user.bio %}{{ user.bio }}{% else %}Bio ma'lumotlar qo'shilmagan.{% endif %}
-            </p>
-
-            <div class="border-top pt-3 mt-3 text-start px-3" style="border-color: var(--border-color) !important;">
-                {% if user.phone %}
-                    <div class="text-muted small mb-2">
-                        <i class="bi bi-telephone-fill me-2 text-gradient"></i> {{ user.phone }}
+    <!-- ── PROFIL SIDEBAR ── -->
+    <aside class="dashboard-aside">
+        <div class="profile-sidebar">
+            <div class="profile-cover"></div>
+            <div class="profile-avatar-wrap">
+                {% if user.avatar %}
+                    <img src="{{ user.avatar.url }}" alt="Avatar" class="avatar-img">
+                {% else %}
+                    <div class="avatar-placeholder">
+                        <i class="bi bi-person-fill"></i>
                     </div>
                 {% endif %}
-                <div class="text-muted small mb-2">
-                    <i class="bi bi-envelope-fill me-2 text-gradient"></i> {{ user.email }}
+            </div>
+
+            <div class="profile-body">
+                <!-- To'liq ism (first + last name) -->
+                {% if user.first_name or user.last_name %}
+                    <div class="profile-fullname">{{ user.first_name }} {{ user.last_name }}</div>
+                    <span class="profile-username">@{{ user.username }}</span>
+                {% else %}
+                    <div class="profile-fullname">{{ user.username }}</div>
+                    <span class="profile-username">{% if lang == 'ru' %}Имя не указано{% elif lang == 'tj' %}Ном ворид нашудааст{% else %}Name not provided{% endif %}</span>
+                {% endif %}
+
+                <div>
+                    <span class="profile-role-badge">
+                        {% if user.role == 'student' %}
+                            <i class="bi bi-mortarboard-fill"></i>
+                        {% elif user.role == 'teacher' %}
+                            <i class="bi bi-person-workspace"></i>
+                        {% else %}
+                            <i class="bi bi-shield-check-fill"></i>
+                        {% endif %}
+                        {{ user.get_role_display }}
+                    </span>
                 </div>
-                <div class="text-muted small">
-                    <i class="bi bi-calendar-event-fill me-2 text-gradient"></i>
-                    Qo'shilgan sana: {{ user.date_joined|date:"d.m.Y" }}
+
+                {% if user.bio %}
+                    <p class="profile-bio">"{{ user.bio }}"</p>
+                {% else %}
+                    <p class="profile-bio">{% if lang == 'ru' %}Биография не добавлена.{% elif lang == 'tj' %}Тарҷумаи ҳол илова нашудааст.{% else %}No bio added.{% endif %}</p>
+                {% endif %}
+
+                <div class="profile-meta">
+                    <div class="profile-meta-item">
+                        <i class="bi bi-envelope-fill"></i>
+                        <span>{{ user.email }}</span>
+                    </div>
+                    {% if user.phone %}
+                    <div class="profile-meta-item">
+                        <i class="bi bi-telephone-fill"></i>
+                        <span>{{ user.phone }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="profile-meta-item">
+                        <i class="bi bi-calendar3"></i>
+                        <span>{% if lang == 'ru' %}Зарегистрирован:{% elif lang == 'tj' %}Ба кайд гирифта шуд:{% else %}Joined:{% endif %} {{ user.date_joined|date:"d.m.Y" }}</span>
+                    </div>
+                </div>
+
+                <a href="{% url 'profile_edit' %}" class="btn-edit-profile">
+                    <i class="bi bi-pencil-square"></i>
+                    {% if lang == 'ru' %}Редактировать профиль{% elif lang == 'tj' %}Профилро вироиш кунед{% else %}Edit Profile{% endif %}
+                </a>
+
+                <!-- Chiqish tugmasi -->
+                <div style="margin-top: 10px; padding-top: 14px; border-top: 1px solid var(--border-color);">
+                    <a href="{% url 'logout' %}" class="btn-logout-sidebar">
+                        <i class="bi bi-box-arrow-right"></i>
+                        {% if lang == 'ru' %}Выйти{% elif lang == 'tj' %}Баромадан{% else %}Log Out{% endif %}
+                    </a>
                 </div>
             </div>
         </div>
-    </div>
+
+        <!-- ── O'QITUVCHI BO'LISH (alohida karta) ── -->
+        {% if user.role == 'student' %}
+        <div class="teacher-upgrade-card">
+            <div class="teacher-upgrade-header">
+                <div class="teacher-upgrade-emoji">🎓</div>
+                <div>
+                    <div class="teacher-upgrade-title">{% if lang == 'ru' %}Станьте преподавателем{% elif lang == 'tj' %}Омузгор шавед{% else %}Become a Teacher{% endif %}</div>
+                    <div class="teacher-upgrade-sub">{% if lang == 'ru' %}Создавайте курсы и обучайте студентов{% elif lang == 'tj' %}Курсхо созед ва донишчуёнро омузонед{% else %}Create courses and teach students{% endif %}</div>
+                </div>
+            </div>
+            <div class="teacher-upgrade-features">
+                <div class="teacher-feature-item">
+                    <i class="bi bi-check-circle-fill"></i>
+                    {% if lang == 'ru' %}Возможность создавать курсы{% elif lang == 'tj' %}Имконияти сохтани курсхо{% else %}Ability to create courses{% endif %}
+                </div>
+                <div class="teacher-feature-item">
+                    <i class="bi bi-check-circle-fill"></i>
+                    {% if lang == 'ru' %}Статистика студентов{% elif lang == 'tj' %}Омори донишчуён{% else %}Student statistics{% endif %}
+                </div>
+                <div class="teacher-feature-item">
+                    <i class="bi bi-check-circle-fill"></i>
+                    {% if lang == 'ru' %}Создание тестов и заданий{% elif lang == 'tj' %}Тест ва вазифа додан{% else %}Create quizzes and assignments{% endif %}
+                </div>
+            </div>
+            <button type="button" class="become-teacher-btn" id="openTeacherModal">
+                <i class="bi bi-mortarboard-fill"></i>
+                {% if lang == 'ru' %}Стать преподавателем{% elif lang == 'tj' %}Омузгор шудан{% else %}Become a Teacher{% endif %}
+            </button>
+            <form method="post" action="{% url 'become_teacher' %}" id="teacherUpgradeForm">
+                {% csrf_token %}
+            </form>
+        </div>
+        {% endif %}
+    </aside>
 
     <!-- ── ASOSIY KONTENT ── -->
-    <div class="col-lg-8">
+    <div class="dashboard-main">
 
-        <!-- Kurslar -->
-        <div class="glass-card mb-4">
-            <h4 class="font-heading mb-4">
-                <i class="bi bi-book-half me-2 text-gradient"></i> Mening Kurslarim
-            </h4>
+        <!-- Stats -->
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="bi bi-book-fill"></i></div>
+                <div>
+                    <div class="stat-info-label">{% if lang == 'ru' %}Курсы{% elif lang == 'tj' %}Курсхо{% else %}Courses{% endif %}</div>
+                    <div class="stat-info-value">{{ enrolled_courses.count }}</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="bi bi-patch-check-fill"></i></div>
+                <div>
+                    <div class="stat-info-label">{% if lang == 'ru' %}Тесты{% elif lang == 'tj' %}Тестхо{% else %}Quizzes{% endif %}</div>
+                    <div class="stat-info-value">{{ recent_results.count }}</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon orange"><i class="bi bi-star-fill"></i></div>
+                <div>
+                    <div class="stat-info-label">{% if lang == 'ru' %}Уровень{% elif lang == 'tj' %}Сатх{% else %}Level{% endif %}</div>
+                    <div class="stat-info-value">
+                        {% if enrolled_courses.count >= 5 %}Pro
+                        {% elif enrolled_courses.count >= 2 %}{% if lang == 'ru' %}Средний{% elif lang == 'tj' %}Миёна{% else %}Mid{% endif %}
+                        {% else %}{% if lang == 'ru' %}Новичок{% elif lang == 'tj' %}Нав{% else %}New{% endif %}{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mening Kurslarim -->
+        <div class="section-card">
+            <div class="section-title">
+                <div class="section-icon"><i class="bi bi-book-half"></i></div>
+                {% if lang == 'ru' %}Мои курсы{% elif lang == 'tj' %}Курсхои ман{% else %}My Courses{% endif %}
+                {% if enrolled_courses %}
+                    <span class="ms-auto badge" style="background:rgba(24,90,219,.12);color:var(--color-primary);font-size:.75rem;font-weight:600;padding:4px 10px;border-radius:999px;">
+                        {{ enrolled_courses.count }}
+                    </span>
+                {% endif %}
+            </div>
 
             {% if enrolled_courses %}
-                <div class="row g-3">
-                    {% for enrollment in enrolled_courses %}
-                        <div class="col-md-6">
-                            <div class="h-100 d-flex flex-column justify-content-between p-3 rounded-3"
-                                 style="background: var(--bg-darker); border: 1px solid var(--border-color);">
-                                <div>
-                                    <h5 class="mb-1" style="font-size: 1rem;">{{ enrollment.course.title }}</h5>
-                                    <p class="text-muted small mb-3">
-                                        {{ enrollment.course.description|truncatewords:15 }}
-                                    </p>
-                                </div>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="badge bg-dark">{{ enrollment.course.category.name }}</span>
-                                    <a href="{% url 'course_detail' enrollment.course.pk %}"
-                                       class="btn btn-sm btn-outline-purple">Darslarga o'tish</a>
-                                </div>
+                {% for enrollment in enrolled_courses %}
+                    <a href="{% url 'course_detail' enrollment.course.pk %}" class="course-item">
+                        <div class="course-item-icon">
+                            <i class="bi bi-play-circle-fill"></i>
+                        </div>
+                        <div class="flex-grow-1 overflow-hidden">
+                            <div class="course-item-title text-truncate">{{ enrollment.course.title }}</div>
+                            <div class="course-item-meta">
+                                {{ enrollment.course.category.name }} &bull;
+                                {{ enrollment.course.description|truncatewords:8 }}
                             </div>
                         </div>
-                    {% endfor %}
-                </div>
+                        <i class="bi bi-chevron-right course-item-arrow"></i>
+                    </a>
+                {% endfor %}
             {% else %}
-                <div class="text-center py-5">
-                    <i class="bi bi-journal-x display-4 text-muted d-block mb-3"></i>
-                    <p class="text-muted mb-3">Siz hali birorta kursga yozilmagansiz.</p>
-                    <a href="{% url 'course_list' %}" class="btn btn-purple rounded-pill px-4">
-                        Kurslarni o'rganish
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="bi bi-journal-x"></i></div>
+                    <p>{% if lang == 'ru' %}Вы ещё не записаны ни на один курс.{% elif lang == 'tj' %}Шумо ба хеч курсе ба кайд гирифта нашудаед.{% else %}You are not enrolled in any courses yet.{% endif %}</p>
+                    <a href="{% url 'course_list' %}" class="btn-edit-profile" style="max-width:220px;margin:0 auto;">
+                        <i class="bi bi-search"></i> {% if lang == 'ru' %}Смотреть курсы{% elif lang == 'tj' %}Курсхоро бубинед{% else %}Browse Courses{% endif %}
                     </a>
                 </div>
             {% endif %}
         </div>
 
-        <!-- Test natijalari -->
-        <div class="glass-card">
-            <h4 class="font-heading mb-4">
-                <i class="bi bi-journal-check me-2 text-gradient"></i> Oxirgi Test Natijalari
-            </h4>
+        <!-- Test Natijalari -->
+        <div class="section-card">
+            <div class="section-title">
+                <div class="section-icon"><i class="bi bi-bar-chart-fill"></i></div>
+                {% if lang == 'ru' %}Последние результаты тестов{% elif lang == 'tj' %}Натиҷахои охирини тест{% else %}Recent Quiz Results{% endif %}
+            </div>
 
             {% if recent_results %}
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
+                <div class="table-responsive" style="border-radius:12px;overflow:hidden;">
+                    <table class="table mb-0">
                         <thead>
                             <tr>
-                                <th>Test</th>
-                                <th>Natija</th>
-                                <th>Foiz</th>
-                                <th>Holat</th>
+                                <th>{% if lang == 'ru' %}Тест{% elif lang == 'tj' %}Тест{% else %}Quiz{% endif %}</th>
+                                <th>{% if lang == 'ru' %}Результат{% elif lang == 'tj' %}Натиҷа{% else %}Score{% endif %}</th>
+                                <th>{% if lang == 'ru' %}%{% elif lang == 'tj' %}%{% else %}%{% endif %}</th>
+                                <th>{% if lang == 'ru' %}Статус{% elif lang == 'tj' %}Холат{% else %}Status{% endif %}</th>
                                 <th></th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for result in recent_results %}
-                                <tr>
-                                    <td class="fw-medium">{{ result.quiz.title }}</td>
-                                    <td>{{ result.score }} / {{ result.total_questions }}</td>
+                                <tr class="quiz-result-row">
+                                    <td class="fw-semibold" style="max-width:180px;">
+                                        <span class="text-truncate d-block">{{ result.quiz.title }}</span>
+                                    </td>
+                                    <td class="text-muted">{{ result.score }}/{{ result.total_questions }}</td>
                                     <td>
                                         <span class="fw-bold {% if result.get_percentage >= 60 %}text-success{% else %}text-danger{% endif %}">
                                             {{ result.get_percentage }}%
                                         </span>
+                                        <div class="score-bar-wrap">
+                                            <div class="score-bar {% if result.get_percentage < 60 %}danger{% endif %}"
+                                                 style="width:{{ result.get_percentage }}%;"></div>
+                                        </div>
                                     </td>
                                     <td>
                                         {% if result.is_passed %}
-                                            <span class="badge rounded-pill" style="background: rgba(16,185,129,.15); color: #10b981; border: 1px solid rgba(16,185,129,.3);">
-                                                <i class="bi bi-check-circle me-1"></i> O'tdi
+                                            <span class="badge rounded-pill"
+                                                  style="background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.25);">
+                                                <i class="bi bi-check-circle me-1"></i>{% if lang == 'ru' %}Пройден{% elif lang == 'tj' %}Гузашт{% else %}Passed{% endif %}
                                             </span>
                                         {% else %}
-                                            <span class="badge rounded-pill" style="background: rgba(239,68,68,.12); color: #ef4444; border: 1px solid rgba(239,68,68,.2);">
-                                                <i class="bi bi-x-circle me-1"></i> Yiqildi
+                                            <span class="badge rounded-pill"
+                                                  style="background:rgba(239,68,68,.10);color:#ef4444;border:1px solid rgba(239,68,68,.2);">
+                                                <i class="bi bi-x-circle me-1"></i>{% if lang == 'ru' %}Не пройден{% elif lang == 'tj' %}Нагузашт{% else %}Failed{% endif %}
                                             </span>
                                         {% endif %}
                                     </td>
                                     <td>
                                         <a href="{% url 'quiz_result' result.pk %}"
-                                           class="btn btn-sm btn-outline-purple rounded-pill py-1 px-3">
-                                            <i class="bi bi-eye-fill me-1"></i> Natija
+                                           class="btn btn-sm btn-outline-purple rounded-pill px-3 py-1">
+                                            <i class="bi bi-eye-fill me-1"></i>{% if lang == 'ru' %}Смотреть{% elif lang == 'tj' %}Дидан{% else %}View{% endif %}
                                         </a>
                                     </td>
                                 </tr>
@@ -135,13 +800,89 @@
                     </table>
                 </div>
             {% else %}
-                <div class="text-center py-5">
-                    <i class="bi bi-clipboard-x display-4 text-muted d-block mb-3"></i>
-                    <p class="text-muted">Siz hali test topshirmagansiz.</p>
+                <div class="empty-state">
+                    <div class="empty-icon"><i class="bi bi-clipboard-x"></i></div>
+                    <p>{% if lang == 'ru' %}Вы ещё не прошли ни одного теста.{% elif lang == 'tj' %}Шумо то ҳол ягон тест нагузаштаед.{% else %}You haven't taken any quizzes yet.{% endif %}</p>
+                    <a href="{% url 'course_list' %}" class="btn-edit-profile" style="max-width:220px;margin:0 auto;">
+                        <i class="bi bi-lightning-fill"></i> {% if lang == 'ru' %}Начать тест{% elif lang == 'tj' %}Тестро оғоз кунед{% else %}Start a Quiz{% endif %}
+                    </a>
                 </div>
             {% endif %}
         </div>
 
     </div>
 </div>
+
+<!-- ── TEACHER UPGRADE MODAL ── -->
+<div id="teacherModal" class="custom-modal-overlay" aria-hidden="true">
+    <div class="custom-modal-box" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
+        <div class="custom-modal-icon">🎓</div>
+        <h2 class="custom-modal-title" id="modalTitle">{% if lang == 'ru' %}Подтвердите роль преподавателя{% elif lang == 'tj' %}Нақши омузгорро тасдик кунед{% else %}Confirm Teacher Role{% endif %}</h2>
+        <p class="custom-modal-desc">
+            {% if lang == 'ru' %}Вы будете переведены на роль <strong>Преподавателя</strong>. Вы сможете создавать курсы и обучать студентов.
+            {% elif lang == 'tj' %}Шумо ба нақши <strong>Омузгор</strong> мегузаред. Шумо метавонед курсхо созед ва донишчуёнро омузонед.
+            {% else %}You will be given the <strong>Teacher</strong> role. You'll be able to create courses and teach students.{% endif %}
+        </p>
+        <div class="custom-modal-info">
+            <i class="bi bi-info-circle-fill"></i>
+            {% if lang == 'ru' %}Это действие необратимо. Хотите продолжить?{% elif lang == 'tj' %}Ин амалро баргардондан мумкин нест. Идома додан мехохед?{% else %}This action cannot be undone. Do you want to continue?{% endif %}
+        </div>
+        <div class="custom-modal-actions">
+            <button type="button" class="custom-modal-cancel" id="closeTeacherModal">
+                <i class="bi bi-x-lg"></i> {% if lang == 'ru' %}Отмена{% elif lang == 'tj' %}Бекор кардан{% else %}Cancel{% endif %}
+            </button>
+            <button type="button" class="custom-modal-confirm" id="confirmTeacher">
+                <i class="bi bi-check2-circle"></i> {% if lang == 'ru' %}Да, подтверждаю{% elif lang == 'tj' %}Ҳа, тасдик мекунам{% else %}Yes, Confirm{% endif %}
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    const modal      = document.getElementById('teacherModal');
+    const openBtn    = document.getElementById('openTeacherModal');
+    const closeBtn   = document.getElementById('closeTeacherModal');
+    const confirmBtn = document.getElementById('confirmTeacher');
+    const form       = document.getElementById('teacherUpgradeForm');
+
+    if (!modal || !openBtn) return;
+
+    function openModal() {
+        modal.classList.add('active');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => closeBtn.focus(), 100);
+    }
+
+    function closeModal() {
+        modal.classList.remove('active');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        openBtn.focus();
+    }
+
+    openBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+
+    // Overlay bosilsa yopilsin
+    modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeModal();
+    });
+
+    // Esc tugmasi bilan yopilsin
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('active')) closeModal();
+    });
+
+    // Tasdiqlash — formani submit qilish
+    confirmBtn.addEventListener('click', function () {
+        confirmBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading...';
+        confirmBtn.disabled = true;
+        form.submit();
+    });
+})();
+</script>
 {% endblock %}

@@ -1,86 +1,117 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}AI Muallim — Edunify{% endblock %}
+{% block title %}{% if lang == 'tj' %}Муаллими AI{% elif lang == 'ru' %}AI Учитель{% else %}AI Teacher{% endif %} — Edunify{% endblock %}
 
 {% block extra_css %}
 <style>
-/* ── AI CHAT PAGE ── */
+body {
+  height: 100vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+main {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+main > .container {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  max-width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
 .ai-page {
+  flex: 1;
   display: grid;
   grid-template-columns: 280px 1fr;
-  gap: 1.5rem;
-  height: calc(100vh - 140px);
-  min-height: 550px;
+  gap: 0;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+  background: var(--bg-card);
 }
-
-/* Sidebar */
 .ai-sidebar {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  background: var(--bg-darker);
+  border-right: 1px solid var(--border-color);
+  height: 100%;
+  padding: 1.5rem 1.25rem;
+  box-sizing: border-box;
+  overflow-y: auto;
+  gap: 1.5rem;
 }
 .ai-sidebar__header {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
-  border-radius: 16px;
-  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  border-radius: 18px;
+  padding: 1.25rem;
   color: #fff;
   position: relative;
-  overflow: hidden;
-}
-.ai-sidebar__header::before {
-  content: '';
-  position: absolute;
-  width: 120px; height: 120px;
-  border-radius: 50%;
-  background: rgba(255,255,255,.1);
-  right: -30px; top: -30px;
-}
-.ai-sidebar__header::after {
-  content: '';
-  position: absolute;
-  width: 70px; height: 70px;
-  border-radius: 50%;
-  background: rgba(255,255,255,.07);
-  right: 40px; bottom: -20px;
+  overflow: visible;
+  box-shadow: 0 8px 24px rgba(24, 90, 219, 0.15);
 }
 .ai-sidebar__avatar {
-  width: 52px; height: 52px;
+  width: 48px;
+  height: 48px;
   border-radius: 14px;
-  background: rgba(255,255,255,.2);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1.5rem;
-  margin-bottom: .75rem;
-  position: relative; z-index: 1;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content:center;
+  font-size: 1.4rem;
+  position: relative;
+  z-index: 1;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
 }
 .ai-sidebar__title {
   font-family: 'Outfit', sans-serif;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   margin: 0 0 .25rem;
-  position: relative; z-index: 1;
+  position: relative;
+  z-index: 1;
+  letter-spacing: -0.02em;
 }
 .ai-sidebar__status {
-  font-size: .78rem;
-  opacity: .85;
-  display: flex; align-items: center; gap: .4rem;
-  position: relative; z-index: 1;
+  font-size: 0.8rem;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  position: relative;
+  z-index: 1;
 }
 .ai-status-dot {
-  width: 7px; height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: #4ade80;
-  animation: pulseDotGreen 1.5s ease-in-out infinite;
+  background: #22c55e;
+  box-shadow: 0 0 12px #22c55e;
+  animation: pulseDot 2s infinite;
 }
-@keyframes pulseDotGreen {
-  0%,100% { box-shadow: 0 0 0 0 rgba(74,222,128,.4); }
-  50%      { box-shadow: 0 0 0 5px rgba(74,222,128,0); }
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+  50% { transform: scale(1.1); opacity: 0.8; box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
 }
-
-/* Subjects */
-.ai-subjects { display: flex; flex-direction: column; gap: .4rem; }
+.ai-subjects {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
 .ai-subjects__title {
-  font-size: .72rem;
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: .08em;
   color: var(--text-muted);
@@ -88,455 +119,657 @@
   margin-bottom: .25rem;
 }
 .ai-subject-btn {
-  display: flex; align-items: center; gap: .6rem;
-  padding: .6rem .85rem;
-  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
   border: 1px solid var(--border-color);
   background: var(--bg-card);
   color: var(--text-main);
-  font-size: .84rem;
+  font-size: 0.88rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all .18s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: left;
   width: 100%;
 }
 .ai-subject-btn:hover {
   border-color: var(--color-primary);
-  background: color-mix(in srgb, var(--color-primary) 6%, var(--bg-card));
+  background: color-mix(in srgb, var(--color-primary) 5%, var(--bg-card));
   color: var(--color-primary);
-  transform: translateX(3px);
+  transform: translateX(4px);
+  box-shadow: 0 4px 15px rgba(24, 90, 219, 0.05);
 }
 .ai-subject-btn .icon {
-  font-size: 1rem;
-  width: 20px; text-align: center;
+  font-size: 1.1rem;
+  width: 24px;
+  text-align: center;
 }
-
-/* Limit info */
 .ai-limit-info {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 1rem;
-  font-size: .8rem;
+  border-radius: 14px;
+  padding: 1.25rem;
+  font-size: 0.82rem;
   color: var(--text-muted);
   margin-top: auto;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.02);
 }
 .ai-limit-bar {
-  height: 5px;
+  height: 6px;
   border-radius: 999px;
   background: var(--bg-darker);
-  margin: .6rem 0 .4rem;
+  margin: 0.75rem 0 0.5rem;
   overflow: hidden;
+  border: 1px solid var(--border-color);
 }
 .ai-limit-bar__fill {
   height: 100%;
   border-radius: 999px;
   background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
   width: 0%;
-  transition: width .6s ease;
+  transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-
-/* ── CHAT PANEL ── */
 .ai-chat-panel {
   display: flex;
   flex-direction: column;
   background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 20px;
+  height: 100%;
   overflow: hidden;
-  box-shadow: 0 8px 40px rgba(0,0,0,.06);
 }
 .ai-chat-panel__header {
-  padding: 1rem 1.5rem;
+  padding: 1.25rem 2rem;
   border-bottom: 1px solid var(--border-color);
-  display: flex; align-items: center; justify-content: space-between;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   flex-shrink: 0;
+  background: color-mix(in srgb, var(--bg-card) 98%, #000);
 }
 .ai-chat-panel__messages {
   flex: 1;
   overflow-y: auto;
-  padding: 1.5rem;
+  padding: 2rem 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
   scroll-behavior: smooth;
 }
-.ai-chat-panel__messages::-webkit-scrollbar { width: 5px; }
-.ai-chat-panel__messages::-webkit-scrollbar-track { background: transparent; }
+.ai-chat-panel__messages::-webkit-scrollbar {
+  width: 6px;
+}
 .ai-chat-panel__messages::-webkit-scrollbar-thumb {
   background: var(--border-color);
   border-radius: 999px;
 }
-
-/* Messages */
 .ai-msg {
   display: flex;
-  gap: .75rem;
+  gap: 1rem;
   align-items: flex-start;
-  animation: msgSlideIn .3s cubic-bezier(.22,1,.36,1) forwards;
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+  animation: msgIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
-@keyframes msgSlideIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-.ai-msg--user { flex-direction: row-reverse; }
+.ai-msg--user {
+  flex-direction: row-reverse;
+}
 .ai-msg__avatar {
-  width: 34px; height: 34px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: .95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
 }
-.ai-msg--bot  .ai-msg__avatar {
+.ai-msg--bot .ai-msg__avatar {
   background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
   color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 .ai-msg--user .ai-msg__avatar {
   background: var(--bg-darker);
   color: var(--text-main);
+  border: 1px solid var(--border-color);
+}
+.ai-msg__content {
+  display: flex;
+  flex-direction: column;
+  max-width: 85%;
+}
+.ai-msg--bot .ai-msg__content {
+  align-items: flex-start;
+}
+.ai-msg--user .ai-msg__content {
+  align-items: flex-end;
 }
 .ai-msg__bubble {
-  max-width: 72%;
-  padding: .85rem 1.1rem;
-  border-radius: 18px;
-  font-size: .9rem;
+  padding: 0.95rem 1.35rem;
+  border-radius: 20px;
+  font-size: 0.93rem;
   line-height: 1.6;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.02);
 }
-.ai-msg--bot  .ai-msg__bubble {
+.ai-msg__bubble p {
+  margin-bottom: 0.5rem;
+}
+.ai-msg__bubble p:last-child {
+  margin-bottom: 0;
+}
+.ai-msg__bubble ul, .ai-msg__bubble ol {
+  margin: 0.5rem 0;
+  padding-left: 1.25rem;
+}
+.ai-msg__bubble li {
+  margin-bottom: 0.25rem;
+}
+.ai-msg__bubble pre {
+  background: rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  overflow-x: auto;
+  margin: 0.75rem 0;
+}
+.ai-msg--user .ai-msg__bubble pre {
+  background: rgba(0, 0, 0, 0.2);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.ai-msg__bubble code {
+  font-family: 'Fira Code', 'Courier New', Courier, monospace;
+  font-size: 0.85rem;
+  background: rgba(0, 0, 0, 0.05);
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+.ai-msg--user .ai-msg__bubble code {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+.ai-msg--bot .ai-msg__bubble {
   background: var(--bg-darker);
   color: var(--text-main);
-  border-bottom-left-radius: 5px;
+  border-top-left-radius: 4px;
+  border: 1px solid var(--border-color);
 }
 .ai-msg--user .ai-msg__bubble {
   background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
   color: #fff;
-  border-bottom-right-radius: 5px;
+  border-top-right-radius: 4px;
+  box-shadow: 0 6px 20px rgba(24, 90, 219, 0.12);
 }
 .ai-msg__time {
-  font-size: .7rem;
+  font-size: 0.72rem;
   color: var(--text-muted);
-  margin-top: .4rem;
+  margin-top: 0.4rem;
+  margin-left: 0.5rem;
   display: block;
 }
-
-/* Typing indicator */
+.ai-msg--user .ai-msg__time {
+  text-align: right;
+  margin-right: 0.5rem;
+  margin-left: 0;
+}
 .ai-typing {
-  display: flex; gap: 5px; align-items: center;
-  padding: .85rem 1.1rem;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 1rem 1.35rem;
   background: var(--bg-darker);
-  border-radius: 18px;
-  border-bottom-left-radius: 5px;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  border-top-left-radius: 4px;
   width: fit-content;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.02);
 }
 .ai-typing span {
-  width: 7px; height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--text-muted);
-  animation: typingBounce .9s ease-in-out infinite;
+  animation: typeBounce .9s ease-in-out infinite;
+  opacity: 0.6;
 }
 .ai-typing span:nth-child(2) { animation-delay: .15s; }
 .ai-typing span:nth-child(3) { animation-delay: .3s; }
-@keyframes typingBounce {
-  0%,80%,100% { transform: translateY(0); opacity: .4; }
-  40%          { transform: translateY(-6px); opacity: 1; }
+@keyframes typeBounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: .4; }
+  40% { transform: translateY(-6px); opacity: 1; }
 }
-
-/* Input bar */
 .ai-input-bar {
-  padding: 1rem 1.5rem 1.25rem;
+  padding: 1.5rem 2rem 2rem;
   border-top: 1px solid var(--border-color);
   flex-shrink: 0;
   background: var(--bg-card);
 }
+.ai-input-container-inner {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
 .ai-input-wrap {
   display: flex;
-  gap: .5rem;
+  gap: 0.75rem;
   align-items: flex-end;
   background: var(--bg-darker);
-  border: 1.5px solid var(--border-color);
-  border-radius: 14px;
-  padding: .6rem .6rem .6rem 1rem;
-  transition: border-color .2s;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 0.75rem 0.75rem 0.75rem 1.25rem;
+  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.01);
 }
 .ai-input-wrap:focus-within {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 12%, transparent);
+  background: var(--bg-card);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-primary) 12%, transparent), 0 4px 12px rgba(0, 0, 0, 0.04);
 }
 .ai-input-wrap textarea {
   flex: 1;
   border: none;
   background: transparent;
   color: var(--text-main);
-  font-size: .92rem;
+  font-size: 0.94rem;
   resize: none;
   outline: none;
   max-height: 120px;
   line-height: 1.5;
   font-family: 'Inter', sans-serif;
+  padding-bottom: 2px;
 }
-.ai-input-wrap textarea::placeholder { color: var(--text-muted); }
+.ai-input-wrap textarea::placeholder {
+  color: var(--text-muted);
+}
 .ai-send-btn {
-  width: 38px; height: 38px;
-  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
   border: none;
   background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
   color: #fff;
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
-  transition: transform .15s, opacity .15s;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(24, 90, 219, 0.15);
 }
-.ai-send-btn:hover  { transform: scale(1.08); }
-.ai-send-btn:active { transform: scale(.96); }
-.ai-send-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+.ai-send-btn:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 6px 15px rgba(24, 90, 219, 0.25);
+}
+.ai-send-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+.ai-send-btn:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
 .ai-input-hint {
-  font-size: .72rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
-  margin-top: .5rem;
+  margin-top: 0.6rem;
   text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  opacity: 0.9;
 }
-
-/* Responsive */
 @media (max-width: 900px) {
-  .ai-page { grid-template-columns: 1fr; height: auto; }
-  .ai-sidebar { flex-direction: row; flex-wrap: wrap; }
-  .ai-sidebar__header { flex: 1; min-width: 200px; }
-  .ai-subjects { flex-direction: row; flex-wrap: wrap; flex: 2; }
-  .ai-subject-btn { flex: 1; min-width: 120px; }
-  .ai-chat-panel { min-height: 500px; }
+  .ai-page {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    height: 100%;
+  }
+  .ai-sidebar {
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+  .ai-sidebar__header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
+  }
+  .ai-sidebar__avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+    margin-bottom: 0;
+  }
+  .ai-sidebar__title {
+    font-size: 1rem;
+    margin: 0;
+  }
+  .ai-sidebar__status {
+    font-size: 0.75rem;
+  }
+  .ai-subjects {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    gap: 0.5rem;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  .ai-subjects::-webkit-scrollbar {
+    height: 4px;
+  }
+  .ai-subjects::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+  }
+  .ai-subject-btn {
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    min-width: auto;
+    width: auto;
+  }
+  .ai-limit-info {
+    display: none;
+  }
+  .ai-chat-panel {
+    height: 100%;
+  }
 }
 </style>
 {% endblock %}
 
-{% block content %}
+{% block main_layout %}
 {% load static %}
-<div class="ai-page py-2">
 
-  <!-- ── SIDEBAR ── -->
+<div class="ai-page">
+  <!-- SIDEBAR -->
   <aside class="ai-sidebar">
-    <!-- Header card -->
     <div class="ai-sidebar__header">
       <div class="ai-sidebar__avatar">🤖</div>
-      <p class="ai-sidebar__title">AI Muallim</p>
-      <div class="ai-sidebar__status">
-        <span class="ai-status-dot"></span> Faol va tayyorl
+      <div>
+        <p class="ai-sidebar__title">AI Muallim</p>
+        <div class="ai-sidebar__status">
+          <span class="ai-status-dot"></span>
+          {% if lang == 'tj' %}Фаъол ва омода{% elif lang == 'ru' %}Активен и готов{% else %}Active and ready{% endif %}
+        </div>
       </div>
     </div>
 
-    <!-- Quick subjects -->
     <div class="ai-subjects">
-      <div class="ai-subjects__title">Tez so'rash</div>
-      <button class="ai-subject-btn" data-question="Matematika bo'yicha yordam bering">
-        <span class="icon">📐</span> Matematika
+      <div class="ai-subjects__title">
+        {% if lang == 'tj' %}ФАНҲО{% elif lang == 'ru' %}ПРЕДМЕТЫ{% else %}SUBJECTS{% endif %}
+      </div>
+      <button class="ai-subject-btn" data-question="{% if lang == 'tj' %}Ба ман дар бораи математика кӯмак кунед{% elif lang == 'ru' %}Помогите с математикой{% else %}Help me with mathematics{% endif %}">
+        <span class="icon">📐</span> {% if lang == 'tj' %}Математика{% elif lang == 'ru' %}Математика{% else %}Mathematics{% endif %}
       </button>
-      <button class="ai-subject-btn" data-question="Fizika qonunlarini tushuntirib bering">
-        <span class="icon">⚡</span> Fizika
+      <button class="ai-subject-btn" data-question="{% if lang == 'tj' %}Қонунҳои физикаро фаҳмонед{% elif lang == 'ru' %}Объясните законы физики{% else %}Explain the laws of physics{% endif %}">
+        <span class="icon">⚡</span> {% if lang == 'tj' %}Физика{% elif lang == 'ru' %}Физика{% else %}Physics{% endif %}
       </button>
-      <button class="ai-subject-btn" data-question="Kimyo elementlari haqida so'rayman">
-        <span class="icon">🧪</span> Kimyo
+      <button class="ai-subject-btn" data-question="{% if lang == 'tj' %}Дар бораи элементҳои химия савол дорам{% elif lang == 'ru' %}Вопрос по химии{% else %}I have a chemistry question{% endif %}">
+        <span class="icon">🧪</span> {% if lang == 'tj' %}Химия{% elif lang == 'ru' %}Химия{% else %}Chemistry{% endif %}
       </button>
-      <button class="ai-subject-btn" data-question="Biologiya bo'yicha savol bor">
-        <span class="icon">🌿</span> Biologiya
+      <button class="ai-subject-btn" data-question="{% if lang == 'tj' %}Дар бораи биология савол дорам{% elif lang == 'ru' %}Вопрос по биологии{% else %}I have a biology question{% endif %}">
+        <span class="icon">🌿</span> {% if lang == 'tj' %}Биология{% elif lang == 'ru' %}Биология{% else %}Biology{% endif %}
       </button>
-      <button class="ai-subject-btn" data-question="Tarix bo'yicha savol bermoqchiman">
-        <span class="icon">📜</span> Tarix
+      <button class="ai-subject-btn" data-question="{% if lang == 'tj' %}Дар бораи таърих савол дорам{% elif lang == 'ru' %}Вопрос по истории{% else %}I have a history question{% endif %}">
+        <span class="icon">📜</span> {% if lang == 'tj' %}Таърих{% elif lang == 'ru' %}История{% else %}History{% endif %}
       </button>
-      <button class="ai-subject-btn" data-question="Ingliz tili grammatikasidan savol">
-        <span class="icon">🇬🇧</span> Ingliz tili
+      <button class="ai-subject-btn" data-question="{% if lang == 'tj' %}Савол дар бораи грамматикаи забони англисӣ{% elif lang == 'ru' %}Вопрос по грамматике английского{% else %}English grammar question{% endif %}">
+        <span class="icon">🇬🇧</span> {% if lang == 'tj' %}Забони Англисӣ{% elif lang == 'ru' %}Английский язык{% else %}English Language{% endif %}
       </button>
     </div>
 
-    <!-- Rate limit info -->
     <div class="ai-limit-info">
-      <div style="font-weight:600; color:var(--text-main); margin-bottom:.25rem;">
-        Kunlik limit
+      <div style="font-weight:600;color:var(--text-main);margin-bottom:.25rem;">
+        {% if lang == 'tj' %}Лимити рӯзона{% elif lang == 'ru' %}Дневной лимит{% else %}Daily Limit{% endif %}
       </div>
-      <div class="ai-limit-bar">
-        <div class="ai-limit-bar__fill" id="limitBar" style="width:0%"></div>
-      </div>
-      <span id="limitText">Minutiga 5 ta so'rov</span>
+      <div class="ai-limit-bar"><div class="ai-limit-bar__fill" id="limitBar"></div></div>
+      <span id="limitText">{% if lang == 'tj' %}5 дархост дар як дақиқа{% elif lang == 'ru' %}5 запросов в минуту{% else %}5 requests per minute{% endif %}</span>
     </div>
   </aside>
 
-  <!-- ── CHAT PANEL ── -->
+  <!-- CHAT PANEL -->
   <div class="ai-chat-panel">
-    <!-- Header -->
     <div class="ai-chat-panel__header">
       <div class="d-flex align-items-center gap-2">
         <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--color-primary),var(--color-accent));display:flex;align-items:center;justify-content:center;color:#fff;font-size:1rem;">🤖</div>
         <div>
           <div style="font-weight:700;font-size:.95rem;font-family:'Outfit',sans-serif;">AI Muallim</div>
           <div style="font-size:.75rem;color:#4ade80;display:flex;align-items:center;gap:.3rem;">
-            <span class="ai-status-dot" style="width:6px;height:6px;"></span> Online
+            <span class="ai-status-dot" style="width:6px;height:6px;"></span>
+            {% if lang == 'tj' %}Онлайн{% elif lang == 'ru' %}Онлайн{% else %}Online{% endif %}
           </div>
         </div>
       </div>
       <button id="clearChatBtn" class="btn btn-sm rounded-pill px-3"
               style="border:1px solid var(--border-color);background:var(--bg-darker);color:var(--text-muted);font-size:.78rem;">
-        <i class="bi bi-trash3 me-1"></i> Tozalash
+        <i class="bi bi-trash3 me-1"></i>
+        {% if lang == 'tj' %}Тоза кардани чат{% elif lang == 'ru' %}Очистить{% else %}Clear{% endif %}
       </button>
     </div>
 
-    <!-- Messages -->
     <div class="ai-chat-panel__messages" id="chatMessages">
-      <!-- Welcome message -->
-      <div class="ai-msg ai-msg--bot" id="welcomeMsg">
+      <div class="ai-msg ai-msg--bot">
         <div class="ai-msg__avatar">🤖</div>
-        <div>
-          <div class="ai-msg__bubble">
-            Salom, <strong>{{ user.username }}</strong>! Men Edunify AI Muallimman 👋<br><br>
-            Matematika, Fizika, Kimyo, Biologiya, Tarix va boshqa ta'lim fanlaridan savolingizni bering — darhol javob beraman!<br><br>
-            <em style="font-size:.82rem;opacity:.8;">Maslahat: Savolni aniq va to'liq yozing.</em>
+        <div class="ai-msg__content">
+          <div class="ai-msg__bubble tex2jax_process">
+            {% if lang == 'tj' %}
+              Салом, <strong>{{ user.username }}</strong>! Ман Муаллими сунъии Edunify ҳастам 👋<br><br>Аз фанҳои математика, физика, химия, биология, таърих ва забони англисӣ савол диҳед — ман фавран ҷавоб медиҳам!<br><br><em style='font-size:.82rem;opacity:.8;'>Маслиҳат: Саволро возеҳ ва пурра нависед.</em>
+            {% elif lang == 'ru' %}
+              Привет, <strong>{{ user.username }}</strong>! Я AI Учитель Edunify 👋<br><br>Задайте вопрос по Математике, Физике, Химии, Биологии, Истории или Английскому — отвечу сразу!<br><br><em style='font-size:.82rem;opacity:.8;'>Совет: Формулируйте вопрос чётко и полно.</em>
+            {% else %}
+              Hello, <strong>{{ user.username }}</strong>! I am Edunify AI Teacher 👋<br><br>Ask me anything about Math, Physics, Chemistry, Biology, History or English — I'll answer instantly!<br><br><em style='font-size:.82rem;opacity:.8;'>Tip: Write your question clearly and completely.</em>
+            {% endif %}
           </div>
-          <span class="ai-msg__time">Hozir</span>
+          <span class="ai-msg__time">{% if lang == 'tj' %}Ҳозир{% elif lang == 'ru' %}Сейчас{% else %}Now{% endif %}</span>
         </div>
       </div>
     </div>
 
-    <!-- Input bar -->
     <div class="ai-input-bar">
-      <div class="ai-input-wrap">
-        <textarea id="aiInput" rows="1"
-          placeholder="Savolingizni yozing... (Shift+Enter — yangi qator, Enter — yuborish)"></textarea>
-        <button class="ai-send-btn" id="aiSendBtn" aria-label="Yuborish">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" fill="currentColor"/>
-          </svg>
-        </button>
+      <div class="ai-input-container-inner">
+        <div class="ai-input-wrap">
+          <textarea id="aiInput" rows="1" placeholder="{% if lang == 'tj' %}Саволи худро нависед... (Shift+Enter — сатри нав, Enter — фиристодан){% elif lang == 'ru' %}Напишите вопрос... (Shift+Enter — новая строка, Enter — отправить){% else %}Write your question... (Shift+Enter — new line, Enter — send){% endif %}"></textarea>
+          <button class="ai-send-btn" id="aiSendBtn" aria-label="Send">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M2 21l21-9L2 3v7l15 2-15 2v7z" fill="currentColor"/>
+            </svg>
+          </button>
+        </div>
+        <p class="ai-input-hint">
+          <i class="bi bi-shield-check me-1"></i>
+          {% if lang == 'tj' %}AI танҳо ба мавзӯъҳои таълимӣ ҷавоб медиҳад · Бехатар ва таҳти назорат{% elif lang == 'ru' %}AI отвечает только на учебные темы · Безопасно и под контролем{% else %}AI only answers educational topics · Safe and monitored{% endif %}
+        </p>
       </div>
-      <p class="ai-input-hint">
-        <i class="bi bi-shield-check me-1"></i>
-        AI faqat ta'lim mavzularida javob beradi · Xavfsiz va nazorat qilingan
-      </p>
     </div>
   </div>
 </div>
 
+<!-- MathJax & Marked JS libraries for premium typography rendering -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
-(function () {
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+      processEscapes: true
+    },
+    options: {
+      ignoreHtmlClass: 'tex2jax_ignore',
+      processHtmlClass: 'tex2jax_process'
+    }
+  };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+
+<script>
+(function(){
   'use strict';
+  const messagesEl = document.getElementById('chatMessages');
+  const inputEl    = document.getElementById('aiInput');
+  const sendBtn    = document.getElementById('aiSendBtn');
+  const clearBtn   = document.getElementById('clearChatBtn');
+  const limitBar   = document.getElementById('limitBar');
+  const limitText  = document.getElementById('limitText');
+  const csrf = document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '';
 
-  const messagesEl  = document.getElementById('chatMessages');
-  const inputEl     = document.getElementById('aiInput');
-  const sendBtn     = document.getElementById('aiSendBtn');
-  const clearBtn    = document.getElementById('clearChatBtn');
-  const limitBar    = document.getElementById('limitBar');
-  const limitText   = document.getElementById('limitText');
-  const csrfToken   = document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '';
+  const TXT = {
+    cleared:    "{% if lang == 'tj' %}Чат тоза карда шуд. Саволи нави худро нависед! 😊{% elif lang == 'ru' %}Чат очищен. Задайте новый вопрос! 😊{% else %}Chat cleared. Ask a new question! 😊{% endif %}",
+    limitDone:  "{% if lang == 'tj' %}⏳ Лимит ба охир расид. Лутфан 1 дақиқа интизор шавед.{% elif lang == 'ru' %}⏳ Лимит исчерпан. Подождите 1 минуту.{% else %}⏳ Limit reached. Please wait 1 minute.{% endif %}",
+    netErr:     "{% if lang == 'tj' %}❌ Хатогии шабака. Пайвасти интернетро тафтиш кунед.{% elif lang == 'ru' %}❌ Ошибка сети. Проверьте подключение к интернету.{% else %}❌ Network error. Check your internet connection.{% endif %}",
+    err:        "{% if lang == 'tj' %}❌ Хатогӣ рӯй дод{% elif lang == 'ru' %}❌ Произошла ошибка{% else %}❌ An error occurred{% endif %}",
+    reqLeft:    "{% if lang == 'tj' %}дархост боқӣ монд{% elif lang == 'ru' %}запросов осталось{% else %}requests left{% endif %}",
+    limitOver:  "{% if lang == 'tj' %}⚠️ Лимит ба охир расид, 1 дақиқа интизор шавед{% elif lang == 'ru' %}⚠️ Лимит исчерпан, подождите 1 минуту{% else %}⚠️ Limit reached, wait 1 minute{% endif %}",
+  };
 
-  let requestCount = 0;
-  const MAX_REQUESTS = 5;
+  let count = 0;
+  const MAX = 5;
 
-  function getTime() {
-    return new Date().toLocaleTimeString('uz-UZ', {hour:'2-digit', minute:'2-digit'});
+  function time(){
+    return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
   }
 
-  function appendMessage(role, html) {
+  // Parses markdown and restores raw LaTeX delimiters so MathJax can render them
+  function parseContent(text) {
+    const mathBlocks = [];
+    let placeholderIndex = 0;
+    
+    // Replace $$...$$ block equations
+    let processed = text.replace(/\$\$([\s\S]+?)\$\$/g, (match, math) => {
+      const key = `@@MATH_BLOCK_${placeholderIndex++}@@`;
+      mathBlocks.push({ key, math: `$$${math}$$` });
+      return key;
+    });
+    
+    // Replace $...$ inline equations
+    processed = processed.replace(/\$([\s\S]+?)\$/g, (match, math) => {
+      const key = `@@MATH_BLOCK_${placeholderIndex++}@@`;
+      mathBlocks.push({ key, math: `$${math}$` });
+      return key;
+    });
+    
+    // Convert Markdown to HTML
+    let html = typeof marked !== 'undefined' ? marked.parse(processed) : processed;
+    
+    // Restore math blocks
+    mathBlocks.forEach(item => {
+      html = html.replace(item.key, item.math);
+    });
+    
+    return html;
+  }
+
+  function appendMsg(role, html){
     const isBot = role === 'bot';
-    const div = document.createElement('div');
-    div.className = `ai-msg ai-msg--${role}`;
-    div.innerHTML = `
+    const d = document.createElement('div');
+    d.className = `ai-msg ai-msg--${role}`;
+    d.innerHTML = `
       <div class="ai-msg__avatar">${isBot ? '🤖' : '👤'}</div>
-      <div>
-        <div class="ai-msg__bubble">${html}</div>
-        <span class="ai-msg__time">${getTime()}</span>
+      <div class="ai-msg__content">
+        <div class="ai-msg__bubble tex2jax_process">${html}</div>
+        <span class="ai-msg__time">${time()}</span>
       </div>`;
-    messagesEl.appendChild(div);
+    messagesEl.appendChild(d);
     messagesEl.scrollTop = messagesEl.scrollHeight;
+
+    // Trigger MathJax typeset for the new element
+    if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
+      window.MathJax.typesetPromise([d]).catch(err => console.log('MathJax error:', err));
+    }
   }
 
-  function showTyping() {
-    const el = document.createElement('div');
-    el.className = 'ai-msg ai-msg--bot';
-    el.id = 'typingIndicator';
-    el.innerHTML = `
+  function showTyping(){
+    const d = document.createElement('div');
+    d.className = 'ai-msg ai-msg--bot';
+    d.id = 'typing';
+    d.innerHTML = `
       <div class="ai-msg__avatar">🤖</div>
-      <div class="ai-typing"><span></span><span></span><span></span></div>`;
-    messagesEl.appendChild(el);
+      <div class="ai-msg__content">
+        <div class="ai-typing"><span></span><span></span><span></span></div>
+      </div>`;
+    messagesEl.appendChild(d);
     messagesEl.scrollTop = messagesEl.scrollHeight;
   }
 
-  function removeTyping() {
-    document.getElementById('typingIndicator')?.remove();
-  }
+  function removeTyping(){ document.getElementById('typing')?.remove(); }
 
-  function updateLimit() {
-    const pct = (requestCount / MAX_REQUESTS) * 100;
+  function updateLimit(){
+    const pct = (count / MAX) * 100;
     limitBar.style.width = pct + '%';
-    limitBar.style.background = requestCount >= MAX_REQUESTS
+    limitBar.style.background = count >= MAX
       ? 'linear-gradient(90deg,#f87171,#ef4444)'
       : 'linear-gradient(90deg,var(--color-primary),var(--color-accent))';
-    limitText.textContent = requestCount >= MAX_REQUESTS
-      ? '⚠️ Limit tugadi, 1 daqiqa kuting'
-      : `${MAX_REQUESTS - requestCount} ta so'rov qoldi`;
+    limitText.textContent = count >= MAX
+      ? TXT.limitOver
+      : `${MAX - count} ${TXT.reqLeft}`;
   }
 
-  async function sendMessage() {
-    const question = inputEl.value.trim();
-    if (!question) return;
-    if (requestCount >= MAX_REQUESTS) {
-      appendMessage('bot', '⏳ Minutiga 5 ta so\'rov limiti tugadi. Biroz kuting.');
-      return;
-    }
+  async function sendMsg(){
+    const q = inputEl.value.trim();
+    if (!q) return;
+    if (count >= MAX){ appendMsg('bot', TXT.limitDone); return; }
 
     inputEl.value = '';
     inputEl.style.height = 'auto';
     sendBtn.disabled = true;
-
-    appendMessage('user', question.replace(/</g,'&lt;').replace(/>/g,'&gt;'));
+    
+    // User message is plain text, escape HTML elements but let linebreaks behave normally
+    const userSafe = q.replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g, '<br>');
+    appendMsg('user', userSafe);
     showTyping();
-    requestCount++;
+    count++;
     updateLimit();
 
     try {
-      const res = await fetch("{% url 'ai_chat' %}", {
+      const res  = await fetch("{% url 'ai_chat' %}", {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRFToken': csrfToken
-        },
-        body: JSON.stringify({ question })
+        headers: {'Content-Type':'application/json','X-CSRFToken': csrf},
+        body: JSON.stringify({question: q})
       });
       const data = await res.json();
       removeTyping();
-      if (data.answer) {
-        const safe = data.answer
-          .replace(/</g,'&lt;').replace(/>/g,'&gt;')
-          .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
-          .replace(/\n/g,'<br>');
-        appendMessage('bot', safe);
+      if (data.answer){
+        const parsed = parseContent(data.answer);
+        appendMsg('bot', parsed);
       } else {
-        appendMessage('bot', '❌ ' + (data.error || 'Xato yuz berdi'));
+        appendMsg('bot', TXT.err + ': ' + (data.error || ''));
       }
     } catch {
       removeTyping();
-      appendMessage('bot', '❌ Tarmoq xatosi. Internet aloqangizni tekshiring.');
+      appendMsg('bot', TXT.netErr);
     } finally {
       sendBtn.disabled = false;
       inputEl.focus();
     }
   }
 
-  // Auto-resize textarea
-  inputEl.addEventListener('input', function () {
+  inputEl.addEventListener('input', function(){
     this.style.height = 'auto';
     this.style.height = Math.min(this.scrollHeight, 120) + 'px';
   });
-
-  // Send on Enter (Shift+Enter = new line)
-  inputEl.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
+  inputEl.addEventListener('keydown', function(e){
+    if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); sendMsg(); }
   });
+  sendBtn.addEventListener('click', sendMsg);
 
-  sendBtn.addEventListener('click', sendMessage);
-
-  // Quick subject buttons
   document.querySelectorAll('.ai-subject-btn').forEach(btn => {
-    btn.addEventListener('click', function () {
+    btn.addEventListener('click', function(){
       inputEl.value = this.dataset.question;
       inputEl.focus();
       inputEl.style.height = 'auto';
@@ -544,12 +777,11 @@
     });
   });
 
-  // Clear chat
-  clearBtn.addEventListener('click', function () {
+  clearBtn.addEventListener('click', function(){
     messagesEl.innerHTML = '';
-    requestCount = 0;
+    count = 0;
     updateLimit();
-    appendMessage('bot', 'Suhbat tozalandi. Yangi savolingizni yozing! 😊');
+    appendMsg('bot', TXT.cleared);
   });
 
   updateLimit();
@@ -557,3 +789,5 @@
 })();
 </script>
 {% endblock %}
+
+{% block footer %}{% endblock %}

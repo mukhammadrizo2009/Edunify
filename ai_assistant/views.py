@@ -21,13 +21,16 @@ def ai_chat_view(request):
         question = data.get('question', '').strip()
 
         if not question:
-            return JsonResponse({'error': "Savol bo'sh"}, status=400)
+            return JsonResponse({'error': 'Empty question'}, status=400)
 
         if len(question) > 500:
-            return JsonResponse({'error': 'Savol juda uzun (max 500 belgi)'}, status=400)
+            return JsonResponse({'error': 'Question too long (max 500 chars)'}, status=400)
 
-        answer = ai_teacher_response(question, request.user.id)
+        # Session'dan tanlangan tilni olish
+        lang = request.session.get('lang', 'en')
+
+        answer = ai_teacher_response(question, request.user.id, lang=lang)
         return JsonResponse({'answer': answer})
 
     except Exception:
-        return JsonResponse({'error': 'Xato yuz berdi'}, status=500)
+        return JsonResponse({'error': 'Server error'}, status=500)

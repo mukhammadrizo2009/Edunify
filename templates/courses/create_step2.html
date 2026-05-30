@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+{% block title %}{% if lang == 'ru' %}Создание курса — Уроки{% elif lang == 'tj' %}Сохтани курс — Дарсхо{% else %}Create Course — Lessons{% endif %} | Edunify{% endblock %}
+
+{% block extra_css %}
+<style>
+.create-wrap { max-width: 760px; margin: 0 auto; }
+.step-header { text-align: center; margin-bottom: 32px; }
+.step-header h1 {
+    font-family: 'Outfit', sans-serif; font-size: 1.8rem;
+    font-weight: 700; color: var(--text-main); margin-bottom: 6px;
+}
+.step-header p { color: var(--text-muted); font-size: 0.92rem; }
+
+.step-indicator {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0; margin-bottom: 36px;
+}
+.step-dot {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 0.88rem;
+    border: 2px solid var(--border-color);
+    color: var(--text-muted); background: var(--bg-card); z-index: 1;
+}
+.step-dot.active { background: linear-gradient(135deg,#059669,#0d9488); border-color:#059669; color:#fff; }
+.step-dot.done   { background: rgba(5,150,105,.12); border-color:#059669; color:#059669; }
+.step-line { flex:1; height:2px; background:var(--border-color); max-width:80px; }
+.step-line.done { background:#059669; }
+
+/* Course info chip */
+.course-info-chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(5,150,105,.1); border: 1px solid rgba(5,150,105,.2);
+    border-radius: 999px; padding: 6px 16px;
+    font-size: 0.8rem; color: #059669; font-weight: 600; margin-bottom: 24px;
+}
+[data-theme="dark"] .course-info-chip { color: #34d399; }
+
+/* Lesson list */
+.lesson-list { margin-bottom: 24px; }
+.lesson-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px;
+    background: var(--bg-darker); border: 1px solid var(--border-color);
+    border-radius: 14px; margin-bottom: 10px;
+    animation: slideIn 0.3s ease;
+}
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.lesson-item:last-child { margin-bottom: 0; }
+.lesson-num {
+    width: 32px; height: 32px; border-radius: 9px;
+    background: linear-gradient(135deg,#059669,#0d9488);
+    display: flex; align-items: center; justify-content: center;
+    color:#fff; font-size:0.82rem; font-weight:700; flex-shrink:0;
+}
+.lesson-info { flex: 1; min-width: 0; }
+.lesson-title-txt {
+    font-weight: 600; font-size: 0.88rem;
+    color: var(--text-main); white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+}
+.lesson-meta { font-size: 0.74rem; color: var(--text-muted); margin-top: 2px; }
+.lesson-done-badge {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 0.74rem; font-weight: 600; color: #059669;
+    background: rgba(5,150,105,.1); border: 1px solid rgba(5,150,105,.2);
+    border-radius: 999px; padding: 3px 10px; flex-shrink: 0;
+}
+[data-theme="dark"] .lesson-done-badge { color: #34d399; }
+
+/* Add lesson card */
+.add-lesson-card {
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: 22px; overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,.06);
+    margin-bottom: 20px;
+}
+.add-lesson-header {
+    background: linear-gradient(135deg, #0d9488, #059669);
+    padding: 18px 28px; display: flex; align-items: center; gap: 12px;
+}
+.add-lesson-header i { font-size: 1.3rem; color: rgba(255,255,255,.9); }
+.add-lesson-header h2 {
+    font-family: 'Outfit', sans-serif; font-size: 1rem;
+    font-weight: 700; color: #fff; margin: 0;
+}
+.add-lesson-body { padding: 24px 28px; }
+
+.field-group { margin-bottom: 20px; }
+.field-label {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 0.85rem; font-weight: 600;
+    color: var(--text-main); margin-bottom: 8px;
+}
+.field-label i { color: #059669; font-size: 0.9rem; }
+.field-input {
+    width: 100%; background: var(--bg-darker);
+    border: 1.5px solid var(--border-color);
+    color: var(--text-main); border-radius: 12px;
+    padding: 11px 14px; font-size: 0.92rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: 'Inter', sans-serif;
+}
+.field-input:focus {
+    outline: none; border-color: #059669;
+    box-shadow: 0 0 0 3px rgba(5,150,105,.15);
+    background: var(--bg-card);
+}
+.field-input::placeholder { color: var(--text-muted); }
+textarea.field-input { resize: vertical; min-height: 90px; }
+
+/* Action buttons */
+.actions-row {
+    display: flex; gap: 12px; margin-top: 4px; align-items: stretch;
+}
+.btn-add-lesson {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 9px;
+    background: var(--bg-darker); border: 1.5px solid rgba(5,150,105,.4);
+    color: #059669 !important; border-radius: 13px;
+    padding: 13px 20px; font-size: 0.9rem; font-weight: 700;
+    cursor: pointer; transition: all 0.22s ease;
+    font-family: 'Inter', sans-serif; text-decoration: none;
+}
+.btn-add-lesson:hover {
+    background: rgba(5,150,105,.08);
+    border-color: #059669;
+    transform: translateY(-1px);
+}
+[data-theme="dark"] .btn-add-lesson { color: #34d399 !important; }
+
+.btn-finish {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 9px;
+    background: linear-gradient(135deg,#059669,#0d9488);
+    color: #fff !important; border: none; border-radius: 13px;
+    padding: 13px 20px; font-size: 0.95rem; font-weight: 700;
+    cursor: pointer; transition: all 0.25s ease;
+    box-shadow: 0 4px 16px rgba(5,150,105,.3);
+    font-family: 'Inter', sans-serif;
+}
+.btn-finish:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(5,150,105,.4); }
+
+/* Alert */
+.alert-msg {
+    border-radius: 12px; padding: 12px 16px; margin-bottom: 20px;
+    font-size: 0.82rem; display: flex; gap: 9px; align-items: center;
+}
+.alert-success {
+    background: rgba(5,150,105,.08); border: 1px solid rgba(5,150,105,.2);
+    color: #059669;
+}
+.alert-error {
+    background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.2);
+    color: #ef4444;
+}
+[data-theme="dark"] .alert-success { color: #34d399; }
+
+/* Counter badge */
+.lessons-count-badge {
+    background: rgba(5,150,105,.12);
+    color: #059669; font-size: 0.72rem; font-weight: 700;
+    padding: 3px 10px; border-radius: 999px;
+}
+[data-theme="dark"] .lessons-count-badge { color: #34d399; }
+
+/* Section header */
+.section-hdr {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 16px;
+}
+.section-hdr-icon {
+    width: 34px; height: 34px; border-radius: 10px;
+    background: linear-gradient(135deg, #059669, #0d9488);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 0.95rem;
+}
+.section-hdr-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.95rem; font-weight: 700;
+    color: var(--text-main); flex: 1;
+}
+
+/* Quiz hint */
+.quiz-hint {
+    background: rgba(245,158,11,.07); border: 1px solid rgba(245,158,11,.25);
+    border-radius: 12px; padding: 12px 16px;
+    font-size: 0.8rem; color: #b45309; display: flex; gap: 9px;
+    margin-bottom: 20px;
+}
+[data-theme="dark"] .quiz-hint { color: #fbbf24; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="create-wrap">
+
+    <div class="step-header">
+        <h1><i class="bi bi-collection-fill" style="color:#059669;margin-right:8px;"></i>{% if lang == 'ru' %}Управление уроками{% elif lang == 'tj' %}Идора кардани дарсхо{% else %}Manage Lessons{% endif %}</h1>
+        <p>{% if lang == 'ru' %}Добавьте уроки и перейдите к созданию тестов{% elif lang == 'tj' %}Дарсхо илова кунед ва ба сохтани тест гузаред{% else %}Add lessons and proceed to create quizzes{% endif %}</p>
+    </div>
+
+    <!-- Step indicator -->
+    <div class="step-indicator">
+        <div class="step-dot done"><i class="bi bi-check-lg"></i></div>
+        <div class="step-line done"></div>
+        <div class="step-dot active">2</div>
+    </div>
+
+    <!-- Course info chip -->
+    <div style="text-align:center; margin-bottom:28px;">
+        <div class="course-info-chip">
+            <i class="bi bi-book-fill"></i>
+            {{ course.title }} &bull; {{ course.category.name }}
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for msg in messages %}
+        <div class="alert-msg {% if 'Dars qo' in msg %}alert-success{% else %}alert-error{% endif %}">
+            <i class="bi {% if 'Dars qo' in msg %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %}"></i>
+            {{ msg }}
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Quiz hint -->
+    <div class="quiz-hint">
+        <i class="bi bi-lightbulb-fill" style="flex-shrink:0;"></i>
+        <div>
+            <strong>{% if lang == 'ru' %}Подсказка:{% elif lang == 'tj' %}Эслатма:{% else %}Tip:{% endif %}</strong>
+            {% if lang == 'ru' %}После добавления уроков нажмите кнопку <strong>"Создать тест"</strong> на панели для каждого урока.
+            {% elif lang == 'tj' %}Пас аз илова кардани дарсхо, аз панел тугмаи <strong>"Тест созед"</strong> ро бифшаред ва барои ҳар дарс тест созед.
+            {% else %}After adding lessons, click <strong>"Create Quiz"</strong> on the dashboard to add a quiz for each lesson.{% endif %}
+        </div>
+    </div>
+
+    <!-- Mavjud darslar ro'yxati -->
+    <div class="section-hdr">
+        <div class="section-hdr-icon"><i class="bi bi-list-ol"></i></div>
+        <div class="section-hdr-title">{% if lang == 'ru' %}Добавленные уроки{% elif lang == 'tj' %}Дарсхои иловашуда{% else %}Added Lessons{% endif %}</div>
+        <span class="lessons-count-badge">{{ lessons.count }}</span>
+    </div>
+
+    <div class="lesson-list">
+        {% for lesson in lessons %}
+        <div class="lesson-item">
+            <div class="lesson-num">{{ forloop.counter }}</div>
+            <div class="lesson-info">
+                <div class="lesson-title-txt">{{ lesson.title }}</div>
+                <div class="lesson-meta">
+                    {{ lesson.content|truncatechars:60 }}
+                </div>
+            </div>
+            <div class="lesson-done-badge">
+                <i class="bi bi-check2"></i> {% if lang == 'ru' %}Добавлен{% elif lang == 'tj' %}Илова шуд{% else %}Added{% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Yana dars qo'shish -->
+    <div class="add-lesson-card">
+        <div class="add-lesson-header">
+            <i class="bi bi-plus-circle-fill"></i>
+            <h2>{% if lang == 'ru' %}Добавить ещё урок (необязательно){% elif lang == 'tj' %}Дарси дигар илова кунед (ихтиёрӣ){% else %}Add Another Lesson (optional){% endif %}</h2>
+        </div>
+        <div class="add-lesson-body">
+            <form method="post" id="addLessonForm">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_lesson">
+
+                <div class="field-group">
+                    <label class="field-label" for="id_lesson_title">
+                        <i class="bi bi-journal-text"></i>
+                        {% if lang == 'ru' %}Название урока{% elif lang == 'tj' %}Номи дарс{% else %}Lesson Name{% endif %}
+                    </label>
+                    <input type="text" id="id_lesson_title" name="lesson_title"
+                           class="field-input"
+                           placeholder="{% if lang == 'ru' %}Например: Урок 2 — Переменные{% elif lang == 'tj' %}Масалан: Дарс 2 — Тағйиробахо{% else %}Example: Lesson 2 — Variables{% endif %}">
+                </div>
+
+                <div class="field-group" style="margin-bottom:0;">
+                    <label class="field-label" for="id_lesson_content">
+                        <i class="bi bi-chat-left-text-fill"></i>
+                        {% if lang == 'ru' %}Содержание урока{% elif lang == 'tj' %}Мазмуни дарс{% else %}Lesson Content{% endif %}
+                    </label>
+                    <textarea id="id_lesson_content" name="lesson_content"
+                              class="field-input" rows="3"
+                              placeholder="{% if lang == 'ru' %}Введите содержание урока...{% elif lang == 'tj' %}Мазмуни дарсро варид кунед...{% else %}Enter lesson content...{% endif %}"></textarea>
+                </div>
+
+                <div class="actions-row" style="margin-top:20px;">
+                    <button type="submit" class="btn-add-lesson" id="addBtn">
+                        <i class="bi bi-plus-circle"></i>
+                        {% if lang == 'ru' %}Добавить урок{% elif lang == 'tj' %}Дарс илова кунед{% else %}Add Lesson{% endif %}
+                    </button>
+                </div>
+            </form>
+
+            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                <form method="post" id="finishForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="finish">
+                    <button type="submit" class="btn-finish" id="finishBtn">
+                        <i class="bi bi-check2-circle"></i>
+                        {% if lang == 'ru' %}Завершить курс и вернуться{% elif lang == 'tj' %}Курсро тамом кунед{% else %}Finish Course{% endif %}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('addLessonForm').addEventListener('submit', function() {
+    const btn = document.getElementById('addBtn');
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Qo\'shilmoqda...';
+    btn.disabled = true;
+});
+document.getElementById('finishForm').addEventListener('submit', function() {
+    const btn = document.getElementById('finishBtn');
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Yuklanmoqda...';
+    btn.disabled = true;
+});
+</script>
+{% endblock %}

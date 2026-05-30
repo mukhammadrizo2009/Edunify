@@ -1,0 +1,402 @@
+{% extends 'base.html' %}
+{% block title %}Edit Profile — Edunify{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ══════════════════════════════════════════════════
+   ROLE-BASED COLOR TOKENS
+   Teacher → emerald green  |  Student → ocean blue
+   ══════════════════════════════════════════════════ */
+
+{% if user.role == 'teacher' or user.role == 'admin' %}
+.edit-layout {
+    --role-primary:      #059669;
+    --role-accent:       #0d9488;
+    --role-glow:         rgba(5, 150, 105, 0.22);
+    --role-glow-soft:    rgba(5, 150, 105, 0.12);
+    --role-glow-ring:    rgba(5, 150, 105, 0.18);
+    --role-badge-border: rgba(5, 150, 105, 0.35);
+    --role-gradient:     linear-gradient(135deg, #059669 0%, #0d9488 100%);
+    --role-btn-shadow:   rgba(5, 150, 105, 0.32);
+    --role-btn-shadow-h: rgba(5, 150, 105, 0.48);
+}
+{% else %}
+.edit-layout {
+    --role-primary:      #185adb;
+    --role-accent:       #0ea5e9;
+    --role-glow:         rgba(24, 90, 219, 0.22);
+    --role-glow-soft:    rgba(24, 90, 219, 0.10);
+    --role-glow-ring:    rgba(24, 90, 219, 0.16);
+    --role-badge-border: rgba(24, 90, 219, 0.30);
+    --role-gradient:     linear-gradient(135deg, #185adb 0%, #0ea5e9 100%);
+    --role-btn-shadow:   rgba(24, 90, 219, 0.30);
+    --role-btn-shadow-h: rgba(24, 90, 219, 0.46);
+}
+{% endif %}
+
+/* ── LAYOUT ── */
+.edit-layout { max-width: 680px; margin: 0 auto; }
+
+.edit-header { text-align: center; margin-bottom: 32px; }
+.edit-header h1 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.85rem; font-weight: 700;
+    color: var(--text-main); margin-bottom: 6px;
+}
+.edit-header p { color: var(--text-muted); font-size: 0.9rem; }
+
+/* ── CARD ── */
+.edit-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 24px; overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,.07);
+    transition: box-shadow 0.3s ease;
+}
+.edit-card:hover { box-shadow: 0 12px 48px var(--role-glow); }
+
+/* ── AVATAR SECTION ── */
+.avatar-section {
+    background: var(--role-gradient);
+    padding: 40px 24px 54px;
+    text-align: center; position: relative; overflow: hidden;
+}
+.avatar-section::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='52' height='52' viewBox='0 0 52 52' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Cpath d='M26 26v-8h-2v8h-8v2h8v8h2v-8h8v-2h-8zM6 6V0H4v6H0v2h4v6h2V8h6V6H6zM46 0v6h-6v2h6v6h2V8h6V6h-6V0h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+}
+.avatar-section::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0;
+    height: 44px; background: var(--bg-card);
+    border-radius: 32px 32px 0 0; z-index: 0;
+}
+
+.avatar-preview-wrap {
+    position: relative; display: inline-block;
+    margin-bottom: 10px; z-index: 2;
+}
+.avatar-preview {
+    width: 118px; height: 118px; border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid rgba(255,255,255,0.92);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.22), 0 0 0 6px var(--role-glow-soft);
+    background: rgba(255,255,255,0.18);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 3rem; color: white; overflow: hidden;
+    transition: box-shadow 0.3s ease;
+}
+.avatar-preview img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+.avatar-upload-btn {
+    position: absolute; bottom: 4px; right: 4px;
+    width: 38px; height: 38px;
+    background: #ffffff !important; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--role-primary) !important; font-size: 1.05rem;
+    cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,.26);
+    transition: all 0.22s ease;
+    border: 2.5px solid var(--role-primary);
+    z-index: 10; line-height: 1; font-weight: normal !important;
+}
+.avatar-upload-btn:hover {
+    transform: scale(1.12);
+    background: var(--role-primary) !important;
+    color: #ffffff !important;
+    box-shadow: 0 6px 20px var(--role-glow);
+}
+.avatar-hint {
+    color: rgba(255,255,255,0.88); font-size: 0.8rem;
+    position: relative; z-index: 2; margin-top: 6px;
+}
+
+/* ── ROLE BADGE ── */
+.role-badge-wrap {
+    position: relative; z-index: 2;
+    display: flex; justify-content: center; margin-top: 12px;
+}
+.role-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.18);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 999px; padding: 5px 16px;
+    font-size: 0.78rem; font-weight: 700; color: #fff;
+    letter-spacing: 0.02em;
+}
+.role-badge i { font-size: 0.85rem; }
+
+/* ── FORM SECTION ── */
+.form-section { padding: 24px 32px 32px; }
+@media (max-width: 576px) { .form-section { padding: 16px 18px 24px; } }
+
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 576px) { .form-row-2 { grid-template-columns: 1fr; } }
+
+.field-group { margin-bottom: 20px; }
+.field-label {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 0.84rem; font-weight: 600;
+    color: var(--text-main); margin-bottom: 8px;
+}
+.field-label i { color: var(--role-primary); font-size: 0.9rem; }
+
+.field-input {
+    width: 100%; background: var(--bg-darker);
+    border: 1.5px solid var(--border-color);
+    color: var(--text-main); border-radius: 12px;
+    padding: 11px 14px; font-size: 0.9rem;
+    transition: border-color 0.22s, box-shadow 0.22s, background 0.22s;
+    font-family: 'Inter', sans-serif;
+}
+.field-input:focus {
+    outline: none;
+    border-color: var(--role-primary);
+    box-shadow: 0 0 0 3px var(--role-glow-ring);
+    background: var(--bg-card); color: var(--text-main);
+}
+.field-input::placeholder { color: var(--text-muted); }
+textarea.field-input { resize: vertical; min-height: 90px; }
+.field-input:disabled { opacity: 0.52; cursor: not-allowed; }
+
+.file-input-hidden { display: none; }
+
+/* ── INFO BAR ── */
+.info-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--role-glow-soft);
+    border: 1px solid var(--role-badge-border);
+    border-radius: 12px; padding: 10px 16px; margin-bottom: 22px;
+}
+.info-bar i { color: var(--role-primary); font-size: 1rem; flex-shrink: 0; }
+.info-bar-text { font-size: 0.81rem; color: var(--text-muted); }
+.info-bar-text strong { color: var(--role-primary); }
+
+/* ── DIVIDER ── */
+.form-divider { border: none; border-top: 1px solid var(--border-color); margin: 24px 0; }
+
+/* ── ACTION BUTTONS ── */
+.form-actions { display: flex; gap: 12px; align-items: center; justify-content: flex-end; }
+
+.btn-cancel {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--bg-darker); border: 1.5px solid var(--border-color);
+    color: var(--text-muted) !important; border-radius: 12px;
+    padding: 11px 22px; font-size: 0.88rem; font-weight: 600;
+    text-decoration: none; transition: all 0.22s ease;
+}
+.btn-cancel:hover {
+    border-color: var(--role-primary);
+    color: var(--role-primary) !important;
+    background: var(--role-glow-soft);
+}
+
+.btn-save {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: var(--role-gradient);
+    color: #fff !important; border: none; border-radius: 12px;
+    padding: 11px 28px; font-size: 0.88rem; font-weight: 700;
+    cursor: pointer; transition: all 0.25s ease;
+    box-shadow: 0 4px 16px var(--role-btn-shadow);
+    font-family: 'Inter', sans-serif;
+}
+.btn-save:hover { transform: translateY(-2px); box-shadow: 0 8px 28px var(--role-btn-shadow-h); }
+.btn-save:active { transform: translateY(0); }
+
+/* ── FIELD ERRORS ── */
+.field-error {
+    color: #ef4444; font-size: 0.78rem; margin-top: 5px;
+    display: flex; align-items: center; gap: 5px;
+}
+
+/* ── AVATAR HOVER RING ── */
+.avatar-preview-wrap:hover .avatar-preview {
+    box-shadow: 0 8px 32px rgba(0,0,0,.18), 0 0 0 8px var(--role-glow-soft);
+}
+</style>
+{% endblock %}
+{% block content %}
+<div class="edit-layout">
+
+    <div class="edit-header">
+        <h1>
+            <i class="bi bi-person-gear" style="color:var(--role-primary);margin-right:8px;"></i>
+            {% if lang == 'ru' %}Редактировать профиль{% elif lang == 'tj' %}Таҳрири профил{% else %}Edit Profile{% endif %}
+        </h1>
+        <p>
+            {% if lang == 'ru' %}Обновите свою информацию и заполните профиль{% elif lang == 'tj' %}Маълумоти худро нав кунед ва профилро пур кунед{% else %}Update your information and complete your profile{% endif %}
+        </p>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" id="profileEditForm">
+        {% csrf_token %}
+
+        <div class="edit-card">
+
+            <!-- ── AVATAR SECTION ── -->
+            <div class="avatar-section">
+                <div class="avatar-preview-wrap">
+                    <div class="avatar-preview" id="avatarPreview">
+                        {% if user.avatar %}
+                            <img src="{{ user.avatar.url }}" alt="Avatar" id="avatarImg">
+                        {% else %}
+                            <i class="bi bi-person-fill" id="avatarIcon"></i>
+                        {% endif %}
+                    </div>
+                    <label for="{{ form.avatar.id_for_label }}" class="avatar-upload-btn" title="{% if lang == 'ru' %}Выбрать изображение{% elif lang == 'tj' %}Интихоби расм{% else %}Select Image{% endif %}">
+                        <i class="bi bi-camera-fill"></i>
+                    </label>
+                </div>
+                <div class="avatar-hint">
+                    {% if lang == 'ru' %}Нажмите на значок камеры, чтобы обновить фото профиля{% elif lang == 'tj' %}Барои навсозии расми профил нишонаи камераро клик кунед{% else %}Click the camera icon to update profile picture{% endif %}
+                </div>
+
+                <!-- Role badge -->
+                <div class="role-badge-wrap">
+                    <div class="role-badge">
+                        {% if user.role == 'teacher' or user.role == 'admin' %}
+                            <i class="bi bi-person-workspace"></i> {% if lang == 'ru' %}Преподаватель{% elif lang == 'tj' %}Омӯзгор{% else %}Teacher{% endif %}
+                        {% else %}
+                            <i class="bi bi-mortarboard-fill"></i> {% if lang == 'ru' %}Студент{% elif lang == 'tj' %}Донишҷӯ{% else %}Student{% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Hidden file input -->
+                <input type="file" name="avatar" id="{{ form.avatar.id_for_label }}"
+                       class="file-input-hidden" accept="image/*" onchange="previewAvatar(this)">
+            </div>
+
+            <!-- ── FORM FIELDS ── -->
+            <div class="form-section">
+
+                <!-- Info bar -->
+                <div class="info-bar">
+                    <i class="bi bi-shield-check-fill"></i>
+                    <div class="info-bar-text">
+                        {% if user.role == 'teacher' or user.role == 'admin' %}
+                            {% if lang == 'ru' %}<strong>Профиль преподавателя</strong> — у вас есть возможность создавать курсы и тесты{% elif lang == 'tj' %}<strong>Профили омӯзгор</strong> — шумо метавонед курсҳо ва тестҳо созед{% else %}<strong>Teacher Profile</strong> — you have the ability to create courses and quizzes{% endif %}
+                        {% else %}
+                            {% if lang == 'ru' %}<strong>Профиль студента</strong> — у вас есть возможность записываться на курсы и проходить тесты{% elif lang == 'tj' %}<strong>Профили донишҷӯ</strong> — шумо метавонед ба курсҳо номнавис шавед ва тестҳо супоред{% else %}<strong>Student Profile</strong> — you have the ability to enroll in courses and solve quizzes{% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Ism va Familiya -->
+                <div class="form-row-2">
+                    <div class="field-group">
+                        <label class="field-label" for="{{ form.first_name.id_for_label }}">
+                            <i class="bi bi-person-fill"></i> {% if lang == 'ru' %}Имя{% elif lang == 'tj' %}Ном{% else %}First Name{% endif %}
+                        </label>
+                        <input type="text"
+                               id="{{ form.first_name.id_for_label }}"
+                               name="first_name"
+                               value="{{ form.first_name.value|default:'' }}"
+                               placeholder="{% if lang == 'ru' %}Имя{% elif lang == 'tj' %}Ном{% else %}First Name{% endif %}"
+                               class="field-input">
+                        {% for error in form.first_name.errors %}
+                            <div class="field-error"><i class="bi bi-exclamation-circle"></i>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="field-group">
+                        <label class="field-label" for="{{ form.last_name.id_for_label }}">
+                            <i class="bi bi-person-fill"></i> {% if lang == 'ru' %}Фамилия{% elif lang == 'tj' %}Насаб{% else %}Last Name{% endif %}
+                        </label>
+                        <input type="text"
+                               id="{{ form.last_name.id_for_label }}"
+                               name="last_name"
+                               value="{{ form.last_name.value|default:'' }}"
+                               placeholder="{% if lang == 'ru' %}Фамилия{% elif lang == 'tj' %}Насаб{% else %}Last Name{% endif %}"
+                               class="field-input">
+                        {% for error in form.last_name.errors %}
+                            <div class="field-error"><i class="bi bi-exclamation-circle"></i>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Telefon -->
+                <div class="field-group">
+                    <label class="field-label" for="{{ form.phone.id_for_label }}">
+                        <i class="bi bi-telephone-fill"></i> {% if lang == 'ru' %}Номер телефона{% elif lang == 'tj' %}Рақами телефон{% else %}Phone Number{% endif %}
+                    </label>
+                    <input type="text"
+                           id="{{ form.phone.id_for_label }}"
+                           name="phone"
+                           value="{{ form.phone.value|default:'' }}"
+                           placeholder="{% if lang == 'ru' %}Номер телефона{% elif lang == 'tj' %}Рақами телефон{% else %}Phone Number{% endif %}"
+                           class="field-input">
+                    {% for error in form.phone.errors %}
+                        <div class="field-error"><i class="bi bi-exclamation-circle"></i>{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <hr class="form-divider">
+
+                <!-- Bio -->
+                <div class="field-group">
+                    <label class="field-label" for="{{ form.bio.id_for_label }}">
+                        <i class="bi bi-chat-quote-fill"></i> {% if lang == 'ru' %}О себе{% elif lang == 'tj' %}Дар бораи худ{% else %}Bio{% endif %}
+                    </label>
+                    <textarea id="{{ form.bio.id_for_label }}"
+                              name="bio"
+                              placeholder="{% if lang == 'ru' %}Напишите немного о себе...{% elif lang == 'tj' %}Дар бораи худ маълумоти кӯтоҳ нависед...{% else %}Write a short bio about yourself...{% endif %}"
+                              class="field-input">{{ form.bio.value|default:'' }}</textarea>
+                    {% for error in form.bio.errors %}
+                        <div class="field-error"><i class="bi bi-exclamation-circle"></i>{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- Email (readonly) -->
+                <div class="field-group">
+                    <label class="field-label">
+                        <i class="bi bi-envelope-fill"></i> {% if lang == 'ru' %}Email (нельзя изменить){% elif lang == 'tj' %}Email (тағйир дода намешавад){% else %}Email (cannot be changed){% endif %}
+                    </label>
+                    <input type="text" value="{{ user.email }}" class="field-input" disabled>
+                </div>
+
+                <!-- Action buttons -->
+                <hr class="form-divider">
+                <div class="form-actions">
+                    <a href="{% url 'dashboard' %}" class="btn-cancel">
+                        <i class="bi bi-x-lg"></i> {% if lang == 'ru' %}Отмена{% elif lang == 'tj' %}Бекор кардан{% else %}Cancel{% endif %}
+                    </a>
+                    <button type="submit" class="btn-save" id="saveBtn">
+                        <i class="bi bi-check2-circle"></i> {% if lang == 'ru' %}Сохранить{% elif lang == 'tj' %}Нигоҳ доштан{% else %}Save{% endif %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function previewAvatar(input) {
+    if (!input.files || !input.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const preview = document.getElementById('avatarPreview');
+        const icon = document.getElementById('avatarIcon');
+        if (icon) icon.remove();
+        let img = document.getElementById('avatarImg');
+        if (!img) {
+            img = document.createElement('img');
+            img.id = 'avatarImg';
+            img.alt = 'Avatar preview';
+            preview.appendChild(img);
+        }
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(input.files[0]);
+}
+
+document.getElementById('profileEditForm').addEventListener('submit', function() {
+    const btn = document.getElementById('saveBtn');
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> {% if lang == "ru" %}Сохранение...{% elif lang == "tj" %}Дар ҳоли нигоҳдорӣ...{% else %}Saving...{% endif %}';
+    btn.disabled = true;
+});
+</script>
+{% endblock %}

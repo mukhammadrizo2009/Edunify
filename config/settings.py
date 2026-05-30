@@ -69,6 +69,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'social_django.context_processors.backends',   # Google OAuth
                 'social_django.context_processors.login_redirect',
+                'users.context_processors.language_processor',
             ],
         },
     },
@@ -118,7 +119,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # ── I18N ─────────────────────────────────────────
-LANGUAGE_CODE = 'uz'
+LANGUAGE_CODE = 'en'
 TIME_ZONE = 'Asia/Tashkent'
 USE_I18N = True
 USE_TZ = True
@@ -141,7 +142,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.CustomUser'
 
 LOGIN_URL = '/users/login/'
-LOGIN_REDIRECT_URL = '/dashboard/'
+LOGIN_REDIRECT_URL = '/users/dashboard/'
 LOGOUT_REDIRECT_URL = '/'
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'

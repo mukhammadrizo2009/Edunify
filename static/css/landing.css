@@ -68,34 +68,34 @@ section { position: relative; z-index: 1; overflow: hidden; }
 .lp-badge {
   display: inline-flex;
   align-items: center;
-  gap: .5rem;
+  gap: 0.6rem;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 999px;
-  padding: .4rem 1rem;
-  font-size: .72rem;
-  font-weight: 600;
-  letter-spacing: .08em;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-muted);
   margin-bottom: 1.5rem;
-  box-shadow: 0 2px 12px rgba(0,0,0,.06);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.04);
 }
 .lp-badge__dot {
-  width: 7px; height: 7px;
+  width: 8px; height: 8px;
   border-radius: 50%;
   background: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(24,90,219,.2);
+  box-shadow: 0 0 0 2px rgba(24,90,219,.2);
   animation: pulseDot 2s ease-in-out infinite;
 }
 @keyframes pulseDot {
-  0%,100% { box-shadow: 0 0 0 3px rgba(24,90,219,.2); }
-  50%      { box-shadow: 0 0 0 6px rgba(24,90,219,.08); }
+  0%,100% { box-shadow: 0 0 0 2px rgba(24,90,219,.2); }
+  50%      { box-shadow: 0 0 0 5px rgba(24,90,219,.08); }
 }
 
 /* Title */
 .lp-hero__title {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: clamp(2.4rem, 5vw, 4rem);
   font-weight: 800;
   line-height: 1.1;
@@ -391,7 +391,7 @@ section { position: relative; z-index: 1; overflow: hidden; }
   padding: .5rem 1.5rem;
 }
 .lp-stat__num {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: 2.4rem;
   font-weight: 800;
   background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
@@ -434,7 +434,7 @@ section { position: relative; z-index: 1; overflow: hidden; }
   margin-bottom: 1rem;
 }
 .lp-section-title {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: clamp(1.8rem, 4vw, 2.8rem);
   font-weight: 800;
   letter-spacing: -.03em;
@@ -500,7 +500,7 @@ section { position: relative; z-index: 1; overflow: hidden; }
   box-shadow: 0 6px 16px rgba(24,90,219,.25);
 }
 .lp-feat-card h3 {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: 1.15rem;
   font-weight: 700;
   color: var(--text-main);
@@ -557,7 +557,7 @@ section { position: relative; z-index: 1; overflow: hidden; }
 }
 .lp-step:hover { transform: translateY(-6px); box-shadow: 0 16px 36px rgba(0,0,0,.08); }
 .lp-step__num {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: 2.5rem;
   font-weight: 800;
   background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
@@ -568,7 +568,7 @@ section { position: relative; z-index: 1; overflow: hidden; }
   margin-bottom: 1rem;
 }
 .lp-step__title {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--text-main);
@@ -604,7 +604,7 @@ section { position: relative; z-index: 1; overflow: hidden; }
   to   { transform: rotate(360deg); }
 }
 .lp-cta__title {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: clamp(1.8rem, 4vw, 2.8rem);
   font-weight: 800;
   color: #fff;

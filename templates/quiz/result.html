@@ -1,56 +1,86 @@
 {% extends 'base.html' %}
 
-{% block title %}Natija: {{ result.quiz.title }} - Edunify{% endblock %}
+{% block title %}
+{% if lang == 'ru' %}Результат{% elif lang == 'tj' %}Натиҷа{% else %}Result{% endif %}: {{ result.quiz.title }} - Edunify
+{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center py-4">
     <div class="col-lg-8">
         <div class="glass-card mb-4 text-center py-5">
-            <h2 class="font-heading text-gradient mb-4">Test Natijalari</h2>
+            <h2 class="font-heading text-gradient mb-4">
+                {% if lang == 'ru' %}Результаты теста{% elif lang == 'tj' %}Натиҷахои тест{% else %}Quiz Results{% endif %}
+            </h2>
             
             <div class="d-inline-flex align-items-center justify-content-center rounded-circle border border-purple border-3 mb-4" style="width: 150px; height: 150px; background: rgba(139, 92, 246, 0.1);">
                 <div class="text-center">
                     <span class="display-4 fw-bold text-white">{{ result.score }}</span>
-                    <span class="text-muted d-block small">/ {{ result.total_questions }} ta to'g'ri</span>
+                    <span class="text-muted d-block small">
+                        / {{ result.total_questions }}
+                        {% if lang == 'ru' %}верных{% elif lang == 'tj' %}дуруст{% else %}correct{% endif %}
+                    </span>
                 </div>
             </div>
             
             <h3 class="mb-4 text-white">
-                Sizning Natijangiz: <span class="text-gradient font-heading">{{ result.get_percentage }}%</span>
+                {% if lang == 'ru' %}Ваш результат:{% elif lang == 'tj' %}Натиҷаи шумо:{% else %}Your Score:{% endif %}
+                <span class="text-gradient font-heading">{{ result.get_percentage }}%</span>
             </h3>
             
             <div class="d-flex justify-content-center gap-3 mb-3">
                 {% if result.is_passed %}
-                    <span class="badge bg-success fs-6 px-3 py-2"><i class="bi bi-patch-check-fill me-1"></i> Testdan O'tdingiz</span>
+                    <span class="badge bg-success fs-6 px-3 py-2">
+                        <i class="bi bi-patch-check-fill me-1"></i>
+                        {% if lang == 'ru' %}Тест пройден{% elif lang == 'tj' %}Тест гузаронида шуд{% else %}Test Passed{% endif %}
+                    </span>
                 {% else %}
-                    <span class="badge bg-danger fs-6 px-3 py-2"><i class="bi bi-x-circle-fill me-1"></i> Yiqildingiz</span>
+                    <span class="badge bg-danger fs-6 px-3 py-2">
+                        <i class="bi bi-x-circle-fill me-1"></i>
+                        {% if lang == 'ru' %}Не пройден{% elif lang == 'tj' %}Нагузашт{% else %}Failed{% endif %}
+                    </span>
                 {% endif %}
-                <span class="badge bg-dark border border-secondary text-muted fs-6 px-3 py-2"><i class="bi bi-clock me-1"></i> {{ result.time_spent }} soniya</span>
+                <span class="badge bg-dark border border-secondary text-muted fs-6 px-3 py-2">
+                    <i class="bi bi-clock me-1"></i> {{ result.time_spent }}
+                    {% if lang == 'ru' %}сек{% elif lang == 'tj' %}сон{% else %}sec{% endif %}
+                </span>
             </div>
             
             <div class="d-flex justify-content-center gap-3 mt-4">
-                <a href="{% url 'lesson_detail' result.quiz.lesson.pk %}" class="btn btn-outline-purple"><i class="bi bi-arrow-left me-1"></i> Darsga Qaytish</a>
-                <a href="{% url 'dashboard' %}" class="btn btn-purple"><i class="bi bi-speedometer2 me-1"></i> Dashboard</a>
+                <a href="{% url 'lesson_detail' result.quiz.lesson.pk %}" class="btn btn-outline-purple">
+                    <i class="bi bi-arrow-left me-1"></i>
+                    {% if lang == 'ru' %}Вернуться к уроку{% elif lang == 'tj' %}Бозгашт ба дарс{% else %}Back to Lesson{% endif %}
+                </a>
+                <a href="{% url 'dashboard' %}" class="btn btn-purple">
+                    <i class="bi bi-speedometer2 me-1"></i> Dashboard
+                </a>
             </div>
         </div>
         
         <!-- Asynchronous AI Feedback Section -->
         <div class="glass-card">
             <h4 class="font-heading mb-4 d-flex align-items-center gap-2">
-                <i class="bi bi-robot text-gradient fs-4"></i> Sun'iy Intellekt Tahlili
+                <i class="bi bi-robot text-gradient fs-4"></i>
+                {% if lang == 'ru' %}Анализ искусственного интеллекта
+                {% elif lang == 'tj' %}Тахлили зехни сунъӣ
+                {% else %}AI Analysis{% endif %}
             </h4>
             
             <div id="aiFeedbackContainer">
-                <!-- Shimmer Loader while fetching feedback -->
+                <!-- Shimmer Loader -->
                 <div id="aiFeedbackLoader">
                     <div class="shimmer-loader" style="width: 100%;"></div>
                     <div class="shimmer-loader" style="width: 90%;"></div>
                     <div class="shimmer-loader" style="width: 95%;"></div>
                     <div class="shimmer-loader" style="width: 60%;"></div>
-                    <p class="text-muted small text-center mt-3 mb-0"><i class="spinner-border spinner-border-sm text-purple me-1" role="status"></i> Gemini AI test natijalaringizni tahlil qilmoqda, iltimos kuting...</p>
+                    <p class="text-muted small text-center mt-3 mb-0">
+                        <i class="spinner-border spinner-border-sm text-purple me-1" role="status"></i>
+                        {% if lang == 'ru' %}Gemini AI анализирует ваши результаты, пожалуйста подождите...
+                        {% elif lang == 'tj' %}Gemini AI натиҷахои шуморо тахлил мекунад, лутфан интизор шавед...
+                        {% else %}Gemini AI is analyzing your results, please wait...{% endif %}
+                    </p>
                 </div>
                 
-                <!-- Feedback Content Placeholder -->
+                <!-- Feedback Content -->
                 <div id="aiFeedbackContent" class="d-none">
                     <div class="p-3 border border-secondary bg-darker rounded-3 leading-relaxed fs-6 text-white" id="aiFeedbackText" style="white-space: pre-line;"></div>
                 </div>
@@ -60,14 +90,28 @@
         <!-- Wrong Questions review -->
         {% if result.wrong_questions %}
             <div class="glass-card mt-4">
-                <h4 class="font-heading mb-4 text-danger"><i class="bi bi-exclamation-triangle-fill me-2"></i> Yo'l qo'yilgan Xatolar</h4>
+                <h4 class="font-heading mb-4 text-danger">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    {% if lang == 'ru' %}Допущенные ошибки{% elif lang == 'tj' %}Хатохои иртикоб ёфта{% else %}Mistakes Made{% endif %}
+                </h4>
                 <div class="list-group list-group-flush bg-transparent">
                     {% for wq in result.wrong_questions %}
                         <div class="list-group-item bg-transparent border-secondary py-3 px-0">
-                            <h6 class="font-heading text-light mb-2">Savol: {{ wq.question }}</h6>
+                            <h6 class="font-heading text-light mb-2">
+                                {% if lang == 'ru' %}Вопрос:{% elif lang == 'tj' %}Савол:{% else %}Question:{% endif %}
+                                {{ wq.question }}
+                            </h6>
                             <div class="d-flex gap-4">
-                                <span class="text-danger small"><i class="bi bi-x-circle-fill me-1"></i> Sizning javobingiz: <strong>{{ wq.user_answer }}</strong></span>
-                                <span class="text-success small"><i class="bi bi-check-circle-fill me-1"></i> To'g'ri javob: <strong>{{ wq.correct_answer }}</strong></span>
+                                <span class="text-danger small">
+                                    <i class="bi bi-x-circle-fill me-1"></i>
+                                    {% if lang == 'ru' %}Ваш ответ:{% elif lang == 'tj' %}Ҷавоби шумо:{% else %}Your answer:{% endif %}
+                                    <strong>{{ wq.user_answer }}</strong>
+                                </span>
+                                <span class="text-success small">
+                                    <i class="bi bi-check-circle-fill me-1"></i>
+                                    {% if lang == 'ru' %}Правильный ответ:{% elif lang == 'tj' %}Ҷавоби дуруст:{% else %}Correct answer:{% endif %}
+                                    <strong>{{ wq.correct_answer }}</strong>
+                                </span>
                             </div>
                         </div>
                     {% endfor %}
@@ -86,7 +130,6 @@
         const textContainer = document.getElementById("aiFeedbackText");
         
         try {
-            // Natija havolasi orqali asinxron ravishda AI tahlilini yuklab olamiz
             const response = await fetch("{% url 'quiz_ai_feedback' result.pk %}");
             const data = await response.json();
             
@@ -95,12 +138,12 @@
                 loader.classList.add("d-none");
                 content.classList.remove("d-none");
             } else {
-                textContainer.innerText = "Tahlilni yuklashda xatolik yuz berdi.";
+                textContainer.innerText = "{% if lang == 'ru' %}Ошибка загрузки анализа.{% elif lang == 'tj' %}Хатои бор кардани тахлил.{% else %}Error loading analysis.{% endif %}";
                 loader.classList.add("d-none");
                 content.classList.remove("d-none");
             }
         } catch (err) {
-            textContainer.innerText = "Sun'iy intellekt xizmati bilan aloqa o'rnatib bo'lmadi.";
+            textContainer.innerText = "{% if lang == 'ru' %}Не удалось подключиться к AI.{% elif lang == 'tj' %}Ба AI пайваст карда намешавад.{% else %}Could not connect to AI service.{% endif %}";
             loader.classList.add("d-none");
             content.classList.remove("d-none");
         }

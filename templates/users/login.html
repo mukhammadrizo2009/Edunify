@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Kirish — Edunify{% endblock %}
+{% block title %}{% if lang == 'ru' %}Войти{% elif lang == 'tj' %}Даромадан{% else %}Log In{% endif %} — Edunify{% endblock %}
 
 {% block extra_css %}
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;800&display=swap" rel="stylesheet">
@@ -83,6 +83,7 @@
     transition: border-color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.15s;
     font-family: 'Inter', sans-serif;
     margin-bottom: 1.1rem;
+    text-decoration: none;
   }
   .btn-google:hover {
     border-color: var(--border-hover);
@@ -258,88 +259,8 @@
   }
   .auth-foot a:hover { text-decoration: underline; }
 
-  /* ── Toast ── */
-  .g-toast {
-    position: fixed;
-    top: calc(var(--navbar-h, 64px) + 12px);
-    right: 20px;
-    z-index: 9999;
-    display: flex;
-    align-items: flex-start;
-    gap: 11px;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 14px;
-    padding: 13px 14px;
-    min-width: 280px;
-    max-width: 320px;
-    box-shadow: 0 8px 28px rgba(11, 29, 58, 0.12);
-    opacity: 0;
-    transform: translateX(calc(100% + 24px));
-    transition: opacity 0.28s ease, transform 0.32s cubic-bezier(0.34, 1.4, 0.64, 1);
-    pointer-events: none;
-    overflow: hidden;
-  }
-  .g-toast.show {
-    opacity: 1;
-    transform: translateX(0);
-    pointer-events: auto;
-  }
-  .g-toast-icon {
-    flex-shrink: 0;
-    width: 34px;
-    height: 34px;
-    background: var(--bg-darker);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .g-toast-body { flex: 1; min-width: 0; }
-  .g-toast-title {
-    font-size: 0.84rem;
-    font-weight: 700;
-    color: var(--text-main);
-    margin-bottom: 1px;
-    font-family: 'Outfit', sans-serif;
-  }
-  .g-toast-msg {
-    font-size: 0.76rem;
-    color: var(--text-muted);
-    line-height: 1.5;
-  }
-  .g-toast-close {
-    flex-shrink: 0;
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    cursor: pointer;
-    padding: 2px;
-    font-size: 1rem;
-    line-height: 1;
-    transition: color 0.15s;
-    align-self: flex-start;
-    border-radius: 4px;
-  }
-  .g-toast-close:hover { color: var(--text-main); }
-  .g-toast-bar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 2.5px;
-    width: 100%;
-    background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
-    transform-origin: left;
-    transform: scaleX(1);
-  }
-  .g-toast-bar.shrink {
-    transition: transform 3.5s linear;
-    transform: scaleX(0);
-  }
-
   @media (max-width: 480px) {
     .auth-card { padding: 1.75rem 1.25rem; }
-    .g-toast { right: 12px; left: 12px; max-width: none; min-width: 0; }
   }
 </style>
 {% endblock %}
@@ -356,17 +277,17 @@
     </div>
 
     <!-- Google OAuth -->
-    <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn-google" aria-label="Google orqali kirish">
+    <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn-google" aria-label="Sign in with Google">
       <svg width="18" height="18" viewBox="0 0 48 48" fill="none" aria-hidden="true">
         <path d="M43.6 20.5H42V20.4H24V27.6H35.2C33.6 32 29.2 35.2 24 35.2C17.4 35.2 12 29.8 12 23.2C12 16.6 17.4 11.2 24 11.2C27 11.2 29.8 12.4 31.8 14.2L36.8 9.2C33.6 6.4 29 4.4 24 4.4C13.4 4.4 4.8 13 4.8 23.6C4.8 34.2 13.4 42.8 24 42.8C34.6 42.8 43.2 34.2 43.2 23.6C43.2 22.5 43 21.5 43.6 20.5Z" fill="#FFC107"/>
         <path d="M7.2 15.2L13 19.4C14.6 15.4 18.8 12.6 24 12.6C27 12.6 29.8 13.8 31.8 15.6L36.8 10.6C33.6 7.8 29 6 24 6C16.6 6 10.2 9.8 7.2 15.2Z" fill="#FF3D00"/>
         <path d="M24 42.8C28.8 42.8 33.2 41 36.4 38.2L30.8 33.6C29 34.8 26.6 35.6 24 35.6C19 35.6 14.6 32.4 13 27.8L7 32.2C10 37.8 16.4 42.8 24 42.8Z" fill="#4CAF50"/>
         <path d="M43.6 20.5H42V20.4H24V27.6H35.2C34.4 29.8 33 31.6 31 32.8L36.6 37.4C36.2 37.8 43.2 32.6 43.2 23.6C43.2 22.5 43 21.5 43.6 20.5Z" fill="#1976D2"/>
       </svg>
-      Google orqali kirish
+      {% if lang == 'ru' %}Войти через Google{% elif lang == 'tj' %}Тавассути Google даромадан{% else %}Sign in with Google{% endif %}
     </a>
 
-    <div class="auth-divider"><span>yoki</span></div>
+    <div class="auth-divider"><span>{% if lang == 'ru' %}или{% elif lang == 'tj' %}ё{% else %}or{% endif %}</span></div>
 
     <!-- Non-field errors (wrong credentials) -->
     {% if form.non_field_errors %}
@@ -382,12 +303,12 @@
 
       <!-- Identifier: username or email -->
       <div class="field-group">
-        <label for="id_identifier">Foydalanuvchi nomi yoki email</label>
+        <label for="id_identifier">{% if lang == 'ru' %}Имя пользователя или Email{% elif lang == 'tj' %}Номи корбар ё Email{% else %}Username or Email{% endif %}</label>
         <div class="field-wrap">
           <input class="auth-input {% if form.identifier.errors %}is-invalid{% endif %}"
             type="text" name="identifier" id="id_identifier"
             value="{{ form.identifier.value|default:'' }}"
-            placeholder="username yoki email"
+            placeholder="{% if lang == 'ru' %}имя пользователя или email{% elif lang == 'tj' %}номи корбар ё email{% else %}username or email{% endif %}"
             autocomplete="username"
             required>
         </div>
@@ -398,7 +319,7 @@
 
       <!-- Password -->
       <div class="field-group">
-        <label for="id_password">Parol</label>
+        <label for="id_password">{% if lang == 'ru' %}Пароль{% elif lang == 'tj' %}Парол{% else %}Password{% endif %}</label>
         <div class="field-wrap">
           <input class="auth-input auth-input--pw {% if form.password.errors %}is-invalid{% endif %}"
             type="password" name="password" id="id_password"
@@ -406,7 +327,7 @@
             autocomplete="current-password"
             required>
           <button type="button" class="pw-toggle" onclick="togglePw('id_password', this)"
-            tabindex="-1" aria-label="Parolni ko'rsatish/yashirish">
+            tabindex="-1" aria-label="Show/Hide password">
             <i class="bi bi-eye" aria-hidden="true"></i>
           </button>
         </div>
@@ -417,34 +338,16 @@
 
       <button type="submit" class="btn-submit" id="submitBtn">
         <div class="btn-spinner" aria-hidden="true"></div>
-        <span class="btn-label">Kirish</span>
+        <span class="btn-label">{% if lang == 'ru' %}Войти{% elif lang == 'tj' %}Даромадан{% else %}Log In{% endif %}</span>
       </button>
     </form>
 
     <p class="auth-foot">
-      Hisobingiz yo'qmi? <a href="{% url 'register' %}">Ro'yxatdan o'tish</a>
+      {% if lang == 'ru' %}Нет аккаунта? <a href="{% url 'register' %}">Зарегистрироваться</a>
+      {% elif lang == 'tj' %}Хисоб надоред? <a href="{% url 'register' %}">Ба кайд гирифтан</a>
+      {% else %}Don't have an account? <a href="{% url 'register' %}">Sign Up</a>{% endif %}
     </p>
   </div>
-</div>
-
-<!-- Toast -->
-<div class="g-toast" id="gToast" role="status" aria-live="polite" aria-atomic="true">
-  <div class="g-toast-icon" aria-hidden="true">
-    <svg width="18" height="18" viewBox="0 0 48 48" fill="none">
-      <path d="M43.6 20.5H42V20.4H24V27.6H35.2C33.6 32 29.2 35.2 24 35.2C17.4 35.2 12 29.8 12 23.2C12 16.6 17.4 11.2 24 11.2C27 11.2 29.8 12.4 31.8 14.2L36.8 9.2C33.6 6.4 29 4.4 24 4.4C13.4 4.4 4.8 13 4.8 23.6C4.8 34.2 13.4 42.8 24 42.8C34.6 42.8 43.2 34.2 43.2 23.6C43.2 22.5 43 21.5 43.6 20.5Z" fill="#FFC107"/>
-      <path d="M7.2 15.2L13 19.4C14.6 15.4 18.8 12.6 24 12.6C27 12.6 29.8 13.8 31.8 15.6L36.8 10.6C33.6 7.8 29 6 24 6C16.6 6 10.2 9.8 7.2 15.2Z" fill="#FF3D00"/>
-      <path d="M24 42.8C28.8 42.8 33.2 41 36.4 38.2L30.8 33.6C29 34.8 26.6 35.6 24 35.6C19 35.6 14.6 32.4 13 27.8L7 32.2C10 37.8 16.4 42.8 24 42.8Z" fill="#4CAF50"/>
-      <path d="M43.6 20.5H42V20.4H24V27.6H35.2C34.4 29.8 33 31.6 31 32.8L36.6 37.4C36.2 37.8 43.2 32.6 43.2 23.6C43.2 22.5 43 21.5 43.6 20.5Z" fill="#1976D2"/>
-    </svg>
-  </div>
-  <div class="g-toast-body">
-    <div class="g-toast-title">Tez orada!</div>
-    <div class="g-toast-msg">Google login hozirda ishlab chiqilmoqda.</div>
-  </div>
-  <button class="g-toast-close" onclick="closeToast()" aria-label="Yopish">
-    <i class="bi bi-x" aria-hidden="true"></i>
-  </button>
-  <div class="g-toast-bar" id="gBar"></div>
 </div>
 {% endblock %}
 
@@ -457,30 +360,6 @@
   var nav = document.querySelector('nav') || document.querySelector('.glass-nav');
   if (nav) document.documentElement.style.setProperty('--navbar-h', nav.offsetHeight + 'px');
 
-  /* Toast */
-  var toast = document.getElementById('gToast');
-  var bar   = document.getElementById('gBar');
-  var timer;
-
-  document.getElementById('googleBtn').addEventListener('click', function () {
-    bar.classList.remove('shrink');
-    bar.style.transition = 'none';
-    void bar.offsetWidth;
-    toast.classList.add('show');
-    requestAnimationFrame(function () { bar.classList.add('shrink'); });
-    clearTimeout(timer);
-    timer = setTimeout(closeToast, 3500);
-  });
-
-  window.closeToast = function () {
-    toast.classList.remove('show');
-    clearTimeout(timer);
-  };
-
-  document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeToast();
-  });
-
   /* Password toggle */
   window.togglePw = function (id, btn) {
     var inp = document.getElementById(id);
@@ -489,7 +368,7 @@
     inp.type = hidden ? 'text' : 'password';
     ic.classList.toggle('bi-eye',       !hidden);
     ic.classList.toggle('bi-eye-slash',  hidden);
-    btn.setAttribute('aria-label', hidden ? 'Parolni yashirish' : "Parolni ko'rsatish");
+    btn.setAttribute('aria-label', hidden ? 'Hide password' : "Show password");
   };
 
   /* Submit loading */

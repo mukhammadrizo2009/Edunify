@@ -1,21 +1,31 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Kurslar — Edunify{% endblock %}
+{% block title %}
+{% if lang == 'ru' %}Курсы{% elif lang == 'tj' %}Курсхо{% else %}Courses{% endif %} — Edunify
+{% endblock %}
 
 {% block content %}
 <!-- Page header -->
 <div class="text-center mb-5">
-    <div class="lp-section-label mb-2">O'quv dasturi</div>
-    <h1 class="lp-section-title mb-2">Bizning Kurslarimiz</h1>
-    <p class="text-muted">Maktab fanlari bo'yicha eng sara va qiziqarli darslar to'plami.</p>
+    <div class="lp-section-label mb-2">
+        {% if lang == 'ru' %}Учебная программа{% elif lang == 'tj' %}Барномаи таълимӣ{% else %}Curriculum{% endif %}
+    </div>
+    <h1 class="lp-section-title mb-2">
+        {% if lang == 'ru' %}Наши Курсы{% elif lang == 'tj' %}Курсхои мо{% else %}Our Courses{% endif %}
+    </h1>
+    <p class="text-muted">
+        {% if lang == 'ru' %}Лучшие и самые интересные уроки по школьным предметам.
+        {% elif lang == 'tj' %}Беҳтарин ва ҷолибтарин дарсхо оид ба фанхои мактабӣ.
+        {% else %}The best and most engaging lessons on school subjects.{% endif %}
+    </p>
 </div>
 
 <!-- Category filters -->
 <div class="d-flex flex-wrap justify-content-center gap-2 mb-5">
     <a href="{% url 'course_list' %}"
        class="btn-filter {% if not request.GET.category %}active{% endif %}">
-        📂 Barchasi
+        📂 {% if lang == 'ru' %}Все{% elif lang == 'tj' %}Хама{% else %}All{% endif %}
     </a>
     {% for cat in categories %}
         <a href="?category={{ cat.pk }}"
@@ -75,7 +85,9 @@
                                 <span class="text-muted small">{{ course.teacher.username }}</span>
                             </div>
                             <a href="{% url 'course_detail' course.pk %}"
-                               class="btn btn-sm btn-purple rounded-pill px-3">O'rganish</a>
+                               class="btn btn-sm btn-purple rounded-pill px-3">
+                                {% if lang == 'ru' %}Учиться{% elif lang == 'tj' %}Омузед{% else %}Learn{% endif %}
+                            </a>
                         </div>
                     </div>
 
@@ -85,7 +97,11 @@
     {% else %}
         <div class="col-12 text-center py-5">
             <i class="bi bi-emoji-frown display-3 text-muted d-block mb-3"></i>
-            <h5 class="text-muted">Hozircha bu kategoriya bo'yicha kurslar mavjud emas.</h5>
+            <h5 class="text-muted">
+                {% if lang == 'ru' %}В этой категории пока нет курсов.
+                {% elif lang == 'tj' %}Дар ин категория феълан курсхо мавҷуд нест.
+                {% else %}No courses in this category yet.{% endif %}
+            </h5>
         </div>
     {% endif %}
 </div>

@@ -1,62 +1,205 @@
 {% extends 'base.html' %}
 
 {% block title %}{{ quiz.title }} - Edunify{% endblock %}
+{% block extra_css %}
+<style>
+/* ════════════════════════════════════════
+   QUIZ TAKE PAGE — Premium Emerald Theme
+════════════════════════════════════════ */
+.quiz-take-wrap {
+    padding: 50px 0 100px;
+    background: var(--bg-main);
+    min-height: 85vh;
+}
+.quiz-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+.quiz-header-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(5,150,105,0.1); color: #059669;
+    padding: 6px 14px; border-radius: 999px;
+    font-size: 0.85rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.05em; margin-bottom: 16px;
+    border: 1px solid rgba(5,150,105,0.2);
+}
+[data-theme="dark"] .quiz-header-badge { color: #34d399; }
+.quiz-header h1 {
+    font-family: 'Inter', sans-serif;
+    font-size: 2.4rem; font-weight: 800;
+    color: var(--text-main); margin-bottom: 12px;
+}
+.quiz-header p {
+    color: var(--text-muted); font-size: 1.05rem;
+}
+
+.question-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 36px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    transition: var(--theme-transition);
+}
+.question-badge {
+    font-family: 'Inter', sans-serif;
+    color: var(--text-muted);
+    font-size: 0.95rem; font-weight: 600;
+    margin-bottom: 16px;
+}
+.question-text {
+    font-size: 1.3rem; font-weight: 700; color: var(--text-main);
+    margin-bottom: 28px; line-height: 1.5; font-family: 'Inter', sans-serif;
+}
+
+.quiz-options-group {
+    display: flex; flex-direction: column; gap: 14px;
+}
+.quiz-option {
+    display: flex; align-items: center;
+    padding: 16px 20px;
+    background: var(--bg-main);
+    border: 1.5px solid var(--border-color);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+.quiz-option input[type="radio"] {
+    position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0;
+}
+.quiz-option .option-marker {
+    display: flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--bg-card); border: 1.5px solid var(--border-color);
+    margin-right: 16px; transition: all 0.2s ease;
+    font-weight: 700; font-family: 'Inter', sans-serif;
+    color: var(--text-muted); font-size: 0.95rem;
+}
+.quiz-option .option-text {
+    font-size: 1.05rem; font-weight: 500; color: var(--text-main); transition: color 0.2s ease;
+}
+
+/* Hover & Selected states */
+.quiz-option:hover {
+    border-color: rgba(5,150,105,0.4);
+    background: var(--bg-card);
+}
+.quiz-option.selected {
+    border-color: #059669;
+    background: rgba(5,150,105,0.04);
+}
+.quiz-option.selected .option-marker {
+    background: #059669;
+    border-color: #059669;
+    color: #fff;
+}
+[data-theme="dark"] .quiz-option.selected { background: rgba(5,150,105,0.08); }
+
+.submit-wrap {
+    margin-top: 40px;
+    display: flex; justify-content: flex-end;
+}
+.btn-submit-test {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    background: linear-gradient(135deg, #059669, #0d9488);
+    color: #fff; padding: 16px 36px; border-radius: 14px;
+    font-weight: 700; font-size: 1.05rem; font-family: 'Inter', sans-serif;
+    border: none; cursor: pointer; transition: all 0.3s ease;
+    box-shadow: 0 8px 24px rgba(5,150,105,0.25);
+}
+.btn-submit-test:hover {
+    transform: translateY(-2px); box-shadow: 0 12px 28px rgba(5,150,105,0.35);
+}
+.btn-submit-test:disabled {
+    opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none;
+}
+
+@media (max-width: 768px) {
+    .quiz-take-wrap { padding: 30px 0 60px; }
+    .quiz-header { margin-bottom: 30px; text-align: left; }
+    .quiz-header h1 { font-size: 1.8rem; }
+    .question-card { padding: 24px; border-radius: 18px; }
+    .question-text { font-size: 1.15rem; }
+    .quiz-option { padding: 14px 16px; }
+    .quiz-option .option-marker { width: 28px; height: 28px; font-size: 0.85rem; margin-right: 12px; }
+    .quiz-option .option-text { font-size: 0.95rem; }
+    .submit-wrap { justify-content: center; }
+    .btn-submit-test { width: 100%; }
+}
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center py-4">
-    <div class="col-lg-8">
-        <div class="glass-card">
-            <div class="text-center mb-4">
-                <i class="bi bi-question-circle text-gradient display-4"></i>
-                <h2 class="font-heading mt-2">{{ quiz.title }}</h2>
-                <p class="text-muted small">Barcha savollarga javob bering va natijangizni tekshiring.</p>
+<div class="quiz-take-wrap">
+    <div class="container" style="max-width: 800px;">
+        <div class="quiz-header">
+            <div class="quiz-header-badge">
+                <i class="bi bi-journal-check"></i>
+                {% if lang == 'tj' %}Тест{% elif lang == 'ru' %}Тест{% else %}Quiz{% endif %}
             </div>
-            
-            <form method="post">
-                {% csrf_token %}
-                <input type="hidden" name="start_time" value="{{ start_time }}">
-                
-                {% for question in questions %}
-                    <div class="mb-5 border-bottom border-secondary pb-4">
-                        <h5 class="mb-3 font-heading">
-                            {{ forloop.counter }}-Savol: 
-                            {% if lang == 'tj' and question.text_tj %}{{ question.text_tj }}
-                            {% elif lang == 'ru' and question.text_ru %}{{ question.text_ru }}
-                            {% elif lang == 'en' and question.text_en %}{{ question.text_en }}
-                            {% else %}{{ question.text }}{% endif %}
-                        </h5>
-                        
-                        <div class="quiz-options-group">
-                            <label class="quiz-option">
-                                <input type="radio" name="question_{{ question.id }}" value="A" required>
-                                <span>A) {{ question.option_a }}</span>
-                            </label>
-                            
-                            <label class="quiz-option">
-                                <input type="radio" name="question_{{ question.id }}" value="B" required>
-                                <span>B) {{ question.option_b }}</span>
-                            </label>
-                            
-                            <label class="quiz-option">
-                                <input type="radio" name="question_{{ question.id }}" value="C" required>
-                                <span>C) {{ question.option_c }}</span>
-                            </label>
-                            
-                            <label class="quiz-option">
-                                <input type="radio" name="question_{{ question.id }}" value="D" required>
-                                <span>D) {{ question.option_d }}</span>
-                            </label>
-                        </div>
-                    </div>
-                {% endfor %}
-                
-                <div class="text-center mt-4">
-                    <button type="submit" class="btn btn-purple btn-lg px-5 py-3 font-heading">
-                        <i class="bi bi-send-check me-2"></i> Javoblarni Yuborish
-                    </button>
-                </div>
-            </form>
+            <h1>{{ quiz.title }}</h1>
+            <p>
+                {% if lang == 'ru' %}Ответьте на все вопросы и проверьте свой результат.
+                {% elif lang == 'tj' %}Ба хамаи саволхо ҷавоб диед ва натиҷаатонро санҷед.
+                {% else %}Answer all questions and check your result.{% endif %}
+            </p>
         </div>
+        
+        <form method="post" id="quizForm">
+            {% csrf_token %}
+            <input type="hidden" name="start_time" value="{{ start_time }}">
+            
+            {% for question in questions %}
+                <div class="question-card" id="q-{{ question.id }}">
+                    <div class="question-badge">
+                        {% if lang == 'ru' %}Вопрос {{ forloop.counter }} из {{ questions.count }}
+                        {% elif lang == 'tj' %}Савол {{ forloop.counter }} аз {{ questions.count }}
+                        {% else %}Question {{ forloop.counter }} of {{ questions.count }}{% endif %}
+                    </div>
+                    <h3 class="question-text">
+                        {% if lang == 'tj' and question.text_tj %}{{ question.text_tj }}
+                        {% elif lang == 'ru' and question.text_ru %}{{ question.text_ru }}
+                        {% elif lang == 'en' and question.text_en %}{{ question.text_en }}
+                        {% else %}{{ question.text }}{% endif %}
+                    </h3>
+                    
+                    <div class="quiz-options-group">
+                        <label class="quiz-option">
+                            <input type="radio" name="question_{{ question.id }}" value="A" required>
+                            <div class="option-marker">A</div>
+                            <span class="option-text">{% if lang == 'ru' and question.option_a_ru %}{{ question.option_a_ru }}{% elif lang == 'tj' and question.option_a_tj %}{{ question.option_a_tj }}{% elif lang == 'en' and question.option_a_en %}{{ question.option_a_en }}{% else %}{{ question.option_a }}{% endif %}</span>
+                        </label>
+
+                        <label class="quiz-option">
+                            <input type="radio" name="question_{{ question.id }}" value="B" required>
+                            <div class="option-marker">B</div>
+                            <span class="option-text">{% if lang == 'ru' and question.option_b_ru %}{{ question.option_b_ru }}{% elif lang == 'tj' and question.option_b_tj %}{{ question.option_b_tj }}{% elif lang == 'en' and question.option_b_en %}{{ question.option_b_en }}{% else %}{{ question.option_b }}{% endif %}</span>
+                        </label>
+
+                        <label class="quiz-option">
+                            <input type="radio" name="question_{{ question.id }}" value="C" required>
+                            <div class="option-marker">C</div>
+                            <span class="option-text">{% if lang == 'ru' and question.option_c_ru %}{{ question.option_c_ru }}{% elif lang == 'tj' and question.option_c_tj %}{{ question.option_c_tj }}{% elif lang == 'en' and question.option_c_en %}{{ question.option_c_en }}{% else %}{{ question.option_c }}{% endif %}</span>
+                        </label>
+
+                        <label class="quiz-option">
+                            <input type="radio" name="question_{{ question.id }}" value="D" required>
+                            <div class="option-marker">D</div>
+                            <span class="option-text">{% if lang == 'ru' and question.option_d_ru %}{{ question.option_d_ru }}{% elif lang == 'tj' and question.option_d_tj %}{{ question.option_d_tj }}{% elif lang == 'en' and question.option_d_en %}{{ question.option_d_en }}{% else %}{{ question.option_d }}{% endif %}</span>
+                        </label>
+                    </div>
+                </div>
+            {% endfor %}
+            
+            <div class="submit-wrap">
+                <button type="submit" class="btn-submit-test" id="submitTestBtn">
+                    <i class="bi bi-send-check-fill fs-5"></i>
+                    {% if lang == 'ru' %}Завершить тест и проверить{% elif lang == 'tj' %}Тестро анҷом додан{% else %}Finish & Submit Answers{% endif %}
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 {% endblock %}
@@ -69,19 +212,40 @@
         options.forEach(option => {
             const radio = option.querySelector('input[type="radio"]');
             
-            // Option ustiga bosilganda tanlash
+            // On click or change
+            const updateSelection = () => {
+                if(radio.checked) {
+                    const group = option.closest(".quiz-options-group");
+                    group.querySelectorAll(".quiz-option").forEach(opt => {
+                        opt.classList.remove("selected");
+                        opt.querySelector('.option-marker').innerHTML = opt.querySelector('.option-marker').getAttribute('data-letter');
+                    });
+                    option.classList.add("selected");
+                    // Keep letter visually when checked, icon is handled by ::after in CSS
+                }
+            };
+            
+            // Store original letter
+            const marker = option.querySelector('.option-marker');
+            marker.setAttribute('data-letter', marker.innerHTML);
+
             option.addEventListener("click", function() {
-                const group = option.closest(".quiz-options-group");
-                group.querySelectorAll(".quiz-option").forEach(opt => {
-                    opt.classList.remove("selected");
-                });
-                
-                option.classList.add("selected");
+                radio.checked = true;
+                updateSelection();
             });
             
             if (radio.checked) {
-                option.classList.add("selected");
+                updateSelection();
             }
+        });
+
+        // Loading state on submit
+        const form = document.getElementById('quizForm');
+        form.addEventListener('submit', function() {
+            const btn = document.getElementById('submitTestBtn');
+            btn.innerHTML = '<i class="bi bi-hourglass-split fs-5"></i> Processing...';
+            btn.style.opacity = '0.8';
+            btn.style.pointerEvents = 'none';
         });
     });
 </script>

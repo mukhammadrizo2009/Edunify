@@ -24,19 +24,33 @@
             
             <div class="row pt-3 mt-4 g-3" style="border-top: 1px solid var(--border-color);">
                 <div class="col-6 col-md-3">
-                    <div class="text-muted small">Muallif</div>
+                    <div class="text-muted small">
+                        {% if lang == 'ru' %}Автор{% elif lang == 'tj' %}Муаллиф{% else %}Author{% endif %}
+                    </div>
                     <div class="fw-bold"><i class="bi bi-person-fill me-1"></i> {{ course.teacher.username }}</div>
                 </div>
                 <div class="col-6 col-md-3">
-                    <div class="text-muted small">Darslar soni</div>
-                    <div class="fw-bold"><i class="bi bi-play-circle-fill me-1"></i> {{ course.get_lessons_count }} ta</div>
+                    <div class="text-muted small">
+                        {% if lang == 'ru' %}Уроков{% elif lang == 'tj' %}Дарсхо{% else %}Lessons{% endif %}
+                    </div>
+                    <div class="fw-bold">
+                        <i class="bi bi-play-circle-fill me-1"></i> {{ course.get_lessons_count }}
+                        {% if lang == 'ru' %}шт{% elif lang == 'tj' %}та{% else %}pcs{% endif %}
+                    </div>
                 </div>
                 <div class="col-6 col-md-3">
-                    <div class="text-muted small">Yozilganlar</div>
-                    <div class="fw-bold"><i class="bi bi-people-fill me-1"></i> {{ course.get_enrolled_count }} o'quvchi</div>
+                    <div class="text-muted small">
+                        {% if lang == 'ru' %}Записаны{% elif lang == 'tj' %}Ба қайд гирифта шуданд{% else %}Enrolled{% endif %}
+                    </div>
+                    <div class="fw-bold">
+                        <i class="bi bi-people-fill me-1"></i> {{ course.get_enrolled_count }}
+                        {% if lang == 'ru' %}студентов{% elif lang == 'tj' %}донишчу{% else %}students{% endif %}
+                    </div>
                 </div>
                 <div class="col-6 col-md-3">
-                    <div class="text-muted small">Yaratilgan sana</div>
+                    <div class="text-muted small">
+                        {% if lang == 'ru' %}Создан{% elif lang == 'tj' %}Сохта шуд{% else %}Created{% endif %}
+                    </div>
                     <div class="fw-bold"><i class="bi bi-calendar-event me-1"></i> {{ course.created_at|date:"d.m.Y" }}</div>
                 </div>
             </div>
@@ -44,7 +58,10 @@
 
         <!-- Lessons List -->
         <div class="glass-card">
-            <h3 class="font-heading mb-4"><i class="bi bi-list-stars me-2 text-gradient"></i> Kurs Darslari</h3>
+            <h3 class="font-heading mb-4">
+                <i class="bi bi-list-stars me-2 text-gradient"></i>
+                {% if lang == 'ru' %}Уроки курса{% elif lang == 'tj' %}Дарсхои курс{% else %}Course Lessons{% endif %}
+            </h3>
             {% if lessons %}
                 <div class="list-group list-group-flush bg-transparent">
                     {% for lesson in lessons %}
@@ -64,15 +81,25 @@
                             </div>
                             
                             {% if is_enrolled %}
-                                <a href="{% url 'lesson_detail' lesson.pk %}" class="btn btn-purple btn-sm">O'qish <i class="bi bi-arrow-right-short ms-1"></i></a>
+                                <a href="{% url 'lesson_detail' lesson.pk %}" class="btn btn-purple btn-sm">
+                                    {% if lang == 'ru' %}Читать{% elif lang == 'tj' %}Хондан{% else %}Read{% endif %}
+                                    <i class="bi bi-arrow-right-short ms-1"></i>
+                                </a>
                             {% else %}
-                                <span class="text-muted"><i class="bi bi-lock-fill"></i> Qulflangan</span>
+                                <span class="text-muted">
+                                    <i class="bi bi-lock-fill"></i>
+                                    {% if lang == 'ru' %}Заблокировано{% elif lang == 'tj' %}Қулфшуда{% else %}Locked{% endif %}
+                                </span>
                             {% endif %}
                         </div>
                     {% endfor %}
                 </div>
             {% else %}
-                <p class="text-muted text-center py-4">Bu kursga darslar hali qo'shilmagan.</p>
+                <p class="text-muted text-center py-4">
+                    {% if lang == 'ru' %}В этот курс ещё не добавлены уроки.
+                    {% elif lang == 'tj' %}Ба ин курс хануз дарсхо илова нашудаанд.
+                    {% else %}No lessons have been added to this course yet.{% endif %}
+                </p>
             {% endif %}
         </div>
     </div>
@@ -90,13 +117,23 @@
             
             {% if is_enrolled %}
                 <div class="alert alert-success mb-0 rounded-3">
-                    <i class="bi bi-patch-check-fill me-2"></i> Siz ushbu kursga yozilgansiz!
+                    <i class="bi bi-patch-check-fill me-2"></i>
+                    {% if lang == 'ru' %}Вы записаны на этот курс!
+                    {% elif lang == 'tj' %}Шумо ба ин курс ба кайд гирифта шудаед!
+                    {% else %}You are enrolled in this course!{% endif %}
                 </div>
             {% else %}
-                <h4 class="mb-3">Bepul Qatnashish</h4>
-                <p class="text-muted small mb-4">Hoziroq darslarga a'zo bo'ling va o'rganishni boshlang!</p>
+                <h4 class="mb-3">
+                    {% if lang == 'ru' %}Бесплатное участие{% elif lang == 'tj' %}Иштироки ройгон{% else %}Free Enrollment{% endif %}
+                </h4>
+                <p class="text-muted small mb-4">
+                    {% if lang == 'ru' %}Запишитесь прямо сейчас и начните учиться!
+                    {% elif lang == 'tj' %}Хозир ба кайд гиред ва омузишро шуруъ кунед!
+                    {% else %}Enroll now and start learning!{% endif %}
+                </p>
                 <a href="{% url 'enroll' course.pk %}" class="btn btn-purple w-100 py-3 font-heading fs-5">
-                    <i class="bi bi-pencil-square me-2"></i> Kursga A'zo Bo'lish
+                    <i class="bi bi-pencil-square me-2"></i>
+                    {% if lang == 'ru' %}Записаться на курс{% elif lang == 'tj' %}Ба курс ба кайд гирифтан{% else %}Enroll in Course{% endif %}
                 </a>
             {% endif %}
         </div>

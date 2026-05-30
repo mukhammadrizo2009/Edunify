@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}Edunify — AI Ta'lim Platformasi{% endblock %}
+{% block title %}Edunify — {% if lang == 'ru' %}Платформа ИИ-образования{% elif lang == 'tj' %}Платформаи таълимии AI{% else %}AI Education Platform{% endif %}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'css/landing.css' %}">
@@ -21,30 +21,54 @@
     <!-- Badge -->
     <div class="lp-badge reveal-up" style="--delay:0s">
       <span class="lp-badge__dot"></span>
-      <span>Maktab o'quvchilari uchun AI Ta'lim</span>
+      <span>
+        {% if lang == 'ru' %}Платформа ИИ-образования для школьников
+        {% elif lang == 'tj' %}Платформаи таълимии AI барои хонандагон
+        {% else %}AI Education for School Students{% endif %}
+      </span>
     </div>
 
     <!-- Headline -->
     <h1 class="lp-hero__title reveal-up" style="--delay:.1s">
-      Kelajak ta'limi<br>
-      <span class="lp-hero__title-accent">shu yerda boshlanadi.</span>
+      {% if lang == 'ru' %}
+        Будущее образования<br>
+        <span class="lp-hero__title-accent">начинается здесь.</span>
+      {% elif lang == 'tj' %}
+        Ояндаи таълим<br>
+        <span class="lp-hero__title-accent">аз ин ҷо оғоз мешавад.</span>
+      {% else %}
+        The future of education<br>
+        <span class="lp-hero__title-accent">starts right here.</span>
+      {% endif %}
     </h1>
 
     <!-- Sub -->
     <p class="lp-hero__sub reveal-up" style="--delay:.2s">
-      Google Gemini AI bilan ta'minlangan online ta'lim ekotizimi.<br>
-      O'z tilingizda o'rganing, testlar topshiring va AI o'qituvchidan dars oling.
+      {% if lang == 'ru' %}
+        Онлайн-экосистема образования на базе Google Gemini AI.<br>
+        Учитесь на своём языке, проходите тесты и занимайтесь с AI-репетитором.
+      {% elif lang == 'tj' %}
+        Экосистемаи таълимии онлайн дар асоси Google Gemini AI.<br>
+        Бо забони худ омӯзед, тестҳо супоред ва бо омӯзгори AI машғул шавед.
+      {% else %}
+        An online education ecosystem powered by Google Gemini AI.<br>
+        Learn in your own language, take quizzes, and study with an AI tutor.
+      {% endif %}
     </p>
 
     <!-- CTA -->
     <div class="lp-hero__cta reveal-up" style="--delay:.3s">
       <a href="{% url 'course_list' %}" class="lp-btn lp-btn--primary">
-        <span>Kurslarni boshlash</span>
+        <span>
+          {% if lang == 'ru' %}Начать курсы
+          {% elif lang == 'tj' %}Сар кардани курсҳо
+          {% else %}Start Courses{% endif %}
+        </span>
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
       {% if not user.is_authenticated %}
       <a href="{% url 'register' %}" class="lp-btn lp-btn--ghost">
-        Ro'yxatdan o'tish
+        {% if lang == 'ru' %}Регистрация{% elif lang == 'tj' %}Рӯйхатгирӣ{% else %}Sign Up{% endif %}
       </a>
       {% else %}
       <a href="{% url 'dashboard' %}" class="lp-btn lp-btn--ghost">
@@ -61,7 +85,11 @@
         <img src="https://i.pravatar.cc/32?img=3" alt="">
         <img src="https://i.pravatar.cc/32?img=4" alt="">
       </div>
-      <p class="lp-proof__text"><strong>500+</strong> o'quvchi allaqachon boshlagan</p>
+      <p class="lp-proof__text">
+        {% if lang == 'ru' %}<strong>500+</strong> учеников уже начали
+        {% elif lang == 'tj' %}<strong>500+</strong> хонандагон аллакай оғоз карданд
+        {% else %}<strong>500+</strong> students already started{% endif %}
+      </p>
     </div>
   </div>
 
@@ -70,7 +98,9 @@
     <div class="lp-mockup">
       <div class="lp-mockup__bar">
         <span></span><span></span><span></span>
-        <div class="lp-mockup__bar-url">edunify.ai/dars</div>
+        <div class="lp-mockup__bar-url">
+          {% if lang == 'ru' %}edunify.online/ai{% elif lang == 'tj' %}edunify.online/ai{% else %}edunify.online/ai{% endif %}
+        </div>
       </div>
       <div class="lp-mockup__body">
         <!-- AI Chat preview -->
@@ -80,24 +110,41 @@
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" fill="currentColor"/></svg>
             </div>
             <div>
-              <div class="lp-chat__name">AI Muallim</div>
-              <div class="lp-chat__status"><span class="lp-chat__dot"></span>Faol</div>
+              <div class="lp-chat__name">
+                {% if lang == 'ru' %}Репетитор AI
+                {% elif lang == 'tj' %}Омӯзгори AI
+                {% else %}AI Teacher{% endif %}
+              </div>
+              <div class="lp-chat__status">
+                <span class="lp-chat__dot"></span>
+                {% if lang == 'ru' %}Онлайн{% elif lang == 'tj' %}Фаъол{% else %}Active{% endif %}
+              </div>
             </div>
           </div>
           <div class="lp-chat__messages">
             <div class="lp-chat__msg lp-chat__msg--bot">
-              Salom! Bugun qaysi mavzuni o'rganmoqchisiz? 👋
+              {% if lang == 'ru' %}Привет! Какую тему хочешь изучить сегодня? 👋
+              {% elif lang == 'tj' %}Салом! Имрӯз кадом мавзӯъро омӯхтан мехоҳед? 👋
+              {% else %}Hello! Which topic would you like to study today? 👋{% endif %}
             </div>
             <div class="lp-chat__msg lp-chat__msg--user">
-              Nyutonning II qonuni nima?
+              {% if lang == 'ru' %}Что такое второй закон Ньютона?
+              {% elif lang == 'tj' %}Қонуни дуюми Нютон чист?
+              {% else %}What is Newton's Second Law?{% endif %}
             </div>
             <div class="lp-chat__msg lp-chat__msg--bot lp-chat__msg--typing" id="typingMsg">
-              <strong>F = m · a</strong> — Nyutonning ikkinchi qonuni.<br>
-              <span class="lp-chat__formula">Kuch = Massa × Tezlanish</span>
+              <strong>F = m · a</strong> —
+              {% if lang == 'ru' %}Второй закон Ньютона.<br>
+              <span class="lp-chat__formula">Сила = Масса × Ускорение</span>
+              {% elif lang == 'tj' %}Қонуни дуюми Нютон.<br>
+              <span class="lp-chat__formula">Қувва = Масса × Шитоб</span>
+              {% else %}Newton's Second Law.<br>
+              <span class="lp-chat__formula">Force = Mass × Acceleration</span>
+              {% endif %}
             </div>
           </div>
           <div class="lp-chat__input">
-            <input type="text" placeholder="Savol yozing..." readonly>
+            <input type="text" placeholder="{% if lang == 'ru' %}Задать вопрос...{% elif lang == 'tj' %}Савол диҳед...{% else %}Ask a question...{% endif %}" readonly>
             <button class="lp-chat__send">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z" fill="currentColor"/></svg>
             </button>
@@ -108,15 +155,15 @@
     <!-- Floating badges around mockup -->
     <div class="lp-float lp-float--1">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="#f59e0b"/></svg>
-      <span>4.9 Reyting</span>
+      <span>4.9 {% if lang == 'ru' %}Рейтинг{% elif lang == 'tj' %}Рейтинг{% else %}Rating{% endif %}</span>
     </div>
     <div class="lp-float lp-float--2">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="#10b981" stroke-width="2" stroke-linecap="round"/></svg>
-      <span>Test topshirildi!</span>
+      <span>{% if lang == 'ru' %}Тест пройден!{% elif lang == 'tj' %}Тест супорида шуд!{% else %}Quiz completed!{% endif %}</span>
     </div>
     <div class="lp-float lp-float--3">
       <span style="font-size:18px">🌍</span>
-      <span>4 tilda</span>
+      <span>{% if lang == 'ru' %}3 языка{% elif lang == 'tj' %}3 забон{% else %}3 languages{% endif %}</span>
     </div>
   </div>
 </section>
@@ -126,32 +173,46 @@
   <div class="lp-stats__grid">
     <div class="lp-stat reveal-up" style="--delay:0s">
       <div class="lp-stat__num" data-target="500">0</div>
-      <div class="lp-stat__label">Faol o'quvchilar</div>
+      <div class="lp-stat__label">
+        {% if lang == 'ru' %}Активные ученики{% elif lang == 'tj' %}Хонандагони фаъол{% else %}Active Students{% endif %}
+      </div>
     </div>
     <div class="lp-stat-divider"></div>
     <div class="lp-stat reveal-up" style="--delay:.1s">
       <div class="lp-stat__num" data-target="30">0</div>
-      <div class="lp-stat__label">Interaktiv darslar</div>
+      <div class="lp-stat__label">
+        {% if lang == 'ru' %}Интерактивные уроки{% elif lang == 'tj' %}Дарсҳои интерактивӣ{% else %}Interactive Lessons{% endif %}
+      </div>
     </div>
     <div class="lp-stat-divider"></div>
     <div class="lp-stat reveal-up" style="--delay:.2s">
       <div class="lp-stat__num" data-target="99">0</div>
-      <div class="lp-stat__label">% O'quvchi mamnun</div>
+      <div class="lp-stat__label">
+        {% if lang == 'ru' %}% Довольных учеников{% elif lang == 'tj' %}% Хонандагони қаноатманд{% else %}% Student Satisfaction{% endif %}
+      </div>
     </div>
     <div class="lp-stat-divider"></div>
     <div class="lp-stat reveal-up" style="--delay:.3s">
-      <div class="lp-stat__num" data-target="4" data-suffix=" til">0</div>
-      <div class="lp-stat__label">Interfeys tillari</div>
+      <div class="lp-stat__num" data-target="3" data-suffix=" {% if lang == 'ru' %}яз{% elif lang == 'tj' %}заб{% else %}lang{% endif %}">0</div>
+      <div class="lp-stat__label">
+        {% if lang == 'ru' %}Языки интерфейса{% elif lang == 'tj' %}Забонҳои интерфейс{% else %}Interface Languages{% endif %}
+      </div>
     </div>
   </div>
 </section>
 
 <!-- ═══════════ FEATURES ═══════════ -->
 <section class="lp-features">
-  <div class="lp-section-label reveal-up" style="--delay:0s">Imkoniyatlar</div>
-  <h2 class="lp-section-title reveal-up" style="--delay:.05s">Nega aynan Edunify?</h2>
+  <div class="lp-section-label reveal-up" style="--delay:0s">
+    {% if lang == 'ru' %}Возможности{% elif lang == 'tj' %}Имкониятҳо{% else %}Features{% endif %}
+  </div>
+  <h2 class="lp-section-title reveal-up" style="--delay:.05s">
+    {% if lang == 'ru' %}Почему именно Edunify?{% elif lang == 'tj' %}Чаро маҳз Edunify?{% else %}Why choose Edunify?{% endif %}
+  </h2>
   <p class="lp-section-sub reveal-up" style="--delay:.1s">
-    Har bir o'quvchiga shaxsiy yondashuv, zamonaviy texnologiya va ko'p tilli qo'llab-quvvatlash.
+    {% if lang == 'ru' %}Персональный подход к каждому ученику, современные технологии и многоязычная поддержка.
+    {% elif lang == 'tj' %}Муносибати инфиродӣ ба ҳар як хонанда, технологияҳои муосир ва дастгирии бисёрзабона.
+    {% else %}Personalized approach for every student, modern technology, and multilingual support.{% endif %}
   </p>
 
   <div class="lp-feat-grid">
@@ -159,37 +220,69 @@
       <div class="lp-feat-card__icon">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zm0 3a3 3 0 110 6 3 3 0 010-6zm0 14.2a7.2 7.2 0 01-6-3.22c.03-1.99 4-3.08 6-3.08s5.97 1.09 6 3.08a7.2 7.2 0 01-6 3.22z" fill="currentColor"/></svg>
       </div>
-      <h3>AI Shaxsiy Muallim</h3>
-      <p>Google Gemini AI asosidagi o'qituvchi — savolingizga darhol, aniq va o'quv dasturi doirasida javob beradi.</p>
-      <div class="lp-feat-card__tag">Yangi</div>
+      <h3>
+        {% if lang == 'ru' %}ИИ-репетитор{% elif lang == 'tj' %}Омӯзгори AI{% else %}AI Personal Tutor{% endif %}
+      </h3>
+      <p>
+        {% if lang == 'ru' %}Учитель на базе Google Gemini AI — ответит на ваши вопросы мгновенно, точно и в рамках учебной программы.
+        {% elif lang == 'tj' %}Омӯзгор дар асоси Google Gemini AI — ба саволҳои шумо фавран, дақиқ ва дар доираи барномаи таълимӣ ҷавоб медиҳад.
+        {% else %}A tutor powered by Google Gemini AI — answers your questions instantly, accurately, and within the curriculum.{% endif %}
+      </p>
+      <div class="lp-feat-card__tag">
+        {% if lang == 'ru' %}Новинка{% elif lang == 'tj' %}Нав{% else %}New{% endif %}
+      </div>
     </div>
     <div class="lp-feat-card reveal-up" style="--delay:.15s">
       <div class="lp-feat-card__icon">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M3 5h18M3 12h18M3 19h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </div>
-      <h3>Ko'p tillilik</h3>
-      <p>O'zbek, Tojik, Rus va Ingliz tillarida parallel darslar. Til to'siqlari yo'q.</p>
+      <h3>
+        {% if lang == 'ru' %}Многоязычность{% elif lang == 'tj' %}Бисёрзабонӣ{% else %}Multilingual{% endif %}
+      </h3>
+      <p>
+        {% if lang == 'ru' %}Параллельные уроки на таджикском, русском и английском языках. Без языковых барьеров.
+        {% elif lang == 'tj' %}Дарсҳои мувозӣ ба забонҳои тоҷикӣ, русӣ ва англисӣ. Маҳдудияти забонӣ нест.
+        {% else %}Parallel lessons in Tajik, Russian, and English. No language barriers.{% endif %}
+      </p>
     </div>
     <div class="lp-feat-card reveal-up" style="--delay:.2s">
       <div class="lp-feat-card__icon">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
       </div>
-      <h3>Smart Testlar</h3>
-      <p>Test yakunida AI tahlil — noto'g'ri javoblar sababini tushuntiradi va qayta o'qishni tavsiya qiladi.</p>
+      <h3>
+        {% if lang == 'ru' %}Умные тесты{% elif lang == 'tj' %}Тестҳои интеллектуалӣ{% else %}Smart Quizzes{% endif %}
+      </h3>
+      <p>
+        {% if lang == 'ru' %}Анализ ИИ после теста — объяснит причины неправильных ответов и порекомендует повторение.
+        {% elif lang == 'tj' %}Таҳлили AI пас аз супоридани тест — сабабҳои ҷавобҳои нодурустро мефаҳмонад ва такроркуниро тавсия медиҳад.
+        {% else %}AI analysis after the quiz — explains the reasons for incorrect answers and recommends review.{% endif %}
+      </p>
     </div>
     <div class="lp-feat-card reveal-up" style="--delay:.25s">
       <div class="lp-feat-card__icon">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-      <h3>Asinxron Tahlil</h3>
-      <p>Sahifani to'xtatmasdan orqa fonda AI tahlil — tezlik va sifat bir joyda.</p>
+      <h3>
+        {% if lang == 'ru' %}Асинхронный анализ{% elif lang == 'tj' %}Таҳлили асинхронӣ{% else %}Asynchronous Analysis{% endif %}
+      </h3>
+      <p>
+        {% if lang == 'ru' %}Анализ ИИ в фоновом режиме без блокировки страницы — скорость и качество вместе.
+        {% elif lang == 'tj' %}Таҳлили AI дар заминаи қафо бидуни қатъ кардани саҳифа — суръат ва сифат якҷоя.
+        {% else %}AI analysis in the background without blocking the page — speed and quality combined.{% endif %}
+      </p>
     </div>
     <div class="lp-feat-card reveal-up" style="--delay:.3s">
       <div class="lp-feat-card__icon">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-      <h3>Xavfsiz Muhit</h3>
-      <p>Faqat tasdiqlangan o'quv materiallari. Maktab o'quvchilari uchun himoyalangan platforma.</p>
+      <h3>
+        {% if lang == 'ru' %}Безопасная среда{% elif lang == 'tj' %}Муҳити бехатар{% else %}Safe Environment{% endif %}
+      </h3>
+      <p>
+        {% if lang == 'ru' %}Только проверенные учебные материалы. Защищенная платформа для школьников.
+        {% elif lang == 'tj' %}Танҳо маводҳои таълимии тасдиқшуда. Платформаи ҳифзшуда барои хонандагон.
+        {% else %}Only verified learning materials. A protected platform for school students.{% endif %}
+      </p>
     </div>
   </div>
 </section>
@@ -197,29 +290,51 @@
 <!-- ═══════════ HOW IT WORKS ═══════════ -->
 <section class="lp-how">
   <div class="lp-how__bg" aria-hidden="true"></div>
-  <div class="lp-section-label reveal-up" style="--delay:0s">Jarayon</div>
-  <h2 class="lp-section-title reveal-up" style="--delay:.05s">3 qadamda boshlang</h2>
+  <div class="lp-section-label reveal-up" style="--delay:0s">
+    {% if lang == 'ru' %}Процесс{% elif lang == 'tj' %}Раванд{% else %}Process{% endif %}
+  </div>
+  <h2 class="lp-section-title reveal-up" style="--delay:.05s">
+    {% if lang == 'ru' %}Начните в 3 шага{% elif lang == 'tj' %}Дар 3 қадам оғоз кунед{% else %}Start in 3 easy steps{% endif %}
+  </h2>
   <div class="lp-steps">
     <div class="lp-step reveal-up" style="--delay:.1s">
       <div class="lp-step__num">01</div>
-      <h3 class="lp-step__title">Ro'yxatdan o'ting</h3>
-      <p class="lp-step__desc">30 soniyada bepul hisob oching. Kredit karta talab qilinmaydi.</p>
+      <h3 class="lp-step__title">
+        {% if lang == 'ru' %}Регистрация{% elif lang == 'tj' %}Рӯйхатгирӣ{% else %}Sign Up{% endif %}
+      </h3>
+      <p class="lp-step__desc">
+        {% if lang == 'ru' %}Создайте бесплатный аккаунт за 30 секунд. Без кредитных карт.
+        {% elif lang == 'tj' %}Дар 30 сония ҳисоби ройгон созед. Корти кредитӣ лозим нест.
+        {% else %}Create a free account in 30 seconds. No credit card required.{% endif %}
+      </p>
     </div>
     <div class="lp-step__arrow" aria-hidden="true">
       <svg width="40" height="16" viewBox="0 0 40 16" fill="none"><path d="M0 8h36M28 2l8 6-8 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <div class="lp-step reveal-up" style="--delay:.2s">
       <div class="lp-step__num">02</div>
-      <h3 class="lp-step__title">Kurs tanlang</h3>
-      <p class="lp-step__desc">O'zingizga mos fanni toping va interaktiv darslarga kirishing.</p>
+      <h3 class="lp-step__title">
+        {% if lang == 'ru' %}Выберите курс{% elif lang == 'tj' %}Курсро интихоб кунед{% else %}Choose a Course{% endif %}
+      </h3>
+      <p class="lp-step__desc">
+        {% if lang == 'ru' %}Найдите подходящий предмет и начните интерактивные уроки.
+        {% elif lang == 'tj' %}Фанни мувофиқро пайдо кунед ва ба дарсҳои интерактивӣ оғоз кунед.
+        {% else %}Find a suitable subject and start interactive lessons.{% endif %}
+      </p>
     </div>
     <div class="lp-step__arrow" aria-hidden="true">
       <svg width="40" height="16" viewBox="0 0 40 16" fill="none"><path d="M0 8h36M28 2l8 6-8 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <div class="lp-step reveal-up" style="--delay:.3s">
       <div class="lp-step__num">03</div>
-      <h3 class="lp-step__title">AI bilan o'rganing</h3>
-      <p class="lp-step__desc">Tushunmagan joylarda AI Muallimdan yordam so'rang — 24/7 tayyor.</p>
+      <h3 class="lp-step__title">
+        {% if lang == 'ru' %}Учитесь с ИИ{% elif lang == 'tj' %}Бо AI омӯзед{% else %}Learn with AI{% endif %}
+      </h3>
+      <p class="lp-step__desc">
+        {% if lang == 'ru' %}Задавайте вопросы ИИ-репетитору в трудных местах — доступен 24/7.
+        {% elif lang == 'tj' %}Дар ҷойҳои душвор аз омӯзгори AI кӯмак пурсед — 24/7 омода аст.
+        {% else %}Ask the AI tutor for help with difficult parts — ready 24/7.{% endif %}
+      </p>
     </div>
   </div>
 </section>
@@ -227,16 +342,22 @@
 <!-- ═══════════ CTA BANNER ═══════════ -->
 <section class="lp-cta reveal-up" style="--delay:0s">
   <div class="lp-cta__glow" aria-hidden="true"></div>
-  <h2 class="lp-cta__title">Bugun o'rganishni boshlang</h2>
-  <p class="lp-cta__sub">500+ o'quvchiga qo'shiling. Bepul. Hoziroq.</p>
+  <h2 class="lp-cta__title">
+    {% if lang == 'ru' %}Начните учиться сегодня{% elif lang == 'tj' %}Имрӯз ба омӯзиш оғоз кунед{% else %}Start learning today{% endif %}
+  </h2>
+  <p class="lp-cta__sub">
+    {% if lang == 'ru' %}Присоединяйтесь к 500+ ученикам. Бесплатно. Прямо сейчас.
+    {% elif lang == 'tj' %}Ба 500+ хонандагон ҳамроҳ шавед. Ройгон. Ҳозир.
+    {% else %}Join 500+ students. Free. Right now.{% endif %}
+  </p>
   <div class="lp-cta__btns">
     <a href="{% url 'course_list' %}" class="lp-btn lp-btn--white">
-      Kurslarni ko'rish
+      {% if lang == 'ru' %}Посмотреть курсы{% elif lang == 'tj' %}Дидани курсҳо{% else %}View Courses{% endif %}
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </a>
     {% if not user.is_authenticated %}
     <a href="{% url 'register' %}" class="lp-btn lp-btn--outline-white">
-      Bepul ro'yxatdan o'tish
+      {% if lang == 'ru' %}Зарегистрироваться бесплатно{% elif lang == 'tj' %}Рӯйхатгирии ройгон{% else %}Sign Up Free{% endif %}
     </a>
     {% endif %}
   </div>

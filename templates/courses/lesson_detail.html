@@ -8,15 +8,10 @@
     <div class="col-lg-8">
         <div class="glass-card mb-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <a href="{% url 'course_detail' lesson.course.pk %}" class="btn btn-sm btn-outline-purple rounded-pill"><i class="bi bi-arrow-left me-1"></i> Kursga qaytish</a>
-                
-                <!-- Til almashtirgich -->
-                <div class="btn-group btn-group-sm">
-                    <a href="?lang=uz" class="btn btn-sm {% if lang == 'uz' or not lang %}btn-purple{% else %}btn-outline-purple{% endif %}">UZ</a>
-                    <a href="?lang=tj" class="btn btn-sm {% if lang == 'tj' %}btn-purple{% else %}btn-outline-purple{% endif %}">TJ</a>
-                    <a href="?lang=ru" class="btn btn-sm {% if lang == 'ru' %}btn-purple{% else %}btn-outline-purple{% endif %}">RU</a>
-                    <a href="?lang=en" class="btn btn-sm {% if lang == 'en' %}btn-purple{% else %}btn-outline-purple{% endif %}">EN</a>
-                </div>
+                <a href="{% url 'course_detail' lesson.course.pk %}" class="btn btn-sm btn-outline-purple rounded-pill">
+                    <i class="bi bi-arrow-left me-1"></i>
+                    {% if lang == 'ru' %}Назад к курсу{% elif lang == 'tj' %}Бозгашт ба курс{% else %}Back to Course{% endif %}
+                </a>
             </div>
             
             <h1 class="font-heading mb-4 text-gradient">
@@ -36,10 +31,21 @@
             {% if has_quiz %}
                 <div class="border-top border-secondary pt-4 mt-5 d-flex justify-content-between align-items-center">
                     <div>
-                        <h4>Mavzuni mustahkamlash uchun test</h4>
-                        <p class="text-muted small mb-0">Ushbu dars bo'yicha tayyorlangan testni topshiring va bilimingizni AI orqali tahlil qiling.</p>
+                        <h4>
+                            {% if lang == 'ru' %}Тест для закрепления темы
+                            {% elif lang == 'tj' %}Тест барои мустаҳкам кардани мавзӯ
+                            {% else %}Quiz to Reinforce the Topic{% endif %}
+                        </h4>
+                        <p class="text-muted small mb-0">
+                            {% if lang == 'ru' %}Пройдите тест по этому уроку и проанализируйте свои знания с помощью AI.
+                            {% elif lang == 'tj' %}Тести ин дарсро гузаред ва донишхои худро тавассути AI тахлил кунед.
+                            {% else %}Take the quiz for this lesson and analyze your knowledge with AI.{% endif %}
+                        </p>
                     </div>
-                    <a href="{% url 'quiz' lesson.quiz.pk %}" class="btn btn-purple btn-lg px-4 font-heading"><i class="bi bi-patch-question me-2"></i> Testni Boshlash</a>
+                    <a href="{% url 'quiz' lesson.quiz.pk %}" class="btn btn-purple btn-lg px-4 font-heading">
+                        <i class="bi bi-patch-question me-2"></i>
+                        {% if lang == 'ru' %}Начать тест{% elif lang == 'tj' %}Тестро оғоз кунед{% else %}Start Quiz{% endif %}
+                    </a>
                 </div>
             {% endif %}
         </div>
@@ -51,20 +57,33 @@
             <div class="d-flex align-items-center gap-2 mb-3 border-bottom border-secondary pb-3">
                 <i class="bi bi-robot fs-3 text-gradient"></i>
                 <div>
-                    <h5 class="mb-0 font-heading">AI Muallim</h5>
-                    <span class="text-success small"><i class="bi bi-circle-fill fs-10"></i> Faol (Online)</span>
+                    <h5 class="mb-0 font-heading">
+                        {% if lang == 'ru' %}Репетитор AI{% elif lang == 'tj' %}Омузгори AI{% else %}AI Teacher{% endif %}
+                    </h5>
+                    <span class="text-success small">
+                        <i class="bi bi-circle-fill fs-10"></i>
+                        {% if lang == 'ru' %}Активен (Онлайн){% elif lang == 'tj' %}Фаъол (Онлайн){% else %}Active (Online){% endif %}
+                    </span>
                 </div>
             </div>
-            <p class="text-muted small mb-3">Dars bo'yicha tushunmagan savollaringizni bering. AI faqat ta'limiy mavzularda yordam beradi.</p>
+            <p class="text-muted small mb-3">
+                {% if lang == 'ru' %}Задайте вопросы по уроку. AI помогает только по учебным темам.
+                {% elif lang == 'tj' %}Саволхои худро аз дарс бипурсед. AI танхо оид ба мавзухои таълимӣ ёрй медихад.
+                {% else %}Ask questions about the lesson. AI helps only with educational topics.{% endif %}
+            </p>
             
             <div class="chat-container mb-3" id="chatContainer">
                 <div class="chat-message bot">
-                    Salom! Men sizning AI muallimingizman. Ushbu dars bo'yicha qanday savolingiz bor?
+                    {% if lang == 'ru' %}Привет! Я ваш AI-репетитор. Какой вопрос по этому уроку?
+                    {% elif lang == 'tj' %}Салом! Ман омузгори AI-и шумо ҳастам. Аз ин дарс чӣ савол доред?
+                    {% else %}Hello! I'm your AI teacher. What questions do you have about this lesson?{% endif %}
                 </div>
             </div>
             
             <div class="input-group">
-                <input type="text" id="chatInput" class="form-control form-control-sm" placeholder="Savol yozing..." style="background: var(--bg-darker); border-color: var(--border-color); color: var(--text-main);">
+                <input type="text" id="chatInput" class="form-control form-control-sm"
+                    placeholder="{% if lang == 'ru' %}Задать вопрос...{% elif lang == 'tj' %}Савол диход...{% else %}Ask a question...{% endif %}"
+                    style="background: var(--bg-darker); border-color: var(--border-color); color: var(--text-main);">
                 <button class="btn btn-purple" id="sendBtn"><i class="bi bi-send-fill"></i></button>
             </div>
         </div>
@@ -95,10 +114,9 @@
             appendMessage(question, true);
             chatInput.value = "";
             
-            // Show typing placeholder
             const typingDiv = document.createElement("div");
             typingDiv.classList.add("chat-message", "bot");
-            typingDiv.innerHTML = '<span class="spinner-grow spinner-grow-sm text-purple" role="status"></span> o\'ylamoqda...';
+            typingDiv.innerHTML = '<span class="spinner-grow spinner-grow-sm text-purple" role="status"></span> ...';
             chatContainer.appendChild(typingDiv);
             chatContainer.scrollTop = chatContainer.scrollHeight;
             
@@ -118,15 +136,15 @@
                 if (data.answer) {
                     appendMessage(data.answer, false);
                 } else if (data.error) {
-                    appendMessage("Xatolik: " + data.error, false);
+                    appendMessage("Error: " + data.error, false);
                 } else {
-                    appendMessage("Noma'lum xatolik yuz berdi.", false);
+                    appendMessage("{% if lang == 'ru' %}Неизвестная ошибка.{% elif lang == 'tj' %}Хатои номаълум.{% else %}Unknown error occurred.{% endif %}", false);
                 }
             } catch (err) {
                 if (typingDiv.parentNode) {
                     chatContainer.removeChild(typingDiv);
                 }
-                appendMessage("Aloqa o'rnatib bo'lmadi.", false);
+                appendMessage("{% if lang == 'ru' %}Не удалось подключиться.{% elif lang == 'tj' %}Пайваст карда намешавад.{% else %}Could not connect.{% endif %}", false);
             }
         }
         

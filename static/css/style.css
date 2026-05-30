@@ -68,7 +68,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6, .font-heading {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-weight: 600;
     color: var(--text-main);
 }
@@ -271,14 +271,53 @@ h1, h2, h3, h4, h5, h6, .font-heading {
     background-color: rgba(24, 90, 219, 0.08);
 }
 
-/* Typography styles for translation dropdown */
-.dropdown-menu-dark .dropdown-item:hover {
-    background-color: var(--color-primary);
+/* Custom Premium Language Dropdown Menu */
+.lang-dropdown-menu {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 14px !important;
+    padding: 6px !important;
+    min-width: 150px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+    margin-top: 8px !important;
+    animation: dropdownFadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.dropdown-menu-dark {
-    background-color: var(--color-secondary) !important;
-    border-color: var(--border-color) !important;
+@keyframes dropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.lang-dropdown-menu .dropdown-item {
+    color: var(--text-main) !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    padding: 8px 12px !important;
+    border-radius: 8px !important;
+    transition: all 0.15s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    background: transparent !important;
+}
+
+.lang-dropdown-menu .dropdown-item:hover {
+    background-color: var(--bg-darker) !important;
+    color: var(--color-primary) !important;
+}
+
+.lang-dropdown-menu .dropdown-item.active {
+    background-color: color-mix(in srgb, var(--color-primary) 10%, transparent) !important;
+    color: var(--color-primary) !important;
+    font-weight: 600 !important;
 }
 
 /* Shimmer Loading Animation for Async AI feedback */
@@ -455,7 +494,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 }
 .lesson-content p  { color: var(--text-main); margin-bottom: 1rem; }
 .lesson-content h2, .lesson-content h3, .lesson-content h4 {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     font-weight: 700;
     color: var(--text-main);
     margin-top: 2rem;

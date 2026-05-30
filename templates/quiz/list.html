@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% block title %}{% if lang == 'tj' %}Тестҳо{% elif lang == 'ru' %}Тесты{% else %}Quizzes{% endif %} | Edunify{% endblock %}
+
+{% block extra_css %}
+<style>
+.quiz-page-wrap {
+    padding: 60px 0 100px;
+    position: relative;
+    overflow: hidden;
+}
+/* Background ambient glows */
+.quiz-bg-glow-1 {
+    position: absolute; top: -100px; left: -100px; width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(5,150,105,0.1) 0%, transparent 70%);
+    border-radius: 50%; pointer-events: none; z-index: 0;
+}
+.quiz-bg-glow-2 {
+    position: absolute; top: 20%; right: -150px; width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(13,148,136,0.08) 0%, transparent 70%);
+    border-radius: 50%; pointer-events: none; z-index: 0;
+}
+
+.page-header {
+    text-align: center; margin-bottom: 60px; position: relative; z-index: 1;
+}
+.page-header h1 {
+    font-family: 'Inter', sans-serif; font-size: 3rem;
+    font-weight: 800; color: var(--text-main); margin-bottom: 16px;
+    letter-spacing: -0.03em;
+}
+.page-header h1 span {
+    background: linear-gradient(135deg, #059669, #0d9488);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: transparent;
+}
+.page-header p {
+    color: var(--text-muted); font-size: 1.15rem; max-width: 650px; margin: 0 auto;
+    line-height: 1.6;
+}
+
+.quiz-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px;
+    position: relative; z-index: 1;
+}
+.quiz-card {
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: 24px; padding: 32px;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex; flex-direction: column; height: 100%;
+    position: relative; overflow: hidden;
+}
+.quiz-card::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+    background: linear-gradient(90deg, #059669, #0d9488);
+    opacity: 0; transition: opacity 0.3s ease;
+}
+.quiz-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.06), 0 0 0 1px rgba(5,150,105,0.15);
+}
+.quiz-card:hover::before { opacity: 1; }
+
+.quiz-badge-wrap { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.quiz-course-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(5,150,105,0.08); color: #059669;
+    padding: 6px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid rgba(5,150,105,0.15);
+}
+.quiz-questions-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--bg-darker); border: 1px solid var(--border-color);
+    color: var(--text-muted); font-size: 0.9rem; font-weight: 600;
+}
+
+.quiz-title {
+    font-size: 1.4rem; font-weight: 800; color: var(--text-main);
+    margin-bottom: 12px; font-family: 'Outfit', sans-serif; line-height: 1.3;
+}
+.quiz-info-list {
+    list-style: none; padding: 0; margin: 0 0 32px 0; flex-grow: 1;
+}
+.quiz-info-list li {
+    display: flex; align-items: center; gap: 12px;
+    color: var(--text-muted); font-size: 0.95rem; margin-bottom: 10px;
+}
+.quiz-info-list li i {
+    display: flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; border-radius: 8px;
+    background: var(--bg-darker); color: var(--text-main); font-size: 0.9rem;
+}
+
+.btn-take {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: linear-gradient(135deg, #059669, #0d9488);
+    color: #fff; padding: 14px; border-radius: 14px; font-weight: 700; font-size: 1rem;
+    text-decoration: none; transition: all 0.3s ease; border: none; width: 100%;
+}
+.btn-take:hover {
+    box-shadow: 0 8px 24px rgba(5,150,105,0.3); color: #fff; transform: translateY(-2px);
+}
+.btn-enroll {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: transparent; border: 2px dashed var(--border-color);
+    color: var(--text-muted); padding: 14px; border-radius: 14px; font-weight: 600; font-size: 0.95rem;
+    text-decoration: none; transition: all 0.3s ease; width: 100%;
+}
+.btn-enroll:hover {
+    border-color: var(--text-main); color: var(--text-main); background: rgba(255,255,255,0.02);
+}
+
+@media (max-width: 768px) {
+    .quiz-page-wrap { padding: 30px 0 60px; }
+    .page-header { margin-bottom: 30px; }
+    .page-header h1 { font-size: 2rem; }
+    .page-header p { font-size: 1rem; }
+    .quiz-card { padding: 20px; border-radius: 18px; }
+    .quiz-title { font-size: 1.25rem; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="quiz-page-wrap">
+    <div class="quiz-bg-glow-1"></div>
+    <div class="quiz-bg-glow-2"></div>
+    
+    <div class="container">
+        <div class="page-header">
+            <h1>{% if lang == 'tj' %}Тестҳои <span>мавҷуда</span>{% elif lang == 'ru' %}Доступные <span>тесты</span>{% else %}Available <span>Quizzes</span>{% endif %}</h1>
+            <p>{% if lang == 'tj' %}Дониши худро бо тестҳои интерактивӣ санҷед. Барои оғоз, курси мувофиқро интихоб кунед ва натиҷаи худро беҳтар кунед.{% elif lang == 'ru' %}Проверьте свои знания с помощью интерактивных тестов. Выберите тест из ваших курсов, чтобы начать и улучшить свои результаты.{% else %}Test your knowledge with interactive quizzes. Select a quiz from your enrolled courses to begin and track your progress.{% endif %}</p>
+        </div>
+
+        {% if not quizzes %}
+        <div class="text-center py-5" style="position:relative; z-index:1;">
+            <div style="width: 100px; height: 100px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                <i class="bi bi-inbox fs-1" style="color: var(--text-muted);"></i>
+            </div>
+            <h3 style="color: var(--text-main); font-family: 'Inter', sans-serif; font-weight: 700; margin-bottom: 8px;">{% if lang == 'tj' %}Ҳозир ҳеҷ гуна тест нест{% elif lang == 'ru' %}Пока нет доступных тестов{% else %}No quizzes available yet{% endif %}</h3>
+            <p style="color: var(--text-muted);">{% if lang == 'tj' %}Устодон ҳоло тест илова накардаанд.{% elif lang == 'ru' %}Учителя еще не добавили тесты.{% else %}Teachers haven't added any quizzes yet.{% endif %}</p>
+        </div>
+        {% else %}
+        <div class="quiz-grid">
+            {% for quiz in quizzes %}
+            <div class="quiz-card">
+                <div class="quiz-badge-wrap">
+                    <span class="quiz-course-badge"><i class="bi bi-journal-code"></i> {{ quiz.lesson.course.category|default:'Course' }}</span>
+                    <span class="quiz-questions-badge" title="{% if lang == 'ru' %}Вопросов{% else %}Questions{% endif %}">{{ quiz.questions.count }}</span>
+                </div>
+                
+                <h3 class="quiz-title">{{ quiz.title|default:quiz.lesson.title }}</h3>
+                
+                <ul class="quiz-info-list">
+                    <li>
+                        <i class="bi bi-book"></i>
+                        <span>{{ quiz.lesson.course.title }}</span>
+                    </li>
+                    <li>
+                        <i class="bi bi-bullseye"></i>
+                        <span>{% if lang == 'tj' %}Гузариш:{% elif lang == 'ru' %}Проходной балл:{% else %}Passing Score:{% endif %} <strong style="color:var(--text-main);">{{ quiz.passing_score }}%</strong></span>
+                    </li>
+                </ul>
+
+                {% if request.user.is_authenticated and quiz.lesson.course.pk in enrolled_course_ids %}
+                <a href="{% url 'quiz' pk=quiz.pk %}" class="btn-take">
+                    <i class="bi bi-play-fill fs-5"></i> {% if lang == 'tj' %}Тестро оғоз кардан{% elif lang == 'ru' %}Начать тест{% else %}Start Quiz{% endif %}
+                </a>
+                {% else %}
+                <a href="{% url 'course_detail' pk=quiz.lesson.course.pk %}" class="btn-enroll">
+                    <i class="bi bi-lock-fill"></i> {% if lang == 'tj' %}Ба курс аъзо шавед{% elif lang == 'ru' %}Запишитесь на курс{% else %}Enroll to Unlock{% endif %}
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
