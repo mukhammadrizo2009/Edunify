@@ -4,6 +4,7 @@ python-dotenv
 google-genai
 django-crispy-forms
 crispy-bootstrap5
+django-unfold
 gunicorn
 whitenoise
 psycopg2-binary

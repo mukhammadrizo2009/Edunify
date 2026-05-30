@@ -22,6 +22,9 @@ ALLOWED_HOSTS = [
 
 # ── APPS ──────────────────────────────────────────
 INSTALLED_APPS = [
+    'unfold',
+    'unfold.contrib.filters',
+    'unfold.contrib.forms',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -207,3 +210,25 @@ CSRF_TRUSTED_ORIGINS = [
     'https://*.onrender.com',
     'https://*.railway.app',
 ]
+
+# ── UNFOLD ADMIN SETTINGS ─────────────────────────
+UNFOLD = {
+    "SITE_TITLE": "Edunify Admin",
+    "SITE_HEADER": "Edunify",
+    "SITE_LOGO": "images/edunify-logo.jpg",
+    "COLORS": {
+        "primary": {
+            "50": "236 253 245",
+            "100": "209 250 229",
+            "200": "167 243 208",
+            "300": "110 231 183",
+            "400": "52 211 153",
+            "500": "16 185 129",
+            "600": "5 150 105",
+            "700": "4 120 87",
+            "800": "6 95 70",
+            "900": "6 78 59",
+            "950": "2 44 34",
+        },
+    },
+}
