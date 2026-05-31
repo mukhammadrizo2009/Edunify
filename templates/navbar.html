@@ -78,22 +78,25 @@ ul.lang-dropdown-menu .dropdown-item.active i {
                     </a>
                 </li>
             </ul>
-            <div class="d-flex align-items-center gap-3 mt-3 mt-lg-0">
+            <div class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center gap-3 mt-3 mt-lg-0 pb-3 pb-lg-0">
                 <!-- Theme Toggle Button -->
-                <button class="btn btn-link text-decoration-none text-muted p-1 d-flex align-items-center justify-content-center" id="themeToggleBtn" aria-label="Toggle theme" style="border: none; background: transparent; outline: none; box-shadow: none;">
+                <button class="btn btn-link text-decoration-none text-muted p-2 d-flex align-items-center justify-content-start justify-content-lg-center w-100 w-lg-auto rounded" id="themeToggleBtn" aria-label="Toggle theme" style="border: none; background: transparent; outline: none; box-shadow: none;">
                     <i class="bi bi-moon fs-5" id="themeToggleIcon" style="color: var(--text-main);"></i>
+                    <span class="d-inline-block d-lg-none ms-3" style="color: var(--text-main); font-weight: 500;">Тема / Theme</span>
                 </button>
 
-                <!-- Language Switcher (Pill style with globe icon and chevron-down) -->
-                <div class="dropdown">
-                    <button class="btn dropdown-toggle d-flex align-items-center gap-2 px-3 py-2 rounded-pill shadow-sm border" type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: var(--bg-card); color: var(--text-main); border-color: var(--border-color) !important; font-weight: 500; font-size: 14px;">
-                        <i class="bi bi-globe fs-5" style="color: var(--color-primary);"></i>
-                        <span>
-                            {% if lang == 'tj' %}Тоҷикӣ
-                            {% elif lang == 'ru' %}Русский
-                            {% else %}English{% endif %}
-                        </span>
-                        <i class="bi bi-chevron-down ms-1 text-muted" style="font-size: 10px;"></i>
+                <!-- Language Switcher -->
+                <div class="dropdown w-100 w-lg-auto">
+                    <button class="btn dropdown-toggle d-flex align-items-center justify-content-between justify-content-lg-start gap-2 px-3 py-2 rounded-pill shadow-sm border w-100 w-lg-auto" type="button" id="langDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: var(--bg-card); color: var(--text-main); border-color: var(--border-color) !important; font-weight: 500; font-size: 14px;">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-globe fs-5" style="color: var(--color-primary);"></i>
+                            <span>
+                                {% if lang == 'tj' %}Тоҷикӣ
+                                {% elif lang == 'ru' %}Русский
+                                {% else %}English{% endif %}
+                            </span>
+                        </div>
+                        <i class="bi bi-chevron-down ms-2 text-muted" style="font-size: 10px;"></i>
                     </button>
                     <ul class="dropdown-menu lang-dropdown-menu dropdown-menu-end border-0 shadow-lg" aria-labelledby="langDropdown">
                         <li>
@@ -120,7 +123,7 @@ ul.lang-dropdown-menu .dropdown-item.active i {
                 {% if user.is_authenticated %}
                     {% if user.role == 'teacher' or user.role == 'admin' %}
                         <a href="{% url 'dashboard' %}"
-                           class="btn rounded-pill d-flex align-items-center gap-2 px-4 py-2 text-decoration-none"
+                           class="btn rounded-pill d-flex align-items-center justify-content-center justify-content-lg-start gap-2 px-4 py-2 text-decoration-none w-100 w-lg-auto"
                            id="navUserBtn"
                            style="background: linear-gradient(135deg, #059669, #0d9488); color: #fff; font-weight: 600;">
                             {% if user.avatar %}
@@ -133,7 +136,7 @@ ul.lang-dropdown-menu .dropdown-item.active i {
                         </a>
                     {% else %}
                         <a href="{% url 'dashboard' %}"
-                           class="btn btn-purple rounded-pill d-flex align-items-center gap-2 px-4 py-2 text-decoration-none"
+                           class="btn btn-purple rounded-pill d-flex align-items-center justify-content-center justify-content-lg-start gap-2 px-4 py-2 text-decoration-none w-100 w-lg-auto"
                            id="navUserBtn">
                             {% if user.avatar %}
                                 <img src="{{ user.avatar.url }}" alt="avatar" class="rounded-circle"
@@ -145,11 +148,11 @@ ul.lang-dropdown-menu .dropdown-item.active i {
                         </a>
                     {% endif %}
                 {% else %}
-                    <a href="{% url 'login' %}" class="btn btn-link text-decoration-none fw-medium" style="color: var(--text-main);">
+                    <a href="{% url 'login' %}" class="btn btn-link text-decoration-none fw-medium text-start px-0 px-lg-2 w-100 w-lg-auto" style="color: var(--text-main);">
                         <i class="bi bi-box-arrow-in-right me-1"></i>
                         {% if lang == 'tj' %}Даромадан{% elif lang == 'ru' %}Войти{% else %}Log In{% endif %}
                     </a>
-                    <a href="{% url 'register' %}" class="btn btn-purple rounded-pill px-4 py-2">
+                    <a href="{% url 'register' %}" class="btn btn-purple rounded-pill px-4 py-2 w-100 w-lg-auto text-center">
                         <i class="bi bi-person-plus me-1"></i>
                         {% if lang == 'tj' %}Оғоз кардан{% elif lang == 'ru' %}Начать{% else %}Get Started{% endif %}
                     </a>
