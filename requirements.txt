@@ -10,3 +10,5 @@ whitenoise
 psycopg2-binary
 dj-database-url
 social-auth-app-django
+cloudinary
+django-cloudinary-storage

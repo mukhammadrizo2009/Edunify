@@ -36,6 +36,8 @@ INSTALLED_APPS = [
     'crispy_forms',
     'crispy_bootstrap5',
     'social_django',           # Google OAuth
+    'cloudinary_storage',
+    'cloudinary',
 
     # Loyiha
     'users',
@@ -138,6 +140,15 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # ── MEDIA FILES ───────────────────────────────────
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+}
+
+if os.getenv('CLOUDINARY_CLOUD_NAME'):
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # ── OTHER ─────────────────────────────────────────
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
