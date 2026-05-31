@@ -5,7 +5,8 @@
 {% block extra_css %}
 <style>
 body {
-  height: 100vh !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
   display: flex !important;
   flex-direction: column !important;
   overflow: hidden !important;
@@ -350,6 +351,7 @@ main > .container {
   border-top: 1px solid var(--border-color);
   flex-shrink: 0;
   background: var(--bg-card);
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom));
 }
 .ai-input-container-inner {
   max-width: 800px;
@@ -489,6 +491,22 @@ main > .container {
   }
   .ai-chat-panel {
     height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  .ai-input-bar {
+    padding: 1rem 1rem calc(1.5rem + env(safe-area-inset-bottom)) 1rem;
+  }
+  .ai-chat-panel__messages {
+    padding: 1rem;
+    gap: 1rem;
+  }
+  .ai-msg__bubble {
+    padding: 0.8rem 1.1rem;
+    font-size: 0.9rem;
+  }
+  .ai-input-wrap {
+    padding: 0.6rem 0.6rem 0.6rem 1rem;
   }
 }
 </style>
