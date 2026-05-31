@@ -28,7 +28,7 @@ O'quvchilarga quyidagi fanlar bo'yicha sifatli, tushunarli va qiziqarli tarzda y
   - Geografiya (fizik, iqtisodiy, siyosiy geografiya, xaritalar)
 
 📚 Gumanitar fanlar:
-  - Tarix (jahon tarixi, O'zbekiston tarixi, sivilizatsiyalar)
+  - Tarix (jahon tarixi, Tojikiston tarixi, sivilizatsiyalar)
   - Adabiyot (o'zbek, rus, jahon adabiyoti, she'riyat tahlili)
 
 🌐 Tillar:
