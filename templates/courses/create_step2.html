@@ -212,7 +212,11 @@ textarea.field-input { resize: vertical; min-height: 90px; }
     <div style="text-align:center; margin-bottom:28px;">
         <div class="course-info-chip">
             <i class="bi bi-book-fill"></i>
-            {{ course.title }} &bull; {{ course.category.name }}
+            {{ course.title }} &bull; 
+            {% if lang == 'tj' and course.category.name_tj %}{{ course.category.name_tj }}
+            {% elif lang == 'ru' and course.category.name_ru %}{{ course.category.name_ru }}
+            {% elif lang == 'en' and course.category.name_en %}{{ course.category.name_en }}
+            {% else %}{{ course.category.name }}{% endif %}
         </div>
     </div>
 

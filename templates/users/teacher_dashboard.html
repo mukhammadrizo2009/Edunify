@@ -487,7 +487,10 @@
                     <div class="flex-grow-1 overflow-hidden">
                         <div class="t-course-title text-truncate">{{ course.title }}</div>
                         <div class="t-course-meta">
-                            {{ course.category.name }} &bull;
+                            {% if lang == 'tj' and course.category.name_tj %}{{ course.category.name_tj }}
+                            {% elif lang == 'ru' and course.category.name_ru %}{{ course.category.name_ru }}
+                            {% elif lang == 'en' and course.category.name_en %}{{ course.category.name_en }}
+                            {% else %}{{ course.category.name }}{% endif %} &bull;
                             {{ course.get_lessons_count }} {% if lang == 'ru' %}уроков{% elif lang == 'tj' %}дарс{% else %}lessons{% endif %}
                         </div>
                     </div>

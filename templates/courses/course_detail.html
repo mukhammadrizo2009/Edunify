@@ -7,7 +7,12 @@
     <!-- Course Info Card -->
     <div class="col-lg-8">
         <div class="glass-card mb-4">
-            <span class="badge bg-purple-glow mb-3">{{ course.category.name }}</span>
+            <span class="badge bg-purple-glow mb-3">
+                {% if lang == 'tj' and course.category.name_tj %}{{ course.category.name_tj }}
+                {% elif lang == 'ru' and course.category.name_ru %}{{ course.category.name_ru }}
+                {% elif lang == 'en' and course.category.name_en %}{{ course.category.name_en }}
+                {% else %}{{ course.category.name }}{% endif %}
+            </span>
             <h1 class="font-heading text-gradient mb-3">
                 {% if lang == 'tj' and course.title_tj %}{{ course.title_tj }}
                 {% elif lang == 'ru' and course.title_ru %}{{ course.title_ru }}

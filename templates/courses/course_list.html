@@ -30,7 +30,11 @@
     {% for cat in categories %}
         <a href="?category={{ cat.pk }}"
            class="btn-filter {% if request.GET.category == cat.pk|stringformat:'i' %}active{% endif %}">
-            {{ cat.icon }} {{ cat.name }}
+            {{ cat.icon }} 
+            {% if lang == 'tj' and cat.name_tj %}{{ cat.name_tj }}
+            {% elif lang == 'ru' and cat.name_ru %}{{ cat.name_ru }}
+            {% elif lang == 'en' and cat.name_en %}{{ cat.name_en }}
+            {% else %}{{ cat.name }}{% endif %}
         </a>
     {% endfor %}
 </div>
@@ -56,7 +60,10 @@
                               style="background: var(--glass-bg); backdrop-filter: blur(8px);
                                      border: 1px solid var(--border-color); color: var(--text-main);
                                      padding: .35rem .7rem; border-radius: 8px; font-size: .72rem;">
-                            {{ course.category.name }}
+                            {% if lang == 'tj' and course.category.name_tj %}{{ course.category.name_tj }}
+                            {% elif lang == 'ru' and course.category.name_ru %}{{ course.category.name_ru }}
+                            {% elif lang == 'en' and course.category.name_en %}{{ course.category.name_en }}
+                            {% else %}{{ course.category.name }}{% endif %}
                         </span>
                     </div>
 

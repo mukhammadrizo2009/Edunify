@@ -722,7 +722,10 @@
                         <div class="flex-grow-1 overflow-hidden">
                             <div class="course-item-title text-truncate">{{ enrollment.course.title }}</div>
                             <div class="course-item-meta">
-                                {{ enrollment.course.category.name }} &bull;
+                                {% if lang == 'tj' and enrollment.course.category.name_tj %}{{ enrollment.course.category.name_tj }}
+                                {% elif lang == 'ru' and enrollment.course.category.name_ru %}{{ enrollment.course.category.name_ru }}
+                                {% elif lang == 'en' and enrollment.course.category.name_en %}{{ enrollment.course.category.name_en }}
+                                {% else %}{{ enrollment.course.category.name }}{% endif %} &bull;
                                 {{ enrollment.course.description|truncatewords:8 }}
                             </div>
                         </div>
