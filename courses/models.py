@@ -13,6 +13,11 @@ class Category(models.Model):
         return self.name
 
 class Course(models.Model):
+    LANGUAGE_CHOICES = [
+        ('ru', 'Russian'),
+        ('tj', 'Tajik'),
+        ('en', 'English'),
+    ]
     title = models.CharField(max_length=200)
     title_tj = models.CharField(max_length=200, blank=True)
     title_ru = models.CharField(max_length=200, blank=True)
@@ -24,6 +29,7 @@ class Course(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     teacher = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     thumbnail = models.ImageField(upload_to='courses/', null=True, blank=True)
+    language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default='en')
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

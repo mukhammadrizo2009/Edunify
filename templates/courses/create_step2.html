@@ -1,9 +1,61 @@
 {% extends 'base.html' %}
-{% block title %}{% if lang == 'ru' %}Создание курса — Уроки{% elif lang == 'tj' %}Сохтани курс — Дарсхо{% else %}Create Course — Lessons{% endif %} | Edunify{% endblock %}
+{% load course_tags %}
+{% block title %}{% if lang == 'ru' %}Создание курса — Шаг 1{% elif lang == 'tj' %}Сохтани курс — Қадам 1{% else %}Create Course — Step 1{% endif %} | Edunify{% endblock %}
 
 {% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
 <style>
-.create-wrap { max-width: 760px; margin: 0 auto; }
+/* Tom Select Dark Mode Overrides */
+.ts-control {
+    background: var(--bg-darker) !important;
+    border: 1.5px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    color: var(--text-main) !important;
+    padding: 11px 14px !important;
+    font-size: 0.92rem !important;
+    box-shadow: none !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+    font-family: 'Inter', sans-serif !important;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+}
+.ts-control.focus {
+    border-color: #059669 !important;
+    box-shadow: 0 0 0 4px rgba(5,150,105,.12) !important;
+}
+.ts-control > input { color: var(--text-main) !important; font-size: 0.92rem; }
+.ts-control > input::placeholder { color: var(--text-muted) !important; }
+.ts-dropdown {
+    background: var(--bg-darker) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+    color: var(--text-main) !important;
+    margin-top: 6px !important;
+    padding: 6px !important;
+    font-size: 0.92rem !important;
+    z-index: 1000;
+}
+.ts-dropdown .option {
+    padding: 10px 14px !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    transition: background 0.2s ease, color 0.2s ease !important;
+    margin-bottom: 2px;
+}
+.ts-dropdown .active, .ts-dropdown .option:hover {
+    background: rgba(5,150,105,.15) !important;
+    color: #10b981 !important;
+}
+.ts-wrapper.single .ts-control:after {
+    border-color: var(--text-muted) transparent transparent transparent !important;
+}
+.ts-wrapper.single.dropdown-active .ts-control:after {
+    border-color: transparent transparent var(--text-muted) transparent !important;
+}
+
+.create-wrap { max-width: 700px; margin: 0 auto; }
 .step-header { text-align: center; margin-bottom: 32px; }
 .step-header h1 {
     font-family: 'Outfit', sans-serif; font-size: 1.8rem;
@@ -20,176 +72,70 @@
     display: flex; align-items: center; justify-content: center;
     font-weight: 700; font-size: 0.88rem;
     border: 2px solid var(--border-color);
-    color: var(--text-muted); background: var(--bg-card); z-index: 1;
+    color: var(--text-muted); background: var(--bg-card);
+    position: relative; z-index: 1;
 }
-.step-dot.active { background: linear-gradient(135deg,#059669,#0d9488); border-color:#059669; color:#fff; }
-.step-dot.done   { background: rgba(5,150,105,.12); border-color:#059669; color:#059669; }
-.step-line { flex:1; height:2px; background:var(--border-color); max-width:80px; }
-.step-line.done { background:#059669; }
+.step-dot.active { background: linear-gradient(135deg, #059669, #0d9488); border-color: #059669; color: #fff; }
+.step-dot.done { background: rgba(5,150,105,.12); border-color: #059669; color: #059669; }
+.step-line { flex: 1; height: 2px; background: var(--border-color); max-width: 80px; }
+.step-line.done { background: #059669; }
 
-/* Course info chip */
-.course-info-chip {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(5,150,105,.1); border: 1px solid rgba(5,150,105,.2);
-    border-radius: 999px; padding: 6px 16px;
-    font-size: 0.8rem; color: #059669; font-weight: 600; margin-bottom: 24px;
-}
-[data-theme="dark"] .course-info-chip { color: #34d399; }
-
-/* Lesson list */
-.lesson-list { margin-bottom: 24px; }
-.lesson-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 14px 16px;
-    background: var(--bg-darker); border: 1px solid var(--border-color);
-    border-radius: 14px; margin-bottom: 10px;
-    animation: slideIn 0.3s ease;
-}
-@keyframes slideIn {
-    from { opacity: 0; transform: translateY(-8px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-.lesson-item:last-child { margin-bottom: 0; }
-.lesson-num {
-    width: 32px; height: 32px; border-radius: 9px;
-    background: linear-gradient(135deg,#059669,#0d9488);
-    display: flex; align-items: center; justify-content: center;
-    color:#fff; font-size:0.82rem; font-weight:700; flex-shrink:0;
-}
-.lesson-info { flex: 1; min-width: 0; }
-.lesson-title-txt {
-    font-weight: 600; font-size: 0.88rem;
-    color: var(--text-main); white-space: nowrap;
-    overflow: hidden; text-overflow: ellipsis;
-}
-.lesson-meta { font-size: 0.74rem; color: var(--text-muted); margin-top: 2px; }
-.lesson-done-badge {
-    display: flex; align-items: center; gap: 5px;
-    font-size: 0.74rem; font-weight: 600; color: #059669;
-    background: rgba(5,150,105,.1); border: 1px solid rgba(5,150,105,.2);
-    border-radius: 999px; padding: 3px 10px; flex-shrink: 0;
-}
-[data-theme="dark"] .lesson-done-badge { color: #34d399; }
-
-/* Add lesson card */
-.add-lesson-card {
+.create-card {
     background: var(--bg-card); border: 1px solid var(--border-color);
     border-radius: 22px; overflow: hidden;
-    box-shadow: 0 8px 32px rgba(0,0,0,.06);
-    margin-bottom: 20px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.06); margin-bottom: 20px;
 }
-.add-lesson-header {
-    background: linear-gradient(135deg, #0d9488, #059669);
+.create-card-header {
+    background: linear-gradient(135deg, #059669, #0d9488);
     padding: 18px 28px; display: flex; align-items: center; gap: 12px;
 }
-.add-lesson-header i { font-size: 1.3rem; color: rgba(255,255,255,.9); }
-.add-lesson-header h2 {
-    font-family: 'Outfit', sans-serif; font-size: 1rem;
-    font-weight: 700; color: #fff; margin: 0;
-}
-.add-lesson-body { padding: 24px 28px; }
+.create-card-header i { font-size: 1.4rem; color: rgba(255,255,255,.9); }
+.create-card-header h2 { font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700; color: #fff; margin: 0; }
+.create-card-body { padding: 28px; }
 
-.field-group { margin-bottom: 20px; }
-.field-label {
-    display: flex; align-items: center; gap: 7px;
-    font-size: 0.85rem; font-weight: 600;
-    color: var(--text-main); margin-bottom: 8px;
+.section-divider { display: flex; align-items: center; gap: 12px; margin: 24px 0; }
+.section-divider::before, .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border-color); }
+.section-divider-label {
+    font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;
+    white-space: nowrap; background: rgba(5,150,105,.08); border: 1px solid rgba(5,150,105,.2);
+    color: #059669; padding: 4px 14px; border-radius: 999px;
 }
+
+.field-group { margin-bottom: 22px; }
+.field-label { display: flex; align-items: center; gap: 7px; font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
 .field-label i { color: #059669; font-size: 0.9rem; }
 .field-input {
-    width: 100%; background: var(--bg-darker);
-    border: 1.5px solid var(--border-color);
-    color: var(--text-main); border-radius: 12px;
-    padding: 11px 14px; font-size: 0.92rem;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    font-family: 'Inter', sans-serif;
+    width: 100%; background: var(--bg-darker); border: 1.5px solid var(--border-color);
+    color: var(--text-main); border-radius: 12px; padding: 11px 14px; font-size: 0.92rem;
+    transition: border-color 0.2s, box-shadow 0.2s; font-family: 'Inter', sans-serif;
 }
-.field-input:focus {
-    outline: none; border-color: #059669;
-    box-shadow: 0 0 0 3px rgba(5,150,105,.15);
-    background: var(--bg-card);
-}
+.field-input:focus { outline: none; border-color: #059669; box-shadow: 0 0 0 3px rgba(5,150,105,.15); background: var(--bg-card); }
 .field-input::placeholder { color: var(--text-muted); }
 textarea.field-input { resize: vertical; min-height: 90px; }
+.field-hint { font-size: 0.76rem; color: var(--text-muted); margin-top: 5px; }
 
-/* Action buttons */
-.actions-row {
-    display: flex; gap: 12px; margin-top: 4px; align-items: stretch;
+.btn-next {
+    display: flex; align-items: center; justify-content: center; gap: 9px; width: 100%;
+    background: linear-gradient(135deg, #059669, #0d9488); color: #fff !important;
+    border: none; border-radius: 13px; padding: 14px 24px; font-size: 0.95rem; font-weight: 700;
+    cursor: pointer; transition: all 0.25s ease; box-shadow: 0 4px 16px rgba(5,150,105,.3);
+    font-family: 'Inter', sans-serif; margin-top: 8px;
 }
-.btn-add-lesson {
-    flex: 1; display: flex; align-items: center; justify-content: center; gap: 9px;
-    background: var(--bg-darker); border: 1.5px solid rgba(5,150,105,.4);
-    color: #059669 !important; border-radius: 13px;
-    padding: 13px 20px; font-size: 0.9rem; font-weight: 700;
-    cursor: pointer; transition: all 0.22s ease;
-    font-family: 'Inter', sans-serif; text-decoration: none;
+.btn-next:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(5,150,105,.4); }
+.btn-back {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    color: var(--text-muted) !important; text-decoration: none;
+    font-size: 0.88rem; font-weight: 600; margin-bottom: 24px; transition: color 0.2s;
 }
-.btn-add-lesson:hover {
-    background: rgba(5,150,105,.08);
-    border-color: #059669;
-    transform: translateY(-1px);
-}
-[data-theme="dark"] .btn-add-lesson { color: #34d399 !important; }
+.btn-back:hover { color: #059669 !important; }
 
-.btn-finish {
-    flex: 1; display: flex; align-items: center; justify-content: center; gap: 9px;
-    background: linear-gradient(135deg,#059669,#0d9488);
-    color: #fff !important; border: none; border-radius: 13px;
-    padding: 13px 20px; font-size: 0.95rem; font-weight: 700;
-    cursor: pointer; transition: all 0.25s ease;
-    box-shadow: 0 4px 16px rgba(5,150,105,.3);
-    font-family: 'Inter', sans-serif;
+.alert-err {
+    background: rgba(239,68,68,.07); border: 1px solid rgba(239,68,68,.2);
+    border-radius: 12px; padding: 12px 16px; margin-bottom: 24px;
+    font-size: 0.82rem; color: #ef4444; display: flex; gap: 9px; align-items: flex-start;
 }
-.btn-finish:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(5,150,105,.4); }
-
-/* Alert */
-.alert-msg {
-    border-radius: 12px; padding: 12px 16px; margin-bottom: 20px;
-    font-size: 0.82rem; display: flex; gap: 9px; align-items: center;
-}
-.alert-success {
-    background: rgba(5,150,105,.08); border: 1px solid rgba(5,150,105,.2);
-    color: #059669;
-}
-.alert-error {
-    background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.2);
-    color: #ef4444;
-}
-[data-theme="dark"] .alert-success { color: #34d399; }
-
-/* Counter badge */
-.lessons-count-badge {
-    background: rgba(5,150,105,.12);
-    color: #059669; font-size: 0.72rem; font-weight: 700;
-    padding: 3px 10px; border-radius: 999px;
-}
-[data-theme="dark"] .lessons-count-badge { color: #34d399; }
-
-/* Section header */
-.section-hdr {
-    display: flex; align-items: center; gap: 10px;
-    margin-bottom: 16px;
-}
-.section-hdr-icon {
-    width: 34px; height: 34px; border-radius: 10px;
-    background: linear-gradient(135deg, #059669, #0d9488);
-    display: flex; align-items: center; justify-content: center;
-    color: #fff; font-size: 0.95rem;
-}
-.section-hdr-title {
-    font-family: 'Outfit', sans-serif;
-    font-size: 0.95rem; font-weight: 700;
-    color: var(--text-main); flex: 1;
-}
-
-/* Quiz hint */
-.quiz-hint {
-    background: rgba(245,158,11,.07); border: 1px solid rgba(245,158,11,.25);
-    border-radius: 12px; padding: 12px 16px;
-    font-size: 0.8rem; color: #b45309; display: flex; gap: 9px;
-    margin-bottom: 20px;
-}
-[data-theme="dark"] .quiz-hint { color: #fbbf24; }
+.alert-err-list { list-style: none; padding: 0; margin: 0; }
+.alert-err-list li::before { content: "• "; }
 </style>
 {% endblock %}
 
@@ -197,83 +143,108 @@ textarea.field-input { resize: vertical; min-height: 90px; }
 <div class="create-wrap">
 
     <div class="step-header">
-        <h1><i class="bi bi-collection-fill" style="color:#059669;margin-right:8px;"></i>{% if lang == 'ru' %}Управление уроками{% elif lang == 'tj' %}Идора кардани дарсхо{% else %}Manage Lessons{% endif %}</h1>
-        <p>{% if lang == 'ru' %}Добавьте уроки и перейдите к созданию тестов{% elif lang == 'tj' %}Дарсхо илова кунед ва ба сохтани тест гузаред{% else %}Add lessons and proceed to create quizzes{% endif %}</p>
+        <h1><i class="bi bi-journal-plus" style="color:#059669;margin-right:8px;"></i>
+            {% if lang == 'ru' %}Создание курса{% elif lang == 'tj' %}Сохтани курс{% else %}Create Course{% endif %}
+        </h1>
+        <p>{% if lang == 'ru' %}Создайте профессиональный курс для студентов{% elif lang == 'tj' %}Барои донишчуён курси ҳарфара созед{% else %}Create a professional course for students{% endif %}</p>
     </div>
 
-    <!-- Step indicator -->
     <div class="step-indicator">
         <div class="step-dot done"><i class="bi bi-check-lg"></i></div>
         <div class="step-line done"></div>
         <div class="step-dot active">2</div>
+        <div class="step-line"></div>
+        <div class="step-dot">3</div>
     </div>
 
-    <!-- Course info chip -->
-    <div style="text-align:center; margin-bottom:28px;">
-        <div class="course-info-chip">
-            <i class="bi bi-book-fill"></i>
-            {{ course.title }} &bull; 
-            {% if lang == 'tj' and course.category.name_tj %}{{ course.category.name_tj }}
-            {% elif lang == 'ru' and course.category.name_ru %}{{ course.category.name_ru }}
-            {% elif lang == 'en' and course.category.name_en %}{{ course.category.name_en }}
-            {% else %}{{ course.category.name }}{% endif %}
-        </div>
-    </div>
+    <a href="{% url 'course_create_step1' %}" class="btn-back">
+        <i class="bi bi-arrow-left"></i>
+        {% if lang == 'ru' %}Назад{% elif lang == 'tj' %}Қафо{% else %}Back{% endif %}
+    </a>
 
     {% if messages %}
-        {% for msg in messages %}
-        <div class="alert-msg {% if 'Dars qo' in msg %}alert-success{% else %}alert-error{% endif %}">
-            <i class="bi {% if 'Dars qo' in msg %}bi-check-circle-fill{% else %}bi-exclamation-triangle-fill{% endif %}"></i>
-            {{ msg }}
-        </div>
-        {% endfor %}
+    <div class="alert-err">
+        <i class="bi bi-exclamation-triangle-fill" style="flex-shrink:0;margin-top:1px;"></i>
+        <ul class="alert-err-list">
+            {% for msg in messages %}<li>{{ msg }}</li>{% endfor %}
+        </ul>
+    </div>
     {% endif %}
 
-    <!-- Quiz hint -->
-    <div class="quiz-hint">
-        <i class="bi bi-lightbulb-fill" style="flex-shrink:0;"></i>
-        <div>
-            <strong>{% if lang == 'ru' %}Подсказка:{% elif lang == 'tj' %}Эслатма:{% else %}Tip:{% endif %}</strong>
-            {% if lang == 'ru' %}После добавления уроков нажмите кнопку <strong>"Создать тест"</strong> на панели для каждого урока.
-            {% elif lang == 'tj' %}Пас аз илова кардани дарсхо, аз панел тугмаи <strong>"Тест созед"</strong> ро бифшаред ва барои ҳар дарс тест созед.
-            {% else %}After adding lessons, click <strong>"Create Quiz"</strong> on the dashboard to add a quiz for each lesson.{% endif %}
-        </div>
-    </div>
+    <form method="post" id="courseForm" enctype="multipart/form-data">
+        {% csrf_token %}
 
-    <!-- Mavjud darslar ro'yxati -->
-    <div class="section-hdr">
-        <div class="section-hdr-icon"><i class="bi bi-list-ol"></i></div>
-        <div class="section-hdr-title">{% if lang == 'ru' %}Добавленные уроки{% elif lang == 'tj' %}Дарсхои иловашуда{% else %}Added Lessons{% endif %}</div>
-        <span class="lessons-count-badge">{{ lessons.count }}</span>
-    </div>
+        <div class="create-card">
+            <div class="create-card-header">
+                <i class="bi bi-book-fill"></i>
+                <h2>{% if lang == 'ru' %}Шаг 2: Информация о курсе{% elif lang == 'tj' %}Қадам 2: Маълумоти курс{% else %}Step 2: Course Information{% endif %}</h2>
+            </div>
+            <div class="create-card-body">
 
-    <div class="lesson-list">
-        {% for lesson in lessons %}
-        <div class="lesson-item">
-            <div class="lesson-num">{{ forloop.counter }}</div>
-            <div class="lesson-info">
-                <div class="lesson-title-txt">{{ lesson.title }}</div>
-                <div class="lesson-meta">
-                    {{ lesson.content|truncatechars:60 }}
+                <div class="field-group">
+                    <label class="field-label" for="id_title">
+                          <input type="text" id="id_title" name="title"
+                           class="field-input"
+                           value="{{ form_data.title|default:'' }}"
+                           placeholder="{% if lang == 'ru' %}Например: Основы Python{% elif lang == 'tj' %}Масалан: Асосхои Python{% else %}Example: Python Programming Basics{% endif %}"
+                           required>
                 </div>
-            </div>
-            <div class="lesson-done-badge">
-                <i class="bi bi-check2"></i> {% if lang == 'ru' %}Добавлен{% elif lang == 'tj' %}Илова шуд{% else %}Added{% endif %}
-            </div>
-        </div>
-        {% endfor %}
-    </div>
 
-    <!-- Yana dars qo'shish -->
-    <div class="add-lesson-card">
-        <div class="add-lesson-header">
-            <i class="bi bi-plus-circle-fill"></i>
-            <h2>{% if lang == 'ru' %}Добавить ещё урок (необязательно){% elif lang == 'tj' %}Дарси дигар илова кунед (ихтиёрӣ){% else %}Add Another Lesson (optional){% endif %}</h2>
-        </div>
-        <div class="add-lesson-body">
-            <form method="post" id="addLessonForm">
-                {% csrf_token %}
-                <input type="hidden" name="action" value="add_lesson">
+                <div class="field-group">
+                    <label class="field-label" for="id_description">
+                        <i class="bi bi-text-paragraph"></i>
+                        {% if lang == 'ru' %}Описание курса{% elif lang == 'tj' %}Тавсифи курс{% else %}Course Description{% endif %}
+                    </label>
+                    <textarea id="id_description" name="description"
+                              class="field-input" rows="3"
+                              placeholder="{% if lang == 'ru' %}Кратко опишите, что будет изучено...{% elif lang == 'tj' %}Қисқа нависед, дар ин курс чи омӯхта мешавад...{% else %}Briefly describe what this course covers...{% endif %}"
+                              required>{{ form_data.description|default:'' }}</textarea>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="id_category">
+                        <i class="bi bi-tag-fill"></i>
+                        {% if lang == 'ru' %}Категория{% elif lang == 'tj' %}Категория{% else %}Category{% endif %}
+                    </label>
+                    <select id="id_category" name="category" class="field-input" required>
+                        <option value="">{% if lang == 'ru' %}— Выберите категорию —{% elif lang == 'tj' %}— Категорияро интихоб кунед —{% else %}— Select a Category —{% endif %}</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.pk }}" {% if form_data.category_id == cat.pk %}selected{% endif %}>{{ cat.icon }} {{ cat|cat_name:lang }}</option>
+                        {% endfor %}
+                    </select>
+                    {% if not categories %}
+                    <div class="field-hint" style="color:#ef4444;">
+                        ⚠️ {% if lang == 'ru' %}Категорий пока нет. Добавьте в админ панели.{% elif lang == 'tj' %}Ҳанӯз категория нест. Дар панели адмін илова кунед.{% else %}No categories yet. Add one in the admin panel.{% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="id_thumbnail">
+                        <i class="bi bi-image"></i>
+                        {% if lang == 'ru' %}Обложка курса (Изображение){% elif lang == 'tj' %}Обложкаи курс (Расм){% else %}Course Thumbnail (Image){% endif %}
+                    </label>
+                    <input type="file" id="id_thumbnail" name="thumbnail" class="field-input" accept="image/*">
+                    <div class="field-hint">
+                        {% if lang == 'ru' %}Необязательно. Будет сохранено в Cloudflare R2 / Cloudinary в production.
+                        {% elif lang == 'tj' %}Ихтиёрӣ. Дар Cloudflare R2 / Cloudinary нигоҳ дошта мешавад.
+                        {% else %}Optional. Will be stored in Cloudflare R2 / Cloudinary in production.{% endif %}
+                    </div>
+                </div>
+
+                <div class="section-divider">
+                    <span class="section-divider-label">
+                        <i class="bi bi-book-open me-1"></i>
+                        {% if lang == 'ru' %}Первый урок{% elif lang == 'tj' %}Дарси аввал{% else %}First Lesson{% endif %}
+                    </span>
+                </div>
+
+                <div class="field-hint" style="margin-bottom:16px; font-size:0.82rem; color:var(--text-muted);">
+                    <i class="bi bi-info-circle me-1"></i>
+                    {% if lang == 'ru' %}Для создания курса нужен минимум 1 урок. Тест можно создать только после урока.
+                    {% elif lang == 'tj' %}Барои сохтани курс лоақал 1 дарс лозим. Тест фақат баъд аз дарс сохта шуданаш мумкин аст.
+                    {% else %}A course requires at least 1 lesson. A quiz can only be created after a lesson exists.{% endif %}
+                </div>
 
                 <div class="field-group">
                     <label class="field-label" for="id_lesson_title">
@@ -282,7 +253,9 @@ textarea.field-input { resize: vertical; min-height: 90px; }
                     </label>
                     <input type="text" id="id_lesson_title" name="lesson_title"
                            class="field-input"
-                           placeholder="{% if lang == 'ru' %}Например: Урок 2 — Переменные{% elif lang == 'tj' %}Масалан: Дарс 2 — Тағйиробахо{% else %}Example: Lesson 2 — Variables{% endif %}">
+                           value="{{ form_data.lesson_title|default:'' }}"
+                           placeholder="{% if lang == 'ru' %}Например: Введение — Что такое Python?{% elif lang == 'tj' %}Масалан: Муқаддима — Python chist?{% else %}Example: Introduction — What is Python?{% endif %}"
+                           required>
                 </div>
 
                 <div class="field-group" style="margin-bottom:0;">
@@ -291,44 +264,49 @@ textarea.field-input { resize: vertical; min-height: 90px; }
                         {% if lang == 'ru' %}Содержание урока{% elif lang == 'tj' %}Мазмуни дарс{% else %}Lesson Content{% endif %}
                     </label>
                     <textarea id="id_lesson_content" name="lesson_content"
-                              class="field-input" rows="3"
-                              placeholder="{% if lang == 'ru' %}Введите содержание урока...{% elif lang == 'tj' %}Мазмуни дарсро варид кунед...{% else %}Enter lesson content...{% endif %}"></textarea>
+                              class="field-input" rows="4"
+                              placeholder="{% if lang == 'ru' %}Напишите основное содержание урока...{% elif lang == 'tj' %}Мазмуни асосии дарсро нависед...{% else %}Write the main content of the lesson...{% endif %}"
+                              required>{{ form_data.lesson_content|default:'' }}</textarea>
+                    <div class="field-hint">
+                        {% if lang == 'ru' %}На следующем шаге можно добавить ещё уроки.
+                        {% elif lang == 'tj' %}Дар қадами баъдӣ дарсхои бештар илова кунед.
+                        {% else %}You can add more lessons in the next step.{% endif %}
+                    </div>
                 </div>
 
-                <div class="actions-row" style="margin-top:20px;">
-                    <button type="submit" class="btn-add-lesson" id="addBtn">
-                        <i class="bi bi-plus-circle"></i>
-                        {% if lang == 'ru' %}Добавить урок{% elif lang == 'tj' %}Дарс илова кунед{% else %}Add Lesson{% endif %}
-                    </button>
-                </div>
-            </form>
-
-            <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
-                <form method="post" id="finishForm">
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="finish">
-                    <button type="submit" class="btn-finish" id="finishBtn">
-                        <i class="bi bi-check2-circle"></i>
-                        {% if lang == 'ru' %}Завершить курс и вернуться{% elif lang == 'tj' %}Курсро тамом кунед{% else %}Finish Course{% endif %}
-                    </button>
-                </form>
             </div>
         </div>
-    </div>
+
+        <button type="submit" class="btn-next" id="nextBtn">
+            <i class="bi bi-arrow-right-circle-fill"></i>
+            {% if lang == 'ru' %}Сохранить и продолжить{% elif lang == 'tj' %}Захира ва идома додан{% else %}Save and Continue{% endif %}
+        </button>
+    </form>
 
 </div>
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script>
-document.getElementById('addLessonForm').addEventListener('submit', function() {
-    const btn = document.getElementById('addBtn');
-    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Qo\'shilmoqda...';
-    btn.disabled = true;
+document.addEventListener("DOMContentLoaded", function() {
+    new TomSelect('#id_category', {
+        create: false,
+        sortField: { field: "text", direction: "asc" },
+        render: {
+            option: function(data, escape) {
+                return '<div class="d-flex align-items-center">' + data.text + '</div>';
+            },
+            item: function(data, escape) {
+                return '<div class="d-flex align-items-center">' + data.text + '</div>';
+            }
+        }
+    });
 });
-document.getElementById('finishForm').addEventListener('submit', function() {
-    const btn = document.getElementById('finishBtn');
-    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Yuklanmoqda...';
+
+document.getElementById('courseForm').addEventListener('submit', function() {
+    const btn = document.getElementById('nextBtn');
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading...';
     btn.disabled = true;
 });
 </script>

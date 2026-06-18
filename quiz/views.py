@@ -10,6 +10,9 @@ from courses.models import Lesson
 def quiz_list_view(request):
     """Barcha testlarni ko'rsatuvchi sahifa."""
     quizzes = Quiz.objects.select_related('lesson', 'lesson__course').all()
+    lang_filter = request.GET.get('language')
+    if lang_filter:
+        quizzes = quizzes.filter(language=lang_filter)
     # Foydalanuvchi a'zo bo'lgan kurslar ID larini olish
     enrolled_course_ids = []
     if request.user.is_authenticated:
@@ -138,12 +141,32 @@ def quiz_ai_feedback_view(request, pk):
 
 
 # ═══════════════════════════════════════════════
-#  TEACHER: Test yaratish — 2 bosqich
+#  TEACHER: Test yaratish — 3 bosqich
 # ═══════════════════════════════════════════════
 
 @teacher_required
 def quiz_create_step1(request):
-    """1-qadam: qaysi dars, nechta savol."""
+    """1-qadam: Til tanlash."""
+    if request.method == 'POST':
+        lang_choice = request.POST.get('quiz_language')
+        if lang_choice in ['ru', 'tj', 'en']:
+            request.session['quiz_draft_lang'] = lang_choice
+            return redirect('quiz_create_step2')
+        else:
+            lang = request.session.get('lang', 'en')
+            if lang == 'ru':
+                messages.error(request, "Пожалуйста, выберите язык.")
+            elif lang == 'tj':
+                messages.error(request, "Лутфан забонро интихоб кунед.")
+            else:
+                messages.error(request, "Please select a language.")
+    
+    return render(request, 'quiz/create_step1.html', {'lang': request.session.get('lang', 'en')})
+
+
+@teacher_required
+def quiz_create_step2(request):
+    """2-qadam: qaysi dars, nechta savol."""
     user = request.user
     # Faqat o'qituvchining o'z darslari (allaqachon quiz yo'q bo'lganlar)
     my_lessons = Lesson.objects.filter(
@@ -155,6 +178,7 @@ def quiz_create_step1(request):
         title         = request.POST.get('title', '').strip()
         passing_score = request.POST.get('passing_score', 60)
         num_questions = request.POST.get('num_questions', '5')
+        thumbnail     = request.FILES.get('thumbnail')
 
         # Validatsiya
         try:
@@ -188,16 +212,18 @@ def quiz_create_step1(request):
             lesson=lesson,
             title=title or f"{lesson.title} — Test",
             passing_score=passing_score,
+            thumbnail=thumbnail,
+            language=request.session.get('quiz_draft_lang', 'en')
         )
-        return redirect('quiz_create_step2', pk=quiz.pk, num=num_questions)
+        return redirect('quiz_create_step3', pk=quiz.pk, num=num_questions)
 
     context = {'my_lessons': my_lessons}
-    return render(request, 'quiz/create_step1.html', context)
+    return render(request, 'quiz/create_step2.html', context)
 
 
 @teacher_required
-def quiz_create_step2(request, pk, num):
-    """2-qadam: savollarni to'ldirish."""
+def quiz_create_step3(request, pk, num):
+    """3-qadam: savollarni to'ldirish."""
     quiz   = get_object_or_404(Quiz, pk=pk, lesson__course__teacher=request.user)
     num    = max(1, min(int(num), 50))
     ranges = range(1, num + 1)
@@ -270,7 +296,7 @@ def quiz_create_step2(request, pk, num):
                 'num': num,
                 'questions_data': questions_data
             }
-            return render(request, 'quiz/create_step2.html', context)
+            return render(request, 'quiz/create_step3.html', context)
 
         # Bulk create all questions inside a transaction
         from django.db import transaction
@@ -313,7 +339,7 @@ def quiz_create_step2(request, pk, num):
                 'num': num,
                 'questions_data': questions_data
             }
-            return render(request, 'quiz/create_step2.html', context)
+            return render(request, 'quiz/create_step3.html', context)
 
     # GET request: build empty list of questions
     questions_data = []
@@ -334,5 +360,5 @@ def quiz_create_step2(request, pk, num):
         'num': num,
         'questions_data': questions_data
     }
-    return render(request, 'quiz/create_step2.html', context)
+    return render(request, 'quiz/create_step3.html', context)
 

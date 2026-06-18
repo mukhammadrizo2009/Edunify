@@ -2,77 +2,41 @@
 {% block title %}{% if lang == 'ru' %}Создание теста — Шаг 1{% elif lang == 'tj' %}Сохтани тест — Қадам 1{% else %}Create Quiz — Step 1{% endif %} | Edunify{% endblock %}
 
 {% block extra_css %}
-<link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
 <style>
-/* Tom Select Dark Mode Overrides */
-.ts-control {
-    background: var(--bg-darker) !important;
-    border: 1.5px solid var(--border-color) !important;
-    border-radius: 12px !important;
-    color: var(--text-main) !important;
-    padding: 11px 14px !important;
-    font-size: 0.92rem !important;
-    box-shadow: none !important;
-    transition: border-color 0.2s, box-shadow 0.2s !important;
-    font-family: 'Inter', sans-serif !important;
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-}
-.ts-control.focus {
-    border-color: #059669 !important;
-    box-shadow: 0 0 0 4px rgba(5,150,105,.12) !important;
-}
-.ts-control > input { color: var(--text-main) !important; font-size: 0.92rem; }
-.ts-control > input::placeholder { color: var(--text-muted) !important; }
-.ts-dropdown {
-    background: var(--bg-darker) !important;
-    border: 1px solid var(--border-color) !important;
-    border-radius: 12px !important;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
-    color: var(--text-main) !important;
-    margin-top: 6px !important;
-    padding: 6px !important;
-    font-size: 0.92rem !important;
-    z-index: 1000;
-}
-.ts-dropdown .option {
-    padding: 10px 14px !important;
-    border-radius: 8px !important;
-    cursor: pointer !important;
-    transition: background 0.2s ease, color 0.2s ease !important;
-    margin-bottom: 2px;
-}
-.ts-dropdown .active, .ts-dropdown .option:hover {
-    background: rgba(5,150,105,.15) !important;
-    color: #10b981 !important;
-}
-.ts-wrapper.single .ts-control:after {
-    border-color: var(--text-muted) transparent transparent transparent !important;
-}
-.ts-wrapper.single.dropdown-active .ts-control:after {
-    border-color: transparent transparent var(--text-muted) transparent !important;
-}
-
-.create-wrap { max-width: 640px; margin: 0 auto; }
+.create-wrap { max-width: 700px; margin: 0 auto; }
 .step-header { text-align: center; margin-bottom: 32px; }
-.step-header h1 { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
+.step-header h1 {
+    font-family: 'Outfit', sans-serif; font-size: 1.8rem;
+    font-weight: 700; color: var(--text-main); margin-bottom: 6px;
+}
 .step-header p { color: var(--text-muted); font-size: 0.92rem; }
 
-.step-indicator { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 36px; }
+.step-indicator {
+    display: flex; align-items: center; justify-content: center;
+    gap: 0; margin-bottom: 36px;
+}
 .step-dot {
     width: 36px; height: 36px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     font-weight: 700; font-size: 0.88rem;
-    border: 2px solid var(--border-color); color: var(--text-muted); background: var(--bg-card); position: relative; z-index: 1;
+    border: 2px solid var(--border-color);
+    color: var(--text-muted); background: var(--bg-card);
+    position: relative; z-index: 1;
 }
 .step-dot.active { background: linear-gradient(135deg, #059669, #0d9488); border-color: #059669; color: #fff; }
 .step-dot.done { background: rgba(5,150,105,.12); border-color: #059669; color: #059669; }
 .step-line { flex: 1; height: 2px; background: var(--border-color); max-width: 80px; }
 .step-line.done { background: #059669; }
 
-.create-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 22px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,.06); }
-.create-card-header { background: linear-gradient(135deg, #059669, #0d9488); padding: 20px 28px; display: flex; align-items: center; gap: 12px; }
+.create-card {
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: 22px; overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,.06); margin-bottom: 20px;
+}
+.create-card-header {
+    background: linear-gradient(135deg, #059669, #0d9488);
+    padding: 18px 28px; display: flex; align-items: center; gap: 12px;
+}
 .create-card-header i { font-size: 1.4rem; color: rgba(255,255,255,.9); }
 .create-card-header h2 { font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700; color: #fff; margin: 0; }
 .create-card-body { padding: 28px; }
@@ -80,17 +44,18 @@
 .field-group { margin-bottom: 22px; }
 .field-label { display: flex; align-items: center; gap: 7px; font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
 .field-label i { color: #059669; font-size: 0.9rem; }
-.field-input {
-    width: 100%; background: var(--bg-darker); border: 1.5px solid var(--border-color);
-    color: var(--text-main); border-radius: 12px; padding: 11px 14px; font-size: 0.92rem;
-    transition: border-color 0.2s, box-shadow 0.2s; font-family: 'Inter', sans-serif;
-}
-.field-input:focus { outline: none; border-color: #059669; box-shadow: 0 0 0 3px rgba(5,150,105,.15); background: var(--bg-card); }
-.field-input::placeholder { color: var(--text-muted); }
-.field-hint { font-size: 0.76rem; color: var(--text-muted); margin-top: 5px; }
 
-.num-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media(max-width:480px){ .num-row { grid-template-columns: 1fr; } }
+.lang-option {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 20px; border: 2px solid var(--border-color);
+    border-radius: 14px; margin-bottom: 12px; cursor: pointer;
+    transition: all 0.2s ease;
+}
+.lang-option:hover { border-color: rgba(5,150,105,.5); background: rgba(5,150,105,.02); }
+.lang-option input { display: none; }
+.lang-option.selected { border-color: #059669; background: rgba(5,150,105,.05); }
+.lang-icon { font-size: 1.5rem; }
+.lang-text { font-weight: 600; color: var(--text-main); font-size: 1rem; }
 
 .btn-next {
     display: flex; align-items: center; justify-content: center; gap: 9px; width: 100%;
@@ -107,12 +72,13 @@
 }
 .btn-back:hover { color: #059669 !important; }
 
-.alert-info {
-    background: rgba(5,150,105,.07); border: 1px solid rgba(5,150,105,.2);
+.alert-err {
+    background: rgba(239,68,68,.07); border: 1px solid rgba(239,68,68,.2);
     border-radius: 12px; padding: 12px 16px; margin-bottom: 24px;
-    font-size: 0.82rem; color: #059669; display: flex; gap: 9px;
+    font-size: 0.82rem; color: #ef4444; display: flex; gap: 9px; align-items: flex-start;
 }
-[data-theme="dark"] .alert-info { color: #34d399; }
+.alert-err-list { list-style: none; padding: 0; margin: 0; }
+.alert-err-list li::before { content: "• "; }
 </style>
 {% endblock %}
 
@@ -120,16 +86,18 @@
 <div class="create-wrap">
 
     <div class="step-header">
-        <h1><i class="bi bi-patch-question-fill" style="color:#059669;margin-right:8px;"></i>
+        <h1><i class="bi bi-ui-checks" style="color:#059669;margin-right:8px;"></i>
             {% if lang == 'ru' %}Создание теста{% elif lang == 'tj' %}Сохтани тест{% else %}Create Quiz{% endif %}
         </h1>
-        <p>{% if lang == 'ru' %}Составьте профессиональный тест для студентов{% elif lang == 'tj' %}Барои донишчуён тести ҳарфара тузед{% else %}Create a professional quiz for students{% endif %}</p>
+        <p>{% if lang == 'ru' %}Создайте тест для проверки знаний{% elif lang == 'tj' %}Барои санҷиши дониш тест созед{% else %}Create a quiz to test knowledge{% endif %}</p>
     </div>
 
     <div class="step-indicator">
         <div class="step-dot active">1</div>
         <div class="step-line"></div>
         <div class="step-dot">2</div>
+        <div class="step-line"></div>
+        <div class="step-dot">3</div>
     </div>
 
     <a href="{% url 'dashboard' %}" class="btn-back">
@@ -138,117 +106,69 @@
     </a>
 
     {% if messages %}
-        {% for msg in messages %}
-        <div class="alert-info"><i class="bi bi-exclamation-circle-fill"></i> {{ msg }}</div>
-        {% endfor %}
-    {% endif %}
-
-    {% if not my_lessons %}
-    <div class="alert-info">
-        <i class="bi bi-info-circle-fill"></i>
-        <div>
-            {% if lang == 'ru' %}Уроков для теста не найдено. Сначала
-            <a href="{% url 'course_create_step1' %}" style="color:#059669;font-weight:600;text-decoration:underline;">создайте курс и урок</a>,
-            или все уроки уже имеют тест.
-            {% elif lang == 'tj' %}Дарсе барои тест ёфта нашуд. Аввал
-            <a href="{% url 'course_create_step1' %}" style="color:#059669;font-weight:600;text-decoration:underline;">курс ва дарс созед</a>,
-            ё ба ҳамаи дарсхо аллакай тест пайваст аст.
-            {% else %}No lessons available for a quiz. First
-            <a href="{% url 'course_create_step1' %}" style="color:#059669;font-weight:600;text-decoration:underline;">create a course and lesson</a>,
-            or all lessons already have quizzes.{% endif %}
-        </div>
-    </div>
-    {% else %}
-
-    <div class="create-card">
-        <div class="create-card-header">
-            <i class="bi bi-journal-text"></i>
-            <h2>{% if lang == 'ru' %}Шаг 1: Данные теста{% elif lang == 'tj' %}Қадам 1: Маълумоти тест{% else %}Step 1: Quiz Information{% endif %}</h2>
-        </div>
-        <div class="create-card-body">
-            <form method="post" id="step1Form">
-                {% csrf_token %}
-
-                <div class="field-group">
-                    <label class="field-label" for="id_title">
-                        <i class="bi bi-fonts"></i>
-                        {% if lang == 'ru' %}Название теста{% elif lang == 'tj' %}Номи тест{% else %}Quiz Name{% endif %}
-                    </label>
-                    <input type="text" id="id_title" name="title"
-                           class="field-input"
-                           placeholder="{% if lang == 'ru' %}Например: Основы алгебры — Тест 1{% elif lang == 'tj' %}Масалан: Асосхои алгебра — Тест 1{% else %}Example: Algebra Basics — Quiz 1{% endif %}">
-                    <div class="field-hint">
-                        {% if lang == 'ru' %}Если оставить пустым, будет использовано название урока.
-                        {% elif lang == 'tj' %}Агар холи монед, номи дарс истифода мешавад.
-                        {% else %}If left empty, the lesson name will be used.{% endif %}
-                    </div>
-                </div>
-
-                <div class="field-group">
-                    <label class="field-label" for="id_lesson">
-                        <i class="bi bi-book-fill"></i>
-                        {% if lang == 'ru' %}К какому уроку относится?{% elif lang == 'tj' %}Ба кадом дарс тааллуқ дорад?{% else %}Which lesson does this belong to?{% endif %}
-                    </label>
-                    <select id="id_lesson" name="lesson" class="field-input" required>
-                        <option value="">{% if lang == 'ru' %}— Выберите урок —{% elif lang == 'tj' %}— Дарсро интихоб кунед —{% else %}— Select a Lesson —{% endif %}</option>
-                        {% for lesson in my_lessons %}
-                        <option value="{{ lesson.pk }}">
-                            {{ lesson.course.title }} › {{ lesson.title }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                </div>
-
-                <div class="num-row">
-                    <div class="field-group" style="margin-bottom:0;">
-                        <label class="field-label" for="id_num_questions">
-                            <i class="bi bi-list-ol"></i>
-                            {% if lang == 'ru' %}Кол-во вопросов{% elif lang == 'tj' %}Шумораи саволхо{% else %}Number of Questions{% endif %}
-                        </label>
-                        <input type="number" id="id_num_questions" name="num_questions"
-                               class="field-input" value="5" min="1" max="50" required>
-                        <div class="field-hint">{% if lang == 'ru' %}от 1 до 50{% elif lang == 'tj' %}аз 1 то 50{% else %}1 to 50{% endif %}</div>
-                    </div>
-
-                    <div class="field-group" style="margin-bottom:0;">
-                        <label class="field-label" for="id_passing_score">
-                            <i class="bi bi-trophy-fill"></i>
-                            {% if lang == 'ru' %}Проходной балл (%){% elif lang == 'tj' %}Бали гузаронидан (%){% else %}Passing Score (%){% endif %}
-                        </label>
-                        <input type="number" id="id_passing_score" name="passing_score"
-                               class="field-input" value="60" min="1" max="100" required>
-                        <div class="field-hint">{% if lang == 'ru' %}Например: 60 (60%){% elif lang == 'tj' %}Масалан: 60 (60%){% else %}Example: 60 (60%){% endif %}</div>
-                    </div>
-                </div>
-
-                <div style="margin-top:28px;">
-                    <button type="submit" class="btn-next" id="nextBtn">
-                        <i class="bi bi-arrow-right-circle-fill"></i>
-                        {% if lang == 'ru' %}Следующий шаг — Вопросы{% elif lang == 'tj' %}Қадами навбатӣ — Саволхо{% else %}Next Step — Questions{% endif %}
-                    </button>
-                </div>
-            </form>
-        </div>
+    <div class="alert-err">
+        <i class="bi bi-exclamation-triangle-fill" style="flex-shrink:0;margin-top:1px;"></i>
+        <ul class="alert-err-list">
+            {% for msg in messages %}<li>{{ msg }}</li>{% endfor %}
+        </ul>
     </div>
     {% endif %}
+
+    <form method="post" id="quizForm">
+        {% csrf_token %}
+
+        <div class="create-card">
+            <div class="create-card-header">
+                <i class="bi bi-globe"></i>
+                <h2>{% if lang == 'ru' %}Шаг 1: Язык теста{% elif lang == 'tj' %}Қадам 1: Забони тест{% else %}Step 1: Quiz Language{% endif %}</h2>
+            </div>
+            <div class="create-card-body">
+
+                <div class="field-group">
+                    <label class="field-label">
+                        <i class="bi bi-translate"></i>
+                        {% if lang == 'ru' %}Выберите язык теста{% elif lang == 'tj' %}Забони тестро интихоб кунед{% else %}Select Quiz Language{% endif %}
+                    </label>
+
+                    <label class="lang-option" onclick="selectLang(this)">
+                        <input type="radio" name="quiz_language" value="en" required>
+                        <span class="lang-icon">🇬🇧</span>
+                        <span class="lang-text">English</span>
+                    </label>
+
+                    <label class="lang-option" onclick="selectLang(this)">
+                        <input type="radio" name="quiz_language" value="ru">
+                        <span class="lang-icon">🇷🇺</span>
+                        <span class="lang-text">Русский (Russian)</span>
+                    </label>
+
+                    <label class="lang-option" onclick="selectLang(this)">
+                        <input type="radio" name="quiz_language" value="tj">
+                        <span class="lang-icon">🇹🇯</span>
+                        <span class="lang-text">Тоҷикӣ (Tajik)</span>
+                    </label>
+                </div>
+
+            </div>
+        </div>
+
+        <button type="submit" class="btn-next" id="nextBtn">
+            {% if lang == 'ru' %}Продолжить{% elif lang == 'tj' %}Идома додан{% else %}Continue{% endif %}
+            <i class="bi bi-arrow-right-circle-fill"></i>
+        </button>
+    </form>
 
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const lessonSelect = document.getElementById('id_lesson');
-    if (lessonSelect) {
-        new TomSelect(lessonSelect, {
-            create: false,
-            sortField: { field: "text", direction: "asc" }
-        });
-    }
-});
-
-document.getElementById('step1Form')?.addEventListener('submit', function() {
+function selectLang(el) {
+    document.querySelectorAll('.lang-option').forEach(opt => opt.classList.remove('selected'));
+    el.classList.add('selected');
+    el.querySelector('input').checked = true;
+}
+document.getElementById('quizForm').addEventListener('submit', function() {
     const btn = document.getElementById('nextBtn');
     btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading...';
     btn.disabled = true;

@@ -1,166 +1,118 @@
 {% extends 'base.html' %}
-{% block title %}{% if lang == 'ru' %}Создание теста — Вопросы{% elif lang == 'tj' %}Сохтани тест — Саволхо{% else %}Create Quiz — Questions{% endif %} | Edunify{% endblock %}
+{% block title %}{% if lang == 'ru' %}Создание теста — Шаг 1{% elif lang == 'tj' %}Сохтани тест — Қадам 1{% else %}Create Quiz — Step 1{% endif %} | Edunify{% endblock %}
 
 {% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
 <style>
-.create-wrap { max-width: 760px; margin: 0 auto; }
-.step-header { text-align: center; margin-bottom: 32px; }
-.step-header h1 {
-    font-family: 'Outfit', sans-serif; font-size: 1.8rem;
-    font-weight: 700; color: var(--text-main); margin-bottom: 6px;
+/* Tom Select Dark Mode Overrides */
+.ts-control {
+    background: var(--bg-darker) !important;
+    border: 1.5px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    color: var(--text-main) !important;
+    padding: 11px 14px !important;
+    font-size: 0.92rem !important;
+    box-shadow: none !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+    font-family: 'Inter', sans-serif !important;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
 }
+.ts-control.focus {
+    border-color: #059669 !important;
+    box-shadow: 0 0 0 4px rgba(5,150,105,.12) !important;
+}
+.ts-control > input { color: var(--text-main) !important; font-size: 0.92rem; }
+.ts-control > input::placeholder { color: var(--text-muted) !important; }
+.ts-dropdown {
+    background: var(--bg-darker) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+    color: var(--text-main) !important;
+    margin-top: 6px !important;
+    padding: 6px !important;
+    font-size: 0.92rem !important;
+    z-index: 1000;
+}
+.ts-dropdown .option {
+    padding: 10px 14px !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    transition: background 0.2s ease, color 0.2s ease !important;
+    margin-bottom: 2px;
+}
+.ts-dropdown .active, .ts-dropdown .option:hover {
+    background: rgba(5,150,105,.15) !important;
+    color: #10b981 !important;
+}
+.ts-wrapper.single .ts-control:after {
+    border-color: var(--text-muted) transparent transparent transparent !important;
+}
+.ts-wrapper.single.dropdown-active .ts-control:after {
+    border-color: transparent transparent var(--text-muted) transparent !important;
+}
+
+.create-wrap { max-width: 640px; margin: 0 auto; }
+.step-header { text-align: center; margin-bottom: 32px; }
+.step-header h1 { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
 .step-header p { color: var(--text-muted); font-size: 0.92rem; }
 
-.step-indicator {
-    display: flex; align-items: center; justify-content: center;
-    gap: 0; margin-bottom: 36px;
-}
+.step-indicator { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 36px; }
 .step-dot {
     width: 36px; height: 36px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     font-weight: 700; font-size: 0.88rem;
-    border: 2px solid var(--border-color);
-    color: var(--text-muted); background: var(--bg-card); z-index: 1;
+    border: 2px solid var(--border-color); color: var(--text-muted); background: var(--bg-card); position: relative; z-index: 1;
 }
-.step-dot.active { background: linear-gradient(135deg,#059669,#0d9488); border-color:#059669; color:#fff; }
-.step-dot.done   { background: rgba(5,150,105,.12); border-color:#059669; color:#059669; }
-.step-line { flex:1; height:2px; background:var(--border-color); max-width:80px; }
-.step-line.done { background:#059669; }
+.step-dot.active { background: linear-gradient(135deg, #059669, #0d9488); border-color: #059669; color: #fff; }
+.step-dot.done { background: rgba(5,150,105,.12); border-color: #059669; color: #059669; }
+.step-line { flex: 1; height: 2px; background: var(--border-color); max-width: 80px; }
+.step-line.done { background: #059669; }
 
-/* Progress bar */
-.progress-bar-wrap {
-    background: var(--bg-darker); border-radius: 999px;
-    height: 6px; margin-bottom: 28px; overflow: hidden;
-}
-.progress-bar-fill {
-    height: 100%; border-radius: 999px;
-    background: linear-gradient(90deg, #059669, #0d9488);
-    transition: width 0.4s ease;
-}
+.create-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 22px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,.06); }
+.create-card-header { background: linear-gradient(135deg, #059669, #0d9488); padding: 20px 28px; display: flex; align-items: center; gap: 12px; }
+.create-card-header i { font-size: 1.4rem; color: rgba(255,255,255,.9); }
+.create-card-header h2 { font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700; color: #fff; margin: 0; }
+.create-card-body { padding: 28px; }
 
-/* Quiz info chip */
-.quiz-info-chip {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(5,150,105,.1); border: 1px solid rgba(5,150,105,.2);
-    border-radius: 999px; padding: 6px 16px;
-    font-size: 0.8rem; color: #059669; font-weight: 600; margin-bottom: 24px;
-}
-[data-theme="dark"] .quiz-info-chip { color: #34d399; }
-
-/* Question card */
-.q-card {
-    background: var(--bg-card); border: 1px solid var(--border-color);
-    border-radius: 18px; margin-bottom: 20px;
-    overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s;
-}
-.q-card:focus-within {
-    border-color: rgba(5,150,105,.4);
-    box-shadow: 0 4px 20px rgba(5,150,105,.1);
-}
-.q-card-header {
-    display: flex; align-items: center; gap: 10px;
-    padding: 14px 20px; background: var(--bg-darker);
-    border-bottom: 1px solid var(--border-color);
-}
-.q-num {
-    width: 30px; height: 30px; border-radius: 8px;
-    background: linear-gradient(135deg,#059669,#0d9488);
-    display: flex; align-items: center; justify-content: center;
-    color:#fff; font-size:0.82rem; font-weight:700; flex-shrink:0;
-}
-.q-card-title {
-    font-weight:600; font-size:0.9rem; color:var(--text-main); flex:1;
-}
-.q-card-body { padding:18px 20px; }
-
-.field-label {
-    display:flex; align-items:center; gap:6px;
-    font-size:0.8rem; font-weight:600; color:var(--text-main); margin-bottom:7px;
-}
-.field-label i { color:#059669; font-size:0.85rem; }
+.field-group { margin-bottom: 22px; }
+.field-label { display: flex; align-items: center; gap: 7px; font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
+.field-label i { color: #059669; font-size: 0.9rem; }
 .field-input {
-    width:100%; background:var(--bg-darker);
-    border:1.5px solid var(--border-color);
-    color:var(--text-main); border-radius:10px;
-    padding:10px 12px; font-size:0.88rem;
-    transition:border-color 0.2s, box-shadow 0.2s;
-    font-family:'Inter',sans-serif;
+    width: 100%; background: var(--bg-darker); border: 1.5px solid var(--border-color);
+    color: var(--text-main); border-radius: 12px; padding: 11px 14px; font-size: 0.92rem;
+    transition: border-color 0.2s, box-shadow 0.2s; font-family: 'Inter', sans-serif;
 }
-.field-input:focus {
-    outline:none; border-color:#059669;
-    box-shadow:0 0 0 3px rgba(5,150,105,.12);
-    background:var(--bg-card); color:var(--text-main);
-}
-.field-input::placeholder { color:var(--text-muted); }
+.field-input:focus { outline: none; border-color: #059669; box-shadow: 0 0 0 3px rgba(5,150,105,.15); background: var(--bg-card); }
+.field-input::placeholder { color: var(--text-muted); }
+.field-hint { font-size: 0.76rem; color: var(--text-muted); margin-top: 5px; }
 
-/* Options grid */
-.options-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
-@media(max-width:540px){ .options-grid { grid-template-columns:1fr; } }
+.num-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media(max-width:480px){ .num-row { grid-template-columns: 1fr; } }
 
-.option-wrap { position:relative; }
-.option-prefix {
-    position:absolute; left:12px; top:50%; transform:translateY(-50%);
-    font-weight:700; font-size:0.8rem; color:#059669; pointer-events:none;
+.btn-next {
+    display: flex; align-items: center; justify-content: center; gap: 9px; width: 100%;
+    background: linear-gradient(135deg, #059669, #0d9488); color: #fff !important;
+    border: none; border-radius: 13px; padding: 14px 24px; font-size: 0.95rem; font-weight: 700;
+    cursor: pointer; transition: all 0.25s ease; box-shadow: 0 4px 16px rgba(5,150,105,.3);
+    font-family: 'Inter', sans-serif; margin-top: 8px;
 }
-.option-input { padding-left:28px; }
+.btn-next:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(5,150,105,.4); }
+.btn-back {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    color: var(--text-muted) !important; text-decoration: none;
+    font-size: 0.88rem; font-weight: 600; margin-bottom: 24px; transition: color 0.2s;
+}
+.btn-back:hover { color: #059669 !important; }
 
-/* Correct answer selector */
-.correct-selector { display:flex; gap:8px; flex-wrap:wrap; }
-.correct-btn {
-    flex:1; min-width:60px;
-    border:2px solid var(--border-color);
-    background:var(--bg-darker); color:var(--text-muted);
-    border-radius:10px; padding:8px 12px;
-    font-size:0.88rem; font-weight:700; cursor:pointer;
-    transition:all 0.18s ease; text-align:center;
+.alert-info {
+    background: rgba(5,150,105,.07); border: 1px solid rgba(5,150,105,.2);
+    border-radius: 12px; padding: 12px 16px; margin-bottom: 24px;
+    font-size: 0.82rem; color: #059669; display: flex; gap: 9px;
 }
-.correct-btn:hover { border-color:#059669; color:#059669; }
-.correct-btn.selected {
-    background:linear-gradient(135deg,#059669,#0d9488);
-    border-color:#059669; color:#fff;
-}
-
-/* Action buttons */
-.actions-row {
-    display:flex; gap:12px; margin-top:8px; align-items:center;
-}
-.btn-submit {
-    flex:1; display:flex; align-items:center; justify-content:center; gap:9px;
-    background:linear-gradient(135deg,#059669,#0d9488);
-    color:#fff !important; border:none; border-radius:13px;
-    padding:14px 24px; font-size:0.95rem; font-weight:700;
-    cursor:pointer; transition:all 0.25s ease;
-    box-shadow:0 4px 16px rgba(5,150,105,.3);
-    font-family:'Inter',sans-serif; white-space:nowrap;
-}
-.btn-submit:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(5,150,105,.4); }
-.btn-cancel {
-    display:flex; align-items:center; justify-content:center; gap:8px;
-    background:var(--bg-darker); border:1.5px solid var(--border-color);
-    color:var(--text-muted) !important; border-radius:13px;
-    padding:14px 20px; font-size:0.88rem; font-weight:600;
-    text-decoration:none; transition:all 0.2s ease; white-space:nowrap;
-}
-.btn-cancel:hover { border-color:var(--border-hover); color:var(--text-main) !important; }
-
-.alert-err {
-    background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.2);
-    border-radius:12px; padding:12px 16px; margin-bottom:20px;
-    font-size:0.82rem; color:#ef4444; display:flex; gap:9px; align-items:flex-start;
-}
-
-/* Sticky footer */
-.sticky-footer {
-    position:sticky; bottom:24px; z-index:50;
-    background:var(--bg-card); border:1px solid var(--border-color);
-    border-radius:16px; padding:16px 20px;
-    box-shadow:0 8px 32px rgba(0,0,0,.14);
-    display:flex; align-items:center; gap:16px;
-}
-.sticky-footer-info {
-    flex:1; font-size:0.82rem; color:var(--text-muted);
-}
-.sticky-footer-info strong { color:var(--text-main); }
+[data-theme="dark"] .alert-info { color: #34d399; }
 </style>
 {% endblock %}
 
@@ -168,201 +120,152 @@
 <div class="create-wrap">
 
     <div class="step-header">
-        <h1><i class="bi bi-pencil-square" style="color:#059669;margin-right:8px;"></i>{% if lang == 'ru' %}Заполните вопросы{% elif lang == 'tj' %}Саволхоро пур кунед{% else %}Fill in the Questions{% endif %}</h1>
-        <p>{% if lang == 'ru' %}Для каждого вопроса введите 4 варианта и правильный ответ{% elif lang == 'tj' %}Барои ҳар савол 4 вариант ва ҷавоби дурустро варид кунед{% else %}Enter 4 options and the correct answer for each question{% endif %}</p>
+        <h1><i class="bi bi-patch-question-fill" style="color:#059669;margin-right:8px;"></i>
+            {% if lang == 'ru' %}Создание теста{% elif lang == 'tj' %}Сохтани тест{% else %}Create Quiz{% endif %}
+        </h1>
+        <p>{% if lang == 'ru' %}Составьте профессиональный тест для студентов{% elif lang == 'tj' %}Барои донишчуён тести ҳарфара тузед{% else %}Create a professional quiz for students{% endif %}</p>
     </div>
 
-    <!-- Step indicator -->
     <div class="step-indicator">
         <div class="step-dot done"><i class="bi bi-check-lg"></i></div>
         <div class="step-line done"></div>
         <div class="step-dot active">2</div>
+        <div class="step-line"></div>
+        <div class="step-dot">3</div>
     </div>
 
-    <!-- Quiz info -->
-    <div style="text-align:center;">
-        <div class="quiz-info-chip">
-            <i class="bi bi-patch-question-fill"></i>
-            {{ quiz.title }} &bull; {{ num }} {% if lang == 'ru' %}вопросов{% elif lang == 'tj' %}савол{% else %}questions{% endif %} &bull;
-            {% if lang == 'ru' %}Проход: {{ quiz.passing_score }}%{% elif lang == 'tj' %}Гузариш: {{ quiz.passing_score }}%{% else %}Pass: {{ quiz.passing_score }}%{% endif %}
-        </div>
-    </div>
-
-    <!-- Progress -->
-    <div class="progress-bar-wrap">
-        <div class="progress-bar-fill" id="progressFill" style="width:0%;"></div>
-    </div>
+    <a href="{% url 'quiz_create_step1' %}" class="btn-back">
+        <i class="bi bi-arrow-left"></i>
+        {% if lang == 'ru' %}Назад{% elif lang == 'tj' %}Қафо{% else %}Back{% endif %}
+    </a>
 
     {% if messages %}
-    <div class="alert-err">
-        <i class="bi bi-exclamation-triangle-fill" style="flex-shrink:0;margin-top:1px;"></i>
+        {% for msg in messages %}
+        <div class="alert-info"><i class="bi bi-exclamation-circle-fill"></i> {{ msg }}</div>
+        {% endfor %}
+    {% endif %}
+
+    {% if not my_lessons %}
+    <div class="alert-info">
+        <i class="bi bi-info-circle-fill"></i>
         <div>
-            {% for msg in messages %}{{ msg }}<br>{% endfor %}
+            {% if lang == 'ru' %}Уроков для теста не найдено. Сначала
+            <a href="{% url 'course_create_step1' %}" style="color:#059669;font-weight:600;text-decoration:underline;">создайте курс и урок</a>,
+            или все уроки уже имеют тест.
+            {% elif lang == 'tj' %}Дарсе барои тест ёфта нашуд. Аввал
+            <a href="{% url 'course_create_step1' %}" style="color:#059669;font-weight:600;text-decoration:underline;">курс ва дарс созед</a>,
+            ё ба ҳамаи дарсхо аллакай тест пайваст аст.
+            {% else %}No lessons available for a quiz. First
+            <a href="{% url 'course_create_step1' %}" style="color:#059669;font-weight:600;text-decoration:underline;">create a course and lesson</a>,
+            or all lessons already have quizzes.{% endif %}
+        </div>
+    </div>
+    {% else %}
+
+    <div class="create-card">
+        <div class="create-card-header">
+            <i class="bi bi-journal-text"></i>
+            <h2>{% if lang == 'ru' %}Шаг 2: Данные теста{% elif lang == 'tj' %}Қадам 2: Маълумоти тест{% else %}Step 2: Quiz Information{% endif %}</h2>
+        </div>
+        <div class="create-card-body">
+            <form method="post" id="step1Form" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="field-group">
+                    <label class="field-label" for="id_title">
+                        <i class="bi bi-fonts"></i>
+                        {% if lang == 'ru' %}Название теста{% elif lang == 'tj' %}Номи тест{% else %}Quiz Name{% endif %}
+                    </label>
+                    <input type="text" id="id_title" name="title"
+                           class="field-input"
+                           placeholder="{% if lang == 'ru' %}Например: Основы алгебры — Тест 1{% elif lang == 'tj' %}Масалан: Асосхои алгебра — Тест 1{% else %}Example: Algebra Basics — Quiz 1{% endif %}">
+                    <div class="field-hint">
+                        {% if lang == 'ru' %}Если оставить пустым, будет использовано название урока.
+                        {% elif lang == 'tj' %}Агар холи монед, номи дарс истифода мешавад.
+                        {% else %}If left empty, the lesson name will be used.{% endif %}
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="id_lesson">
+                        <i class="bi bi-book-fill"></i>
+                        {% if lang == 'ru' %}К какому уроку относится?{% elif lang == 'tj' %}Ба кадом дарс тааллуқ дорад?{% else %}Which lesson does this belong to?{% endif %}
+                    </label>
+                    <select id="id_lesson" name="lesson" class="field-input" required>
+                        <option value="">{% if lang == 'ru' %}— Выберите урок —{% elif lang == 'tj' %}— Дарсро интихоб кунед —{% else %}— Select a Lesson —{% endif %}</option>
+                        {% for lesson in my_lessons %}
+                        <option value="{{ lesson.pk }}">
+                            {{ lesson.course.title }} › {{ lesson.title }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="id_thumbnail">
+                        <i class="bi bi-image"></i>
+                        {% if lang == 'ru' %}Обложка теста (Изображение){% elif lang == 'tj' %}Обложкаи тест (Расм){% else %}Quiz Thumbnail (Image){% endif %}
+                    </label>
+                    <input type="file" id="id_thumbnail" name="thumbnail" class="field-input" accept="image/*">
+                    <div class="field-hint">
+                        {% if lang == 'ru' %}Необязательно. Будет сохранено в Cloudflare R2 / Cloudinary в production.
+                        {% elif lang == 'tj' %}Ихтиёрӣ. Дар Cloudflare R2 / Cloudinary нигоҳ дошта мешавад.
+                        {% else %}Optional. Will be stored in Cloudflare R2 / Cloudinary in production.{% endif %}
+                    </div>
+                </div>
+
+                <div class="num-row">
+                    <div class="field-group" style="margin-bottom:0;">
+                        <label class="field-label" for="id_num_questions">
+                            <i class="bi bi-list-ol"></i>
+                            {% if lang == 'ru' %}Кол-во вопросов{% elif lang == 'tj' %}Шумораи саволхо{% else %}Number of Questions{% endif %}
+                        </label>
+                        <input type="number" id="id_num_questions" name="num_questions"
+                               class="field-input" value="5" min="1" max="50" required>
+                        <div class="field-hint">{% if lang == 'ru' %}от 1 до 50{% elif lang == 'tj' %}аз 1 то 50{% else %}1 to 50{% endif %}</div>
+                    </div>
+
+                    <div class="field-group" style="margin-bottom:0;">
+                        <label class="field-label" for="id_passing_score">
+                            <i class="bi bi-trophy-fill"></i>
+                            {% if lang == 'ru' %}Проходной балл (%){% elif lang == 'tj' %}Бали гузаронидан (%){% else %}Passing Score (%){% endif %}
+                        </label>
+                        <input type="number" id="id_passing_score" name="passing_score"
+                               class="field-input" value="60" min="1" max="100" required>
+                        <div class="field-hint">{% if lang == 'ru' %}Например: 60 (60%){% elif lang == 'tj' %}Масалан: 60 (60%){% else %}Example: 60 (60%){% endif %}</div>
+                    </div>
+                </div>
+
+                <div style="margin-top:28px;">
+                    <button type="submit" class="btn-next" id="nextBtn">
+                        <i class="bi bi-arrow-right-circle-fill"></i>
+                        {% if lang == 'ru' %}Следующий шаг — Вопросы{% elif lang == 'tj' %}Қадами навбатӣ — Саволхо{% else %}Next Step — Questions{% endif %}
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
     {% endif %}
-
-    <form method="post" id="questionsForm">
-        {% csrf_token %}
-
-        {% for q in questions_data %}
-        <div class="q-card" id="card_{{ q.num }}">
-            <div class="q-card-header">
-                <div class="q-num">{{ q.num }}</div>
-                <div class="q-card-title">{% if lang == 'ru' %}Вопрос {{ q.num }}{% elif lang == 'tj' %}Савол {{ q.num }}{% else %}Question {{ q.num }}{% endif %}</div>
-                <div style="font-size:0.75rem;color:var(--text-muted);">
-                    <i class="bi bi-check-circle-fill text-success me-1 d-none filled-icon-{{ q.num }}"></i>
-                </div>
-            </div>
-            <div class="q-card-body">
-
-                <!-- Savol matni -->
-                <div style="margin-bottom:14px;">
-                    <label class="field-label" for="q_{{ q.num }}_text">
-                        <i class="bi bi-chat-left-text-fill"></i>
-                        {% if lang == 'ru' %}Текст вопроса{% elif lang == 'tj' %}Матни савол{% else %}Question Text{% endif %}
-                    </label>
-                    <textarea id="q_{{ q.num }}_text" name="q_{{ q.num }}_text"
-                              class="field-input q-text-input" rows="2"
-                              placeholder="{% if lang == 'ru' %}Введите текст вопроса...{% elif lang == 'tj' %}Матни саволро варид кунед...{% else %}Enter the question text...{% endif %}"
-                              data-qnum="{{ q.num }}" required>{{ q.text }}</textarea>
-                </div>
-
-                <!-- Variantlar -->
-                <div class="options-grid">
-                    <div class="option-wrap">
-                        <span class="option-prefix">A</span>
-                        <input type="text" name="q_{{ q.num }}_a"
-                               class="field-input option-input"
-                               value="{{ q.option_a }}"
-                               placeholder="Variant A"
-                               required>
-                    </div>
-                    <div class="option-wrap">
-                        <span class="option-prefix">B</span>
-                        <input type="text" name="q_{{ q.num }}_b"
-                               class="field-input option-input"
-                               value="{{ q.option_b }}"
-                               placeholder="Variant B"
-                               required>
-                    </div>
-                    <div class="option-wrap">
-                        <span class="option-prefix">C</span>
-                        <input type="text" name="q_{{ q.num }}_c"
-                               class="field-input option-input"
-                               value="{{ q.option_c }}"
-                               placeholder="Variant C"
-                               required>
-                    </div>
-                    <div class="option-wrap">
-                        <span class="option-prefix">D</span>
-                        <input type="text" name="q_{{ q.num }}_d"
-                               class="field-input option-input"
-                               value="{{ q.option_d }}"
-                               placeholder="Variant D"
-                               required>
-                    </div>
-                </div>
-
-                <!-- To'g'ri javob -->
-                <div>
-                    <label class="field-label">
-                        <i class="bi bi-check-circle-fill"></i>
-                        {% if lang == 'ru' %}Правильный ответ{% elif lang == 'tj' %}Ҷавоби дуруст{% else %}Correct Answer{% endif %}
-                    </label>
-                    <input type="hidden" name="q_{{ q.num }}_correct" id="correct_{{ q.num }}" value="{{ q.correct }}">
-                    <div class="correct-selector">
-                        <button type="button" class="correct-btn {% if q.correct == 'A' %}selected{% endif %}"
-                                onclick="selectCorrect({{ q.num }}, 'A', this)">
-                            A
-                        </button>
-                        <button type="button" class="correct-btn {% if q.correct == 'B' %}selected{% endif %}"
-                                onclick="selectCorrect({{ q.num }}, 'B', this)">
-                            B
-                        </button>
-                        <button type="button" class="correct-btn {% if q.correct == 'C' %}selected{% endif %}"
-                                onclick="selectCorrect({{ q.num }}, 'C', this)">
-                            C
-                        </button>
-                        <button type="button" class="correct-btn {% if q.correct == 'D' %}selected{% endif %}"
-                                onclick="selectCorrect({{ q.num }}, 'D', this)">
-                            D
-                        </button>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-        {% endfor %}
-
-        <!-- Sticky footer -->
-        <div class="sticky-footer">
-            <div class="sticky-footer-info">
-                <strong id="filledCount">0</strong> / {{ num }} {% if lang == 'ru' %}вопросов заполнено{% elif lang == 'tj' %}савол пур карда шуд{% else %}questions filled{% endif %}
-            </div>
-            <a href="{% url 'quiz_create_step1' %}" class="btn-cancel">
-                <i class="bi bi-arrow-left"></i>
-                {% if lang == 'ru' %}Назад{% elif lang == 'tj' %}Оқарга{% else %}Back{% endif %}
-            </a>
-            <button type="submit" class="btn-submit" id="submitBtn">
-                <i class="bi bi-check2-circle"></i>
-                {% if lang == 'ru' %}Сохранить тест{% elif lang == 'tj' %}Тестро сақлаш{% else %}Save Quiz{% endif %}
-            </button>
-        </div>
-    </form>
 
 </div>
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script>
-const totalQ = {{ num }};
-const filledSet = new Set();
-
-// To'g'ri javob tanlash
-function selectCorrect(qnum, letter, btn) {
-    const container = btn.closest('.correct-selector');
-    container.querySelectorAll('.correct-btn').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    document.getElementById('correct_' + qnum).value = letter;
-    updateProgress();
-}
-
-// Savol to'ldirilganini kuzatish
-document.querySelectorAll('.q-text-input').forEach(function(input) {
-    input.addEventListener('input', updateProgress);
+document.addEventListener("DOMContentLoaded", function() {
+    const lessonSelect = document.getElementById('id_lesson');
+    if (lessonSelect) {
+        new TomSelect(lessonSelect, {
+            create: false,
+            sortField: { field: "text", direction: "asc" }
+        });
+    }
 });
 
-function updateProgress() {
-    let filled = 0;
-    for (let i = 1; i <= totalQ; i++) {
-        const text    = document.getElementById('q_' + i + '_text')?.value.trim();
-        const correct = document.getElementById('correct_' + i)?.value;
-        if (text && correct) filled++;
-    }
-    document.getElementById('filledCount').textContent = filled;
-    const pct = Math.round((filled / totalQ) * 100);
-    document.getElementById('progressFill').style.width = pct + '%';
-}
-
-// Submit — loading state
-document.getElementById('questionsForm').addEventListener('submit', function(e) {
-    // Check all correct answers filled
-    let missing = [];
-    for (let i = 1; i <= totalQ; i++) {
-        if (!document.getElementById('correct_' + i).value) {
-            missing.push(i);
-        }
-    }
-    if (missing.length > 0) {
-        e.preventDefault();
-        alert(missing.join(', ') + '-savollar uchun to\'g\'ri javob tanlanmagan!');
-        // Scroll to first missing
-        document.getElementById('card_' + missing[0])?.scrollIntoView({behavior:'smooth', block:'center'});
-        return;
-    }
-    const btn = document.getElementById('submitBtn');
-    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saqlanmoqda...';
+document.getElementById('step1Form')?.addEventListener('submit', function() {
+    const btn = document.getElementById('nextBtn');
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading...';
     btn.disabled = true;
 });
 </script>

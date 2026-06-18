@@ -49,8 +49,11 @@ def course_list_view(request):
     courses = Course.objects.filter(is_active=True)
     categories = Category.objects.all()
     category_id = request.GET.get('category')
+    lang_filter = request.GET.get('language')
     if category_id:
         courses = courses.filter(category_id=category_id)
+    if lang_filter:
+        courses = courses.filter(language=lang_filter)
 
     lang = request.session.get('lang', 'en')
 
@@ -126,18 +129,39 @@ def lesson_detail_view(request, pk):
 
 
 # ═══════════════════════════════════════════════
-#  TEACHER: Kurs yaratish — 2 bosqich
+#  TEACHER: Kurs yaratish — 3 bosqich
 # ═══════════════════════════════════════════════
 
 @teacher_required
 def course_create_step1(request):
-    """1-qadam: kurs asosiy ma'lumotlari + birinchi dars."""
+    """1-qadam: Til tanlash."""
+    if request.method == 'POST':
+        lang_choice = request.POST.get('course_language')
+        if lang_choice in ['ru', 'tj', 'en']:
+            request.session['course_draft_lang'] = lang_choice
+            return redirect('course_create_step2')
+        else:
+            lang = request.session.get('lang', 'en')
+            if lang == 'ru':
+                messages.error(request, "Пожалуйста, выберите язык.")
+            elif lang == 'tj':
+                messages.error(request, "Лутфан забонро интихоб кунед.")
+            else:
+                messages.error(request, "Please select a language.")
+    
+    return render(request, 'courses/create_step1.html', {'lang': request.session.get('lang', 'en')})
+
+
+@teacher_required
+def course_create_step2(request):
+    """2-qadam: kurs asosiy ma'lumotlari + birinchi dars."""
     categories = Category.objects.all().order_by('name')
 
     if request.method == 'POST':
         title        = request.POST.get('title', '').strip()
         description  = request.POST.get('description', '').strip()
         category_id  = request.POST.get('category')
+        thumbnail    = request.FILES.get('thumbnail')
         lesson_title = request.POST.get('lesson_title', '').strip()
         lesson_content = request.POST.get('lesson_content', '').strip()
 
@@ -211,7 +235,9 @@ def course_create_step1(request):
                     title=title,
                     description=description,
                     category=category,
+                    thumbnail=thumbnail,
                     teacher=request.user,
+                    language=request.session.get('course_draft_lang', 'en'),
                     is_active=True,
                 )
                 # Birinchi dars yaratish
@@ -221,7 +247,7 @@ def course_create_step1(request):
                     content=lesson_content,
                     order=1,
                 )
-            return redirect('course_create_step2', pk=course.pk)
+            return redirect('course_create_step3', pk=course.pk)
         except Exception as e:
             lang = request.session.get('lang', 'en')
             if lang == 'ru':
@@ -231,17 +257,17 @@ def course_create_step1(request):
             else:
                 msg = f"An error occurred: {str(e)}"
             messages.error(request, msg)
-            return render(request, 'courses/create_step1.html', {
+            return render(request, 'courses/create_step2.html', {
                 'categories': categories,
                 'form_data': form_data
             })
 
-    return render(request, 'courses/create_step1.html', {'categories': categories})
+    return render(request, 'courses/create_step2.html', {'categories': categories})
 
 
 @teacher_required
-def course_create_step2(request, pk):
-    """2-qadam: yana dars qo'shish yoki tugatish."""
+def course_create_step3(request, pk):
+    """3-qadam: yana dars qo'shish yoki tugatish."""
     course = get_object_or_404(Course, pk=pk, teacher=request.user)
     lessons = course.lessons.all()
 
@@ -276,7 +302,7 @@ def course_create_step2(request, pk):
                 else:
                     msg = f"✅ Lesson added: {lesson_title}"
                 messages.success(request, msg)
-            return redirect('course_create_step2', pk=pk)
+            return redirect('course_create_step3', pk=pk)
 
         elif action == 'finish':
             lang = request.session.get('lang', 'en')
@@ -293,5 +319,5 @@ def course_create_step2(request, pk):
         'course': course,
         'lessons': lessons,
     }
-    return render(request, 'courses/create_step2.html', context)
+    return render(request, 'courses/create_step3.html', context)
 

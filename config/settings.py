@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'social_django',           # Google OAuth
     'cloudinary_storage',
     'cloudinary',
+    'storages',
 
     # Loyiha
     'users',
@@ -147,7 +148,17 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
 }
 
-if os.getenv('CLOUDINARY_CLOUD_NAME'):
+if os.getenv('CLOUDFLARE_ACCOUNT_ID'):
+    # Cloudflare R2 for media storage in production
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    AWS_ACCESS_KEY_ID = os.getenv('CLOUDFLARE_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.getenv('CLOUDFLARE_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.getenv('CLOUDFLARE_BUCKET_NAME')
+    AWS_S3_ENDPOINT_URL = f"https://{os.getenv('CLOUDFLARE_ACCOUNT_ID')}.r2.cloudflarestorage.com"
+    AWS_S3_CUSTOM_DOMAIN = os.getenv('CLOUDFLARE_CUSTOM_DOMAIN')  # e.g., 'cdn.edunify.online'
+    AWS_DEFAULT_ACL = 'public-read'
+    AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
+elif os.getenv('CLOUDINARY_CLOUD_NAME'):
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # ── OTHER ─────────────────────────────────────────

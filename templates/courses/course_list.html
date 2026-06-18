@@ -21,14 +21,28 @@
     </p>
 </div>
 
+<!-- Language filters -->
+<div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
+    <a href="?{% if request.GET.category %}category={{ request.GET.category }}{% endif %}"
+       class="btn-filter {% if not request.GET.language %}active{% endif %}">
+        🌐 {% if lang == 'ru' %}Все языки{% elif lang == 'tj' %}Хамаи забонхо{% else %}All Languages{% endif %}
+    </a>
+    <a href="?language=en{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}"
+       class="btn-filter {% if request.GET.language == 'en' %}active{% endif %}">🇬🇧 English</a>
+    <a href="?language=ru{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}"
+       class="btn-filter {% if request.GET.language == 'ru' %}active{% endif %}">🇷🇺 Русский</a>
+    <a href="?language=tj{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}"
+       class="btn-filter {% if request.GET.language == 'tj' %}active{% endif %}">🇹🇯 Тоҷикӣ</a>
+</div>
+
 <!-- Category filters -->
 <div class="d-flex flex-wrap justify-content-center gap-2 mb-5">
-    <a href="{% url 'course_list' %}"
+    <a href="?{% if request.GET.language %}language={{ request.GET.language }}{% endif %}"
        class="btn-filter {% if not request.GET.category %}active{% endif %}">
-        📂 {% if lang == 'ru' %}Все{% elif lang == 'tj' %}Хама{% else %}All{% endif %}
+        📂 {% if lang == 'ru' %}Все категории{% elif lang == 'tj' %}Хамаи категорияхо{% else %}All Categories{% endif %}
     </a>
     {% for cat in categories %}
-        <a href="?category={{ cat.pk }}"
+        <a href="?category={{ cat.pk }}{% if request.GET.language %}&language={{ request.GET.language }}{% endif %}"
            class="btn-filter {% if request.GET.category == cat.pk|stringformat:'i' %}active{% endif %}">
             {{ cat.icon }} 
             {% if lang == 'tj' and cat.name_tj %}{{ cat.name_tj }}
@@ -64,6 +78,15 @@
                             {% elif lang == 'ru' and course.category.name_ru %}{{ course.category.name_ru }}
                             {% elif lang == 'en' and course.category.name_en %}{{ course.category.name_en }}
                             {% else %}{{ course.category.name }}{% endif %}
+                        </span>
+                        
+                        <span class="position-absolute top-0 end-0 m-3 badge"
+                              style="background: rgba(5,150,105,0.8); backdrop-filter: blur(8px);
+                                     border: 1px solid rgba(5,150,105,0.5); color: #fff;
+                                     padding: .35rem .7rem; border-radius: 8px; font-size: .72rem;">
+                            {% if course.language == 'ru' %}🇷🇺 RU
+                            {% elif course.language == 'tj' %}🇹🇯 TJ
+                            {% else %}🇬🇧 EN{% endif %}
                         </span>
                     </div>
 

@@ -132,6 +132,30 @@
             <p>{% if lang == 'tj' %}Дониши худро бо тестҳои интерактивӣ санҷед. Барои оғоз, курси мувофиқро интихоб кунед ва натиҷаи худро беҳтар кунед.{% elif lang == 'ru' %}Проверьте свои знания с помощью интерактивных тестов. Выберите тест из ваших курсов, чтобы начать и улучшить свои результаты.{% else %}Test your knowledge with interactive quizzes. Select a quiz from your enrolled courses to begin and track your progress.{% endif %}</p>
         </div>
 
+        <!-- Language filters -->
+        <div class="d-flex flex-wrap justify-content-center gap-2 mb-5" style="position:relative; z-index:1;">
+            <a href="{% url 'quiz_list' %}"
+               class="btn-filter {% if not request.GET.language %}active{% endif %}"
+               style="display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border-radius:999px; text-decoration:none; color:var(--text-main); border:1px solid var(--border-color); background:var(--bg-card);">
+                🌐 {% if lang == 'ru' %}Все языки{% elif lang == 'tj' %}Хамаи забонхо{% else %}All Languages{% endif %}
+            </a>
+            <a href="?language=en"
+               class="btn-filter {% if request.GET.language == 'en' %}active{% endif %}"
+               style="display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border-radius:999px; text-decoration:none; color:var(--text-main); border:1px solid var(--border-color); background:var(--bg-card);">
+                🇬🇧 English
+            </a>
+            <a href="?language=ru"
+               class="btn-filter {% if request.GET.language == 'ru' %}active{% endif %}"
+               style="display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border-radius:999px; text-decoration:none; color:var(--text-main); border:1px solid var(--border-color); background:var(--bg-card);">
+                🇷🇺 Русский
+            </a>
+            <a href="?language=tj"
+               class="btn-filter {% if request.GET.language == 'tj' %}active{% endif %}"
+               style="display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border-radius:999px; text-decoration:none; color:var(--text-main); border:1px solid var(--border-color); background:var(--bg-card);">
+                🇹🇯 Тоҷикӣ
+            </a>
+        </div>
+
         {% if not quizzes %}
         <div class="text-center py-5" style="position:relative; z-index:1;">
             <div style="width: 100px; height: 100px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 24px; display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
@@ -143,9 +167,29 @@
         {% else %}
         <div class="quiz-grid">
             {% for quiz in quizzes %}
-            <div class="quiz-card">
-                <div class="quiz-badge-wrap">
-                    <span class="quiz-course-badge"><i class="bi bi-journal-code"></i> {{ quiz.lesson.course.category|default:'Course' }}</span>
+            <div class="quiz-card" style="padding: 0;">
+                <!-- Thumbnail -->
+                <div class="position-relative" style="height: 160px; flex-shrink: 0;">
+                    {% if quiz.thumbnail %}
+                        <img src="{{ quiz.thumbnail.url }}" alt="{{ quiz.title }}"
+                             class="w-100 h-100" style="object-fit: cover; border-radius: 24px 24px 0 0;">
+                    {% else %}
+                        <div class="w-100 h-100 d-flex align-items-center justify-content-center" style="background: var(--bg-darker); border-radius: 24px 24px 0 0;">
+                            <i class="bi bi-patch-question-fill" style="font-size: 3rem; color: var(--color-primary); opacity: .6;"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="p-4 flex-grow-1 d-flex flex-column">
+                    <div class="quiz-badge-wrap">
+                    <div style="display:flex; gap:8px;">
+                        <span class="quiz-course-badge"><i class="bi bi-journal-code"></i> {{ quiz.lesson.course.category|default:'Course' }}</span>
+                        <span class="quiz-course-badge" style="border-color:rgba(5,150,105,0.4); color:#059669;">
+                            {% if quiz.language == 'ru' %}🇷🇺 RU
+                            {% elif quiz.language == 'tj' %}🇹🇯 TJ
+                            {% else %}🇬🇧 EN{% endif %}
+                        </span>
+                    </div>
                     <span class="quiz-questions-badge" title="{% if lang == 'ru' %}Вопросов{% else %}Questions{% endif %}">{{ quiz.questions.count }}</span>
                 </div>
                 
@@ -171,6 +215,7 @@
                     <i class="bi bi-lock-fill"></i> {% if lang == 'tj' %}Ба курс аъзо шавед{% elif lang == 'ru' %}Запишитесь на курс{% else %}Enroll to Unlock{% endif %}
                 </a>
                 {% endif %}
+                </div>
             </div>
             {% endfor %}
         </div>

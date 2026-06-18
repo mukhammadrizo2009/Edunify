@@ -3,9 +3,16 @@ from users.models import CustomUser
 from courses.models import Lesson
 
 class Quiz(models.Model):
+    LANGUAGE_CHOICES = [
+        ('ru', 'Russian'),
+        ('tj', 'Tajik'),
+        ('en', 'English'),
+    ]
     lesson = models.OneToOneField(Lesson, on_delete=models.CASCADE, related_name='quiz')
     title = models.CharField(max_length=200)
+    thumbnail = models.ImageField(upload_to='quizzes/', null=True, blank=True)
     passing_score = models.PositiveIntegerField(default=60)
+    language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default='en')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
