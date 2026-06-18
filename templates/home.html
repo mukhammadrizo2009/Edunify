@@ -169,32 +169,182 @@
 </section>
 
 <!-- ═══════════ STATS ═══════════ -->
-<section class="lp-stats">
-  <div class="lp-stats__grid">
-    <div class="lp-stat reveal-up" style="--delay:0s">
-      <div class="lp-stat__num" data-target="500">0</div>
-      <div class="lp-stat__label">
+<style>
+/* Premium Stats Redesign */
+.lp-stats {
+  padding: 3rem 0;
+  position: relative;
+  z-index: 2;
+}
+.premium-stats-wrapper {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 3rem 2rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 
+              inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+[data-theme="dark"] .premium-stats-wrapper {
+    background: rgba(20, 20, 20, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+/* Glowing orbs behind stats */
+.premium-stats-wrapper::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -10%;
+    width: 50%; height: 200%;
+    background: radial-gradient(circle, rgba(24, 90, 219, 0.05) 0%, transparent 60%);
+    pointer-events: none;
+}
+.premium-stats-wrapper::after {
+    content: '';
+    position: absolute;
+    top: -50%; right: -10%;
+    width: 50%; height: 200%;
+    background: radial-gradient(circle, rgba(14, 165, 233, 0.05) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.premium-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.premium-stat-item:hover {
+  transform: translateY(-8px);
+}
+.premium-stat-icon {
+  width: 56px; height: 56px;
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+/* Icon Variations */
+.premium-stat-icon.icon-students {
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    color: #2563eb;
+    border: 1px solid rgba(37, 99, 235, 0.1);
+}
+.premium-stat-icon.icon-lessons {
+    background: linear-gradient(135deg, #fdf4ff 0%, #fae8ff 100%);
+    color: #c026d3;
+    border: 1px solid rgba(192, 38, 211, 0.1);
+}
+.premium-stat-icon.icon-rating {
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+    color: #d97706;
+    border: 1px solid rgba(217, 119, 6, 0.1);
+}
+.premium-stat-icon.icon-lang {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    color: #059669;
+    border: 1px solid rgba(5, 150, 105, 0.1);
+}
+/* Dark Mode Icons */
+[data-theme="dark"] .premium-stat-icon.icon-students { background: rgba(37, 99, 235, 0.15); color: #60a5fa; }
+[data-theme="dark"] .premium-stat-icon.icon-lessons { background: rgba(192, 38, 211, 0.15); color: #e879f9; }
+[data-theme="dark"] .premium-stat-icon.icon-rating { background: rgba(217, 119, 6, 0.15); color: #fbbf24; }
+[data-theme="dark"] .premium-stat-icon.icon-lang { background: rgba(5, 150, 105, 0.15); color: #34d399; }
+
+.premium-stat-value {
+  font-family: 'Outfit', sans-serif;
+  font-size: 2.8rem;
+  font-weight: 800;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.5rem;
+  letter-spacing: -1px;
+}
+[data-theme="dark"] .premium-stat-value {
+    background: linear-gradient(135deg, #60a5fa 0%, #38bdf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.premium-stat-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+  .premium-stats-wrapper {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3rem 2rem;
+    padding: 2.5rem 1.5rem;
+  }
+}
+@media (max-width: 575.98px) {
+  .premium-stats-wrapper {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+  .premium-stat-value { font-size: 3.2rem; }
+}
+</style>
+
+<section class="lp-stats container">
+  <div class="premium-stats-wrapper">
+    <!-- Active Students -->
+    <div class="premium-stat-item reveal-up" style="--delay:0s">
+      <div class="premium-stat-icon icon-students">
+        <i class="bi bi-people-fill"></i>
+      </div>
+      <div class="premium-stat-value" data-target="{{ active_students }}" data-suffix="+">0</div>
+      <div class="premium-stat-label">
         {% if lang == 'ru' %}Активные ученики{% elif lang == 'tj' %}Хонандагони фаъол{% else %}Active Students{% endif %}
       </div>
     </div>
-    <div class="lp-stat-divider"></div>
-    <div class="lp-stat reveal-up" style="--delay:.1s">
-      <div class="lp-stat__num" data-target="30">0</div>
-      <div class="lp-stat__label">
+    
+    <!-- Interactive Lessons -->
+    <div class="premium-stat-item reveal-up" style="--delay:.1s">
+      <div class="premium-stat-icon icon-lessons">
+        <i class="bi bi-play-btn-fill"></i>
+      </div>
+      <div class="premium-stat-value" data-target="{{ interactive_lessons }}" data-suffix="+">0</div>
+      <div class="premium-stat-label">
         {% if lang == 'ru' %}Интерактивные уроки{% elif lang == 'tj' %}Дарсҳои интерактивӣ{% else %}Interactive Lessons{% endif %}
       </div>
     </div>
-    <div class="lp-stat-divider"></div>
-    <div class="lp-stat reveal-up" style="--delay:.2s">
-      <div class="lp-stat__num" data-target="99">0</div>
-      <div class="lp-stat__label">
-        {% if lang == 'ru' %}% Довольных учеников{% elif lang == 'tj' %}% Хонандагони қаноатманд{% else %}% Student Satisfaction{% endif %}
+    
+    <!-- Satisfaction Rate -->
+    <div class="premium-stat-item reveal-up" style="--delay:.2s">
+      <div class="premium-stat-icon icon-rating">
+        <i class="bi bi-star-fill"></i>
+      </div>
+      <div class="premium-stat-value" data-target="{{ satisfaction_rate }}" data-suffix="%">0</div>
+      <div class="premium-stat-label">
+        {% if lang == 'ru' %}Довольных учеников{% elif lang == 'tj' %}Хонандагони қаноатманд{% else %}Student Satisfaction{% endif %}
       </div>
     </div>
-    <div class="lp-stat-divider"></div>
-    <div class="lp-stat reveal-up" style="--delay:.3s">
-      <div class="lp-stat__num" data-target="3" data-suffix=" {% if lang == 'ru' %}яз{% elif lang == 'tj' %}заб{% else %}lang{% endif %}">0</div>
-      <div class="lp-stat__label">
+    
+    <!-- Supported Languages -->
+    <div class="premium-stat-item reveal-up" style="--delay:.3s">
+      <div class="premium-stat-icon icon-lang">
+        <i class="bi bi-globe"></i>
+      </div>
+      <!-- Fixed suffix properly handling languages -->
+      <div class="premium-stat-value" data-target="{{ supported_languages }}" data-suffix=" {% if lang == 'ru' %}яз{% elif lang == 'tj' %}заб{% else %}lang{% endif %}">0</div>
+      <div class="premium-stat-label">
         {% if lang == 'ru' %}Языки интерфейса{% elif lang == 'tj' %}Забонҳои интерфейс{% else %}Interface Languages{% endif %}
       </div>
     </div>
@@ -365,5 +515,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="{% static 'js/landing.js' %}"></script>
+<script src="{% static 'js/landing.js' %}?v=2"></script>
 {% endblock %}

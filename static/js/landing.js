@@ -89,7 +89,7 @@
   }
 
   /* ── COUNTER ANIMATION ── */
-  const counters = document.querySelectorAll('.lp-stat__num');
+  const counters = document.querySelectorAll('.lp-stat__num, .premium-stat-value');
   if (counters.length) {
     const counterObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {

@@ -3,10 +3,11 @@ from django.views.generic import TemplateView
 from .views import (
     course_list_view, course_detail_view, enroll_view,
     lesson_detail_view, course_create_step1, course_create_step2,
+    home_view
 )
 
 urlpatterns = [
-    path('', TemplateView.as_view(template_name='home.html'), name='home'),
+    path('', home_view, name='home'),
     path('courses/', course_list_view, name='course_list'),
     # Teacher: kurs yaratish (statik URL'lar avval!)
     path('courses/create/', course_create_step1, name='course_create_step1'),

@@ -205,7 +205,7 @@ def ai_teacher_response(user_question, user_id, lang='en'):
         client = _get_client()
         prompt = f"{lang_force}\n\n{AI_TEACHER_PROMPT}\n\nStudent question: {user_question}"
         response = client.models.generate_content(
-            model='gemini-flash-latest',
+            model='gemini-2.5-flash',
             contents=prompt,
         )
         return response.text
@@ -261,7 +261,7 @@ Respond in EXACTLY this format (4 sentences max):
 IMPORTANT: Write ONLY in the language specified above. No more than 4 sentences.
 """
         response = client.models.generate_content(
-            model='gemini-flash-latest',
+            model='gemini-2.5-flash',
             contents=prompt,
         )
         return response.text

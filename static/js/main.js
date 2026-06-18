@@ -34,10 +34,14 @@ document.addEventListener("DOMContentLoaded", function() {
     if (themeToggleBtn && themeToggleIcon) {
         // Set initial icon based on active theme
         function updateToggleIcon(theme) {
+            // Remove any inline style that might override classes
+            themeToggleIcon.removeAttribute('style');
             if (theme === 'dark') {
-                themeToggleIcon.className = "bi bi-sun fs-5 text-warning";
+                themeToggleIcon.className = "bi bi-sun-fill fs-5";
+                themeToggleIcon.style.color = "#fbbf24";
             } else {
-                themeToggleIcon.className = "bi bi-moon fs-5";
+                themeToggleIcon.className = "bi bi-moon-stars fs-5";
+                themeToggleIcon.style.color = "var(--text-muted)";
             }
         }
 
