@@ -35,22 +35,85 @@
        class="btn-filter {% if request.GET.language == 'tj' %}active{% endif %}">🇹🇯 Тоҷикӣ</a>
 </div>
 
+<!-- Premium Filter Toggle Button CSS -->
+<style>
+.btn-premium-filter {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    border-radius: 999px;
+    padding: 0.65rem 1.75rem;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.btn-premium-filter:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-hover);
+    box-shadow: 0 8px 25px var(--purple-glow);
+    color: var(--text-main);
+}
+
+.btn-premium-filter[aria-expanded="true"] {
+    background: var(--bg-darker);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 1px var(--color-primary);
+}
+
+.btn-premium-filter .bi-chevron-down {
+    transition: transform 0.3s ease;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.btn-premium-filter[aria-expanded="true"] .bi-chevron-down {
+    transform: rotate(180deg);
+    color: var(--color-primary);
+}
+
+.btn-premium-filter .filter-icon {
+    font-size: 1.1rem;
+}
+</style>
+
+<!-- Category filters toggle button -->
+<div class="text-center mb-4">
+    <button class="btn-premium-filter" type="button" data-bs-toggle="collapse" data-bs-target="#subjectFilters" aria-expanded="{% if request.GET.category %}true{% else %}false{% endif %}" aria-controls="subjectFilters">
+        <i class="bi bi-sliders text-gradient filter-icon"></i> 
+        <span class="font-heading" style="font-size: 1rem;">
+            {% if lang == 'ru' %}Фильтр по предметам
+            {% elif lang == 'tj' %}Филтр аз рӯи фанҳо
+            {% else %}Filter by subjects{% endif %}
+        </span>
+        <i class="bi bi-chevron-down ms-2"></i>
+    </button>
+</div>
+
 <!-- Category filters -->
-<div class="d-flex flex-wrap justify-content-center gap-2 mb-5">
-    <a href="?{% if request.GET.language %}language={{ request.GET.language }}{% endif %}"
-       class="btn-filter {% if not request.GET.category %}active{% endif %}">
-        📂 {% if lang == 'ru' %}Все категории{% elif lang == 'tj' %}Хамаи категорияхо{% else %}All Categories{% endif %}
-    </a>
-    {% for cat in categories %}
-        <a href="?category={{ cat.pk }}{% if request.GET.language %}&language={{ request.GET.language }}{% endif %}"
-           class="btn-filter {% if request.GET.category == cat.pk|stringformat:'i' %}active{% endif %}">
-            {{ cat.icon }} 
-            {% if lang == 'tj' and cat.name_tj %}{{ cat.name_tj }}
-            {% elif lang == 'ru' and cat.name_ru %}{{ cat.name_ru }}
-            {% elif lang == 'en' and cat.name_en %}{{ cat.name_en }}
-            {% else %}{{ cat.name }}{% endif %}
+<div class="collapse {% if request.GET.category %}show{% endif %}" id="subjectFilters">
+    <div class="d-flex flex-wrap justify-content-center gap-2 mb-5">
+        <a href="?{% if request.GET.language %}language={{ request.GET.language }}{% endif %}"
+           class="btn-filter {% if not request.GET.category %}active{% endif %}">
+            📂 {% if lang == 'ru' %}Все категории{% elif lang == 'tj' %}Хамаи категорияхо{% else %}All Categories{% endif %}
         </a>
-    {% endfor %}
+        {% for cat in categories %}
+            <a href="?category={{ cat.pk }}{% if request.GET.language %}&language={{ request.GET.language }}{% endif %}"
+               class="btn-filter {% if request.GET.category == cat.pk|stringformat:'i' %}active{% endif %}">
+                {{ cat.icon }} 
+                {% if lang == 'tj' and cat.name_tj %}{{ cat.name_tj }}
+                {% elif lang == 'ru' and cat.name_ru %}{{ cat.name_ru }}
+                {% elif lang == 'en' and cat.name_en %}{{ cat.name_en }}
+                {% else %}{{ cat.name }}{% endif %}
+            </a>
+        {% endfor %}
+    </div>
 </div>
 
 <!-- Courses grid -->
