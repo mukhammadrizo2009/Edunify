@@ -136,7 +136,15 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'          # collectstatic uchun
 
 # WhiteNoise — production static xizmat qiluvchi
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# STATICFILES_STORAGE and DEFAULT_FILE_STORAGE are removed in Django 5.1+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 # ── MEDIA FILES ───────────────────────────────────
 MEDIA_URL = '/media/'
@@ -150,7 +158,7 @@ CLOUDINARY_STORAGE = {
 
 if os.getenv('CLOUDFLARE_ACCOUNT_ID'):
     # Cloudflare R2 for media storage in production
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    STORAGES["default"]["BACKEND"] = 'storages.backends.s3boto3.S3Boto3Storage'
     AWS_ACCESS_KEY_ID = os.getenv('CLOUDFLARE_ACCESS_KEY_ID')
     AWS_SECRET_ACCESS_KEY = os.getenv('CLOUDFLARE_SECRET_ACCESS_KEY')
     AWS_STORAGE_BUCKET_NAME = os.getenv('CLOUDFLARE_BUCKET_NAME')
@@ -159,7 +167,7 @@ if os.getenv('CLOUDFLARE_ACCOUNT_ID'):
     AWS_DEFAULT_ACL = 'public-read'
     AWS_S3_OBJECT_PARAMETERS = {'CacheControl': 'max-age=86400'}
 elif os.getenv('CLOUDINARY_CLOUD_NAME'):
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    STORAGES["default"]["BACKEND"] = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # ── OTHER ─────────────────────────────────────────
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
