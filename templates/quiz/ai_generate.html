@@ -655,6 +655,15 @@
                         <option value="{% if lang == 'ru' %}Сложный{% elif lang == 'tj' %}Душвор{% else %}Hard{% endif %}">{% if lang == 'ru' %}Сложный{% elif lang == 'tj' %}Душвор{% else %}Hard{% endif %}</option>
                     </select>
                 </div>
+                
+                <div class="field-group" style="margin-bottom:0; grid-column: 1 / -1;">
+                    <label class="field-label" for="languageSelect"><i class="bi bi-translate"></i> {% if lang == 'ru' %}Язык теста{% elif lang == 'tj' %}Забони тест{% else %}Quiz Language{% endif %}</label>
+                    <select id="languageSelect" class="field-input">
+                        <option value="Русский">Русский</option>
+                        <option value="Тоҷикӣ">Тоҷикӣ</option>
+                        <option value="English">English</option>
+                    </select>
+                </div>
             </div>
 
             <button type="button" class="btn-generate" id="generateBtn" onclick="generateQuiz()">
@@ -738,6 +747,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const diff = document.getElementById('difficultySelect');
     if (diff) new TomSelect(diff, {create:false, controlInput: null});
+
+    const langSel = document.getElementById('languageSelect');
+    if (langSel) new TomSelect(langSel, {create:false, controlInput: null});
 });
 
 function generateQuiz() {
@@ -745,14 +757,15 @@ function generateQuiz() {
     const grade = document.getElementById('gradeInput').value.trim();
     const count = document.getElementById('countInput').value.trim();
     const difficulty = document.getElementById('difficultySelect').value;
+    const language = document.getElementById('languageSelect').value;
 
     if (!subject || !grade || !count) {
-        document.getElementById('errorText').textContent = '{% if lang == "ru" %}Пожалуйста, заполните все поля (Предмет, Класс, Количество).{% elif lang == "tj" %}Лутфан ҳамаи майдонҳоро пур кунед (Фан, Синф, Шумора).{% else %}Please fill in all fields (Subject, Grade, Count).{% endif %}';
+        document.getElementById('errorText').textContent = '{% if lang == "ru" %}Пожалуйста, заполните все поля.{% elif lang == "tj" %}Лутфан ҳамаи майдонҳоро пур кунед.{% else %}Please fill in all fields.{% endif %}';
         document.getElementById('errorBox').style.display = 'flex';
         return;
     }
 
-    const prompt = `Fan / Subject: ${subject}\nSinf / Grade: ${grade}\nSavollar soni / Number of questions: ${count}\nQiyinchilik darajasi / Difficulty: ${difficulty}\n\nUshbu ma'lumotlar asosida test savollarini tuzing. Savollar ko'rsatilgan qiyinchilik darajasiga mos bo'lsin.`;
+    const prompt = `Fan / Subject: ${subject}\nSinf / Grade: ${grade}\nSavollar soni / Number of questions: ${count}\nQiyinchilik darajasi / Difficulty: ${difficulty}\nTest Tili / Quiz Language: ${language}\n\nUshbu ma'lumotlar asosida test savollarini faqat "${language}" tilida tuzing. Savollar ko'rsatilgan qiyinchilik darajasiga mos bo'lsin. Barcha savollar, variantlar va to'g'ri javoblar aynan "${language}" tilida bo'lishi qat'iyan talab qilinadi. (Generate the quiz strictly and only in ${language} language).`;
 
     const btn = document.getElementById('generateBtn');
     btn.classList.add('loading');

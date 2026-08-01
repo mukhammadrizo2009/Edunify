@@ -306,7 +306,6 @@ ul.lang-dropdown-menu .dropdown-item.active i {
                         AI Teacher
                     </a>
                 </li>
-                {% if user.is_authenticated and user.role == 'teacher' or user.is_authenticated and user.role == 'admin' %}
                 <li class="nav-item">
                     <a class="nav-link nav-link-pro {% if request.resolver_match.url_name == 'ai_quiz_generate' %}active{% endif %}"
                        href="{% url 'ai_quiz_generate' %}">
@@ -317,7 +316,6 @@ ul.lang-dropdown-menu .dropdown-item.active i {
                         {% if lang == 'tj' %}AI Тест{% elif lang == 'ru' %}AI Тест{% else %}AI Quiz{% endif %}
                     </a>
                 </li>
-                {% endif %}
             </ul>
 
             <!-- ── Right Actions ──────────────────────── -->
