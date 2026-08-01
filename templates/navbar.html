@@ -90,6 +90,11 @@ ul.lang-dropdown-menu .dropdown-item.active i {
     color: #059669;
     position: relative;
 }
+.nav-icon-ai-gen {
+    background: linear-gradient(135deg, #ede9fe, #f5f3ff);
+    color: #7c3aed;
+    position: relative;
+}
 [data-theme="dark"] .nav-icon-courses {
     background: rgba(37, 99, 235, 0.15);
     color: #60a5fa;
@@ -101,6 +106,10 @@ ul.lang-dropdown-menu .dropdown-item.active i {
 [data-theme="dark"] .nav-icon-ai {
     background: rgba(5, 150, 105, 0.15);
     color: #34d399;
+}
+[data-theme="dark"] .nav-icon-ai-gen {
+    background: rgba(139, 92, 246, 0.15);
+    color: #a78bfa;
 }
 
 /* AI live pulse */
@@ -297,6 +306,18 @@ ul.lang-dropdown-menu .dropdown-item.active i {
                         AI Teacher
                     </a>
                 </li>
+                {% if user.is_authenticated and user.role == 'teacher' or user.is_authenticated and user.role == 'admin' %}
+                <li class="nav-item">
+                    <a class="nav-link nav-link-pro {% if request.resolver_match.url_name == 'ai_quiz_generate' %}active{% endif %}"
+                       href="{% url 'ai_quiz_generate' %}">
+                        <span class="nav-icon nav-icon-ai-gen">
+                            <i class="bi bi-stars"></i>
+                            <span class="ai-live-dot"></span>
+                        </span>
+                        {% if lang == 'tj' %}AI Тест{% elif lang == 'ru' %}AI Тест{% else %}AI Quiz{% endif %}
+                    </a>
+                </li>
+                {% endif %}
             </ul>
 
             <!-- ── Right Actions ──────────────────────── -->

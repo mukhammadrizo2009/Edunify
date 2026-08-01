@@ -362,3 +362,144 @@ def quiz_create_step3(request, pk, num):
     }
     return render(request, 'quiz/create_step3.html', context)
 
+
+# ═══════════════════════════════════════════════
+#  TEACHER: AI Test Generator
+# ═══════════════════════════════════════════════
+
+@teacher_required
+def ai_quiz_generate_page(request):
+    """AI yordamida test yaratish sahifasi."""
+    user = request.user
+    # Faqat quiz yo'q bo'lgan darslar
+    my_lessons = Lesson.objects.filter(
+        course__teacher=user
+    ).exclude(quiz__isnull=False).select_related('course')
+
+    context = {
+        'my_lessons': my_lessons,
+        'lang': request.session.get('lang', 'en'),
+    }
+    return render(request, 'quiz/ai_generate.html', context)
+
+
+@teacher_required
+def ai_quiz_generate_api(request):
+    """AJAX endpoint — AI yordamida test yaratish."""
+    import json as json_module
+
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST only'}, status=405)
+
+    try:
+        data = json_module.loads(request.body)
+        prompt = data.get('prompt', '').strip()
+
+        if not prompt:
+            return JsonResponse({'error': 'Prompt is empty'}, status=400)
+
+        if len(prompt) > 1000:
+            return JsonResponse({'error': 'Prompt too long (max 1000 chars)'}, status=400)
+
+        lang = request.session.get('lang', 'en')
+
+        from ai_assistant.utils import generate_quiz_with_ai
+        result = generate_quiz_with_ai(prompt, lang=lang)
+
+        return JsonResponse({'success': True, 'data': result})
+
+    except ValueError as e:
+        return JsonResponse({'error': str(e)}, status=400)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        lang = request.session.get('lang', 'en')
+        err_msgs = {
+            'ru': 'Произошла ошибка при генерации теста. Попробуйте ещё раз.',
+            'tj': 'Ҳангоми сохтани тест хатогӣ рух дод. Дубора кӯшиш кунед.',
+            'en': 'An error occurred while generating the quiz. Please try again.',
+        }
+        return JsonResponse({'error': err_msgs.get(lang, err_msgs['en'])}, status=500)
+
+
+@teacher_required
+def ai_quiz_save(request):
+    """AI yaratgan testni bazaga saqlash."""
+    import json as json_module
+
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST only'}, status=405)
+
+    try:
+        data = json_module.loads(request.body)
+        lesson_id = data.get('lesson_id')
+        title = data.get('title', '').strip()
+        passing_score = int(data.get('passing_score', 60))
+        questions_data = data.get('questions', [])
+
+        if not lesson_id:
+            return JsonResponse({'error': 'Lesson ID required'}, status=400)
+
+        if not questions_data:
+            return JsonResponse({'error': 'No questions to save'}, status=400)
+
+        user = request.user
+        lesson = get_object_or_404(Lesson, pk=lesson_id, course__teacher=user)
+
+        if Quiz.objects.filter(lesson=lesson).exists():
+            lang = request.session.get('lang', 'en')
+            err_msgs = {
+                'ru': 'Для этого урока тест уже существует.',
+                'tj': 'Барои ин дарс аллакай тест мавҷуд аст.',
+                'en': 'A quiz already exists for this lesson.',
+            }
+            return JsonResponse({'error': err_msgs.get(lang, err_msgs['en'])}, status=400)
+
+        # Quiz yaratish
+        quiz = Quiz.objects.create(
+            lesson=lesson,
+            title=title or f"{lesson.title} — AI Test",
+            passing_score=max(1, min(passing_score, 100)),
+            language=request.session.get('quiz_draft_lang', 'en'),
+        )
+
+        # Savollarni yaratish
+        from django.db import transaction
+        questions_to_create = []
+        for i, q in enumerate(questions_data, 1):
+            correct = q.get('correct', 'A').upper()
+            if correct not in ('A', 'B', 'C', 'D'):
+                correct = 'A'
+
+            questions_to_create.append(Question(
+                quiz=quiz,
+                text=q.get('text', ''),
+                option_a=q.get('option_a', ''),
+                option_b=q.get('option_b', ''),
+                option_c=q.get('option_c', ''),
+                option_d=q.get('option_d', ''),
+                correct_answer=correct,
+                order=i,
+            ))
+
+        with transaction.atomic():
+            Question.objects.bulk_create(questions_to_create)
+
+        lang = request.session.get('lang', 'en')
+        success_msgs = {
+            'ru': f'✅ Тест успешно создан! {len(questions_to_create)} вопросов добавлено.',
+            'tj': f'✅ Тест бомуваффақият сохта шуд! {len(questions_to_create)} савол илова карда шуд.',
+            'en': f'✅ Quiz created successfully! {len(questions_to_create)} questions added.',
+        }
+        messages.success(request, success_msgs.get(lang, success_msgs['en']))
+
+        return JsonResponse({
+            'success': True,
+            'message': success_msgs.get(lang, success_msgs['en']),
+            'redirect': '/users/dashboard/',
+        })
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({'error': str(e)}, status=500)

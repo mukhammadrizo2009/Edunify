@@ -267,3 +267,130 @@ IMPORTANT: Write ONLY in the language specified above. No more than 4 sentences.
         return response.text
     except Exception:
         return "AI analysis is currently unavailable."
+
+
+# =============================================
+# AI TEST GENERATOR — O'qituvchilar uchun
+# =============================================
+
+QUIZ_GENERATOR_PROMPT = """
+Sen professional ta'lim test generatorisan. O'qituvchi senga test yaratishni so'raydi.
+Sen FAQAT JSON formatida javob berishing kerak.
+
+QOIDALAR:
+1. Savollar ilmiy jihatdan to'g'ri bo'lishi kerak
+2. 4 ta variant (A, B, C, D) bo'lishi shart
+3. Faqat BITTA to'g'ri javob bo'lishi kerak
+4. Savollar berilgan fan va sinf darajasiga mos bo'lishi kerak
+5. Variantlar bir-biriga o'xshash, lekin faqat bittasi to'g'ri bo'lishi kerak
+6. Har bir savol aniq va tushunarli bo'lishi kerak
+
+MUHIM: Javobingni FAQAT quyidagi JSON formatida ber, boshqa hech narsa yozma:
+
+{
+  "title": "Test nomi",
+  "subject": "Fan nomi",
+  "grade": "Sinf",
+  "questions": [
+    {
+      "text": "Savol matni",
+      "option_a": "A varianti",
+      "option_b": "B varianti",
+      "option_c": "C varianti",
+      "option_d": "D varianti",
+      "correct": "A"
+    }
+  ]
+}
+
+MUHIM QOIDALAR:
+- "correct" qiymati faqat "A", "B", "C" yoki "D" bo'lishi kerak
+- Hech qanday izoh, tushuntirish yoki qo'shimcha matn YOZMA
+- FAQAT JSON qaytar
+- Savollar soni o'qituvchi so'ragan miqdorda bo'lsin
+- Agar o'qituvchi sonini ko'rsatmasa, 10 ta savol yarat
+"""
+
+
+def generate_quiz_with_ai(teacher_prompt, lang='en'):
+    """
+    O'qituvchining so'roviga asosan AI yordamida test savollarini yaratadi.
+    Returns: dict with 'title', 'subject', 'grade', 'questions' list
+    Raises: Exception on failure
+    """
+    import json
+    import re
+
+    if not settings.GEMINI_API_KEY or settings.GEMINI_API_KEY == 'your_gemini_api_key':
+        raise ValueError("Gemini API key is not configured.")
+
+    # Til bo'yicha ko'rsatma
+    lang_instruction = {
+        'ru': 'Саволлар ва вариантларни РУСЧА ёз. JSON ichidagi barcha матнлар русский тилда бўлсин.',
+        'tj': 'Саволҳо ва вариантҳоро бо ЗАБОНИ ТОҶИКӢ нависед. Ҳамаи матнҳо бояд тоҷикӣ бошанд.',
+        'en': 'Write all questions and options in ENGLISH.',
+    }.get(lang, 'Write all questions and options in ENGLISH.')
+
+    try:
+        client = _get_client()
+        full_prompt = (
+            f"{lang_instruction}\n\n"
+            f"{QUIZ_GENERATOR_PROMPT}\n\n"
+            f"O'qituvchining so'rovi: {teacher_prompt}"
+        )
+
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=full_prompt,
+        )
+
+        raw_text = response.text.strip()
+
+        # JSON ni ajratib olish (```json ... ``` yoki oddiy JSON)
+        json_match = re.search(r'```(?:json)?\s*([\s\S]*?)```', raw_text)
+        if json_match:
+            json_str = json_match.group(1).strip()
+        else:
+            # To'g'ridan-to'g'ri JSON sifatida parse qilishga harakat
+            # Boshidan { topib, oxiridan } topamiz
+            start = raw_text.find('{')
+            end = raw_text.rfind('}')
+            if start != -1 and end != -1:
+                json_str = raw_text[start:end + 1]
+            else:
+                raise ValueError("AI javobida JSON topilmadi.")
+
+        data = json.loads(json_str)
+
+        # Validatsiya
+        if 'questions' not in data or not isinstance(data['questions'], list):
+            raise ValueError("AI javobi noto'g'ri formatda — 'questions' topilmadi.")
+
+        if len(data['questions']) == 0:
+            raise ValueError("AI hech qanday savol yaratmadi.")
+
+        # Har bir savolni tekshirish
+        valid_questions = []
+        for i, q in enumerate(data['questions']):
+            if not all(k in q for k in ('text', 'option_a', 'option_b', 'option_c', 'option_d', 'correct')):
+                continue  # Bu savolni o'tkazib yuboramiz
+            if q['correct'] not in ('A', 'B', 'C', 'D'):
+                q['correct'] = 'A'  # Default
+            valid_questions.append(q)
+
+        if not valid_questions:
+            raise ValueError("AI yaratgan savollar noto'g'ri formatda.")
+
+        data['questions'] = valid_questions
+        data.setdefault('title', 'AI Test')
+        data.setdefault('subject', '')
+        data.setdefault('grade', '')
+
+        return data
+
+    except json.JSONDecodeError as e:
+        raise ValueError(f"AI javobini JSON sifatida o'qib bo'lmadi: {str(e)}")
+    except Exception as e:
+        if 'JSONDecodeError' in str(type(e).__name__):
+            raise ValueError(f"AI javobini JSON sifatida o'qib bo'lmadi: {str(e)}")
+        raise
