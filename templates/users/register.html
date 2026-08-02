@@ -310,15 +310,18 @@
     </div>
 
     <!-- Google OAuth -->
-    <a href="{% url 'social:begin' 'google-oauth2' %}" class="btn-google" aria-label="Sign up with Google">
-      <svg width="18" height="18" viewBox="0 0 48 48" fill="none" aria-hidden="true">
-        <path d="M43.6 20.5H42V20.4H24V27.6H35.2C33.6 32 29.2 35.2 24 35.2C17.4 35.2 12 29.8 12 23.2C12 16.6 17.4 11.2 24 11.2C27 11.2 29.8 12.4 31.8 14.2L36.8 9.2C33.6 6.4 29 4.4 24 4.4C13.4 4.4 4.8 13 4.8 23.6C4.8 34.2 13.4 42.8 24 42.8C34.6 42.8 43.2 34.2 43.2 23.6C43.2 22.5 43 21.5 43.6 20.5Z" fill="#FFC107"/>
-        <path d="M7.2 15.2L13 19.4C14.6 15.4 18.8 12.6 24 12.6C27 12.6 29.8 13.8 31.8 15.6L36.8 10.6C33.6 7.8 29 6 24 6C16.6 6 10.2 9.8 7.2 15.2Z" fill="#FF3D00"/>
-        <path d="M24 42.8C28.8 42.8 33.2 41 36.4 38.2L30.8 33.6C29 34.8 26.6 35.6 24 35.6C19 35.6 14.6 32.4 13 27.8L7 32.2C10 37.8 16.4 42.8 24 42.8Z" fill="#4CAF50"/>
-        <path d="M43.6 20.5H42V20.4H24V27.6H35.2C34.4 29.8 33 31.6 31 32.8L36.6 37.4C36.2 37.8 43.2 32.6 43.2 23.6C43.2 22.5 43 21.5 43.6 20.5Z" fill="#1976D2"/>
-      </svg>
-      {% if lang == 'ru' %}Зарегистрироваться через Google{% elif lang == 'tj' %}Тавассути Google ба кайд гирифтан{% else %}Sign up with Google{% endif %}
-    </a>
+    <form action="{% url 'social:begin' 'google-oauth2' %}" method="post">
+      {% csrf_token %}
+      <button type="submit" class="btn-google" aria-label="Sign up with Google">
+        <svg width="18" height="18" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <path d="M43.6 20.5H42V20.4H24V27.6H35.2C33.6 32 29.2 35.2 24 35.2C17.4 35.2 12 29.8 12 23.2C12 16.6 17.4 11.2 24 11.2C27 11.2 29.8 12.4 31.8 14.2L36.8 9.2C33.6 6.4 29 4.4 24 4.4C13.4 4.4 4.8 13 4.8 23.6C4.8 34.2 13.4 42.8 24 42.8C34.6 42.8 43.2 34.2 43.2 23.6C43.2 22.5 43 21.5 43.6 20.5Z" fill="#FFC107"/>
+          <path d="M7.2 15.2L13 19.4C14.6 15.4 18.8 12.6 24 12.6C27 12.6 29.8 13.8 31.8 15.6L36.8 10.6C33.6 7.8 29 6 24 6C16.6 6 10.2 9.8 7.2 15.2Z" fill="#FF3D00"/>
+          <path d="M24 42.8C28.8 42.8 33.2 41 36.4 38.2L30.8 33.6C29 34.8 26.6 35.6 24 35.6C19 35.6 14.6 32.4 13 27.8L7 32.2C10 37.8 16.4 42.8 24 42.8Z" fill="#4CAF50"/>
+          <path d="M43.6 20.5H42V20.4H24V27.6H35.2C34.4 29.8 33 31.6 31 32.8L36.6 37.4C36.2 37.8 43.2 32.6 43.2 23.6C43.2 22.5 43 21.5 43.6 20.5Z" fill="#1976D2"/>
+        </svg>
+        {% if lang == 'ru' %}Зарегистрироваться через Google{% elif lang == 'tj' %}Тавассути Google ба кайд гирифтан{% else %}Sign up with Google{% endif %}
+      </button>
+    </form>
 
     <div class="auth-divider"><span>{% if lang == 'ru' %}или{% elif lang == 'tj' %}ё{% else %}or{% endif %}</span></div>
 
