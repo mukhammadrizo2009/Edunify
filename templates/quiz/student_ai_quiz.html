@@ -1,0 +1,541 @@
+{% extends 'base.html' %}
+{% block title %}{% if lang == 'ru' %}AI Тест{% elif lang == 'tj' %}AI Тест{% else %}AI Quiz{% endif %} — Edunify{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ═══════════════════════════════════════
+   STUDENT AI QUIZ — Premium Design
+═══════════════════════════════════════ */
+.ai-quiz-hero {
+    text-align: center;
+    padding: 48px 0 32px;
+}
+.ai-quiz-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: linear-gradient(135deg, rgba(139,92,246,.12), rgba(14,165,233,.12));
+    color: #7c3aed; padding: 8px 18px; border-radius: 999px;
+    font-size: .82rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .06em; margin-bottom: 16px;
+    border: 1px solid rgba(139,92,246,.2);
+}
+[data-theme="dark"] .ai-quiz-badge { color: #a78bfa; }
+.ai-quiz-hero h1 {
+    font-family: 'Outfit', 'Inter', sans-serif; font-size: 2.6rem;
+    font-weight: 800; margin-bottom: 12px;
+    background: linear-gradient(135deg, #7c3aed, #0ea5e9);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; color: transparent;
+}
+.ai-quiz-hero p { color: var(--text-muted); font-size: 1.05rem; max-width: 560px; margin: 0 auto; }
+
+/* ── SETUP FORM ── */
+.setup-card {
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: 24px; padding: 36px; max-width: 680px;
+    margin: 0 auto 40px; box-shadow: 0 8px 32px rgba(0,0,0,.04);
+    transition: var(--theme-transition);
+}
+.setup-card label {
+    font-family: 'Inter', sans-serif; font-weight: 600;
+    font-size: .88rem; margin-bottom: 6px; display: block;
+}
+.setup-card .form-control, .setup-card .form-select {
+    border-radius: 14px !important; padding: 14px 16px !important;
+    font-size: .95rem !important;
+}
+
+/* Difficulty selector */
+.diff-group { display: flex; gap: 10px; margin-bottom: 20px; }
+.diff-btn {
+    flex: 1; text-align: center; padding: 14px 12px;
+    border-radius: 14px; cursor: pointer;
+    border: 1.5px solid var(--border-color);
+    background: var(--bg-darker); color: var(--text-muted);
+    font-weight: 600; font-size: .88rem; transition: all .2s ease;
+    font-family: 'Inter', sans-serif;
+}
+.diff-btn:hover { border-color: rgba(139,92,246,.3); }
+.diff-btn.active-easy {
+    border-color: #22c55e; background: rgba(34,197,94,.08); color: #16a34a;
+}
+.diff-btn.active-medium {
+    border-color: #f59e0b; background: rgba(245,158,11,.08); color: #d97706;
+}
+.diff-btn.active-hard {
+    border-color: #ef4444; background: rgba(239,68,68,.08); color: #dc2626;
+}
+.diff-btn .diff-icon { font-size: 1.25rem; display: block; margin-bottom: 6px; }
+
+/* Language selector */
+.lang-group { display: flex; gap: 10px; margin-bottom: 24px; }
+.lang-btn {
+    flex: 1; text-align: center; padding: 12px; border-radius: 12px;
+    cursor: pointer; border: 1.5px solid var(--border-color);
+    background: var(--bg-darker); color: var(--text-muted);
+    font-weight: 600; font-size: .92rem; transition: all .2s ease;
+    font-family: 'Inter', sans-serif; display: flex; align-items: center;
+    justify-content: center; gap: 8px;
+}
+.lang-btn:hover { border-color: rgba(14,165,233,.4); }
+.lang-btn.active {
+    border-color: #0ea5e9; background: rgba(14,165,233,.08); color: #0284c7;
+}
+[data-theme="dark"] .lang-btn.active { color: #38bdf8; }
+
+/* Number slider */
+.num-slider-wrap {
+    display: flex; align-items: center; gap: 16px; margin-bottom: 24px;
+}
+.num-slider-wrap input[type="range"] {
+    flex: 1; accent-color: #7c3aed; height: 6px;
+}
+.num-display {
+    min-width: 48px; height: 48px; display: flex; align-items: center;
+    justify-content: center; border-radius: 14px;
+    background: linear-gradient(135deg, #7c3aed, #0ea5e9);
+    color: #fff; font-weight: 800; font-size: 1.2rem;
+    font-family: 'Outfit', 'Inter', sans-serif;
+}
+
+/* Generate button */
+.btn-generate {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; background: linear-gradient(135deg, #7c3aed, #6366f1);
+    color: #fff; padding: 16px; border-radius: 16px; border: none;
+    font-weight: 700; font-size: 1.05rem; cursor: pointer;
+    font-family: 'Inter', sans-serif; transition: all .3s ease;
+    box-shadow: 0 8px 24px rgba(124,58,237,.3);
+}
+.btn-generate:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(124,58,237,.4); }
+.btn-generate:disabled { opacity: .6; cursor: not-allowed; transform: none; box-shadow: none; }
+
+/* ── LOADING STATE ── */
+.loading-overlay {
+    display: none; position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,.6); backdrop-filter: blur(8px);
+    align-items: center; justify-content: center; flex-direction: column; gap: 20px;
+}
+.loading-overlay.active { display: flex; }
+.loading-spinner {
+    width: 64px; height: 64px; border-radius: 50%;
+    border: 4px solid rgba(255,255,255,.15);
+    border-top-color: #a78bfa; animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text {
+    color: #fff; font-size: 1.1rem; font-weight: 600;
+    font-family: 'Inter', sans-serif; text-align: center;
+}
+.loading-sub { color: rgba(255,255,255,.6); font-size: .85rem; margin-top: 4px; }
+
+/* ── QUIZ PLAY AREA ── */
+#quizPlayArea { display: none; }
+.quiz-progress-bar {
+    height: 6px; border-radius: 999px; background: var(--bg-darker);
+    margin-bottom: 24px; overflow: hidden;
+}
+.quiz-progress-fill {
+    height: 100%; border-radius: 999px;
+    background: linear-gradient(90deg, #7c3aed, #0ea5e9);
+    transition: width .4s ease;
+}
+.quiz-timer {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--bg-darker); border: 1px solid var(--border-color);
+    padding: 8px 16px; border-radius: 12px;
+    font-weight: 600; font-size: .9rem; color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+}
+.q-card {
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: 20px; padding: 32px; margin-bottom: 20px;
+    box-shadow: 0 4px 16px rgba(0,0,0,.03); transition: var(--theme-transition);
+}
+.q-num { color: var(--text-muted); font-size: .88rem; font-weight: 600; margin-bottom: 12px; }
+.q-text { font-size: 1.2rem; font-weight: 700; color: var(--text-main); margin-bottom: 24px; line-height: 1.5; }
+.q-options { display: flex; flex-direction: column; gap: 12px; }
+.q-opt {
+    display: flex; align-items: center; padding: 14px 18px;
+    background: var(--bg-darker); border: 1.5px solid var(--border-color);
+    border-radius: 14px; cursor: pointer; transition: all .2s ease;
+}
+.q-opt:hover { border-color: rgba(139,92,246,.35); }
+.q-opt.selected { border-color: #7c3aed; background: rgba(139,92,246,.06); }
+.q-opt .q-marker {
+    width: 32px; height: 32px; border-radius: 10px; display: flex;
+    align-items: center; justify-content: center; margin-right: 14px;
+    background: var(--bg-card); border: 1.5px solid var(--border-color);
+    font-weight: 700; font-size: .9rem; color: var(--text-muted);
+    transition: all .2s ease; flex-shrink: 0;
+}
+.q-opt.selected .q-marker {
+    background: #7c3aed; border-color: #7c3aed; color: #fff;
+}
+.q-opt .q-label { font-size: 1rem; font-weight: 500; color: var(--text-main); }
+
+.btn-finish-quiz {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    background: linear-gradient(135deg, #059669, #0d9488);
+    color: #fff; padding: 16px 36px; border-radius: 14px; border: none;
+    font-weight: 700; font-size: 1.05rem; cursor: pointer;
+    font-family: 'Inter', sans-serif; transition: all .3s ease;
+    box-shadow: 0 8px 24px rgba(5,150,105,.25);
+}
+.btn-finish-quiz:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(5,150,105,.35); }
+.btn-finish-quiz:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+/* ── PAST QUIZZES ── */
+.past-section { max-width: 680px; margin: 0 auto 60px; }
+.past-title {
+    font-family: 'Outfit', 'Inter', sans-serif; font-size: 1.1rem;
+    font-weight: 700; color: var(--text-main); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+}
+.past-item {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: 14px; padding: 14px 18px; margin-bottom: 10px;
+    text-decoration: none; color: inherit; transition: all .25s ease;
+}
+.past-item:hover {
+    border-color: var(--border-hover); transform: translateX(4px);
+    box-shadow: 0 4px 16px rgba(124,58,237,.1); color: inherit;
+}
+.past-score {
+    width: 48px; height: 48px; border-radius: 12px; display: flex;
+    align-items: center; justify-content: center;
+    font-weight: 800; font-size: .95rem; flex-shrink: 0;
+    font-family: 'Outfit', 'Inter', sans-serif;
+}
+.past-score.good { background: rgba(16,185,129,.12); color: #059669; }
+.past-score.bad { background: rgba(239,68,68,.1); color: #ef4444; }
+.past-info-title { font-weight: 600; font-size: .88rem; color: var(--text-main); }
+.past-info-meta { font-size: .78rem; color: var(--text-muted); }
+
+@media (max-width: 768px) {
+    .ai-quiz-hero h1 { font-size: 1.8rem; }
+    .setup-card { padding: 24px; border-radius: 20px; }
+    .diff-group { flex-direction: column; }
+    .lang-group { flex-direction: column; }
+    .q-card { padding: 20px; }
+    .q-text { font-size: 1.05rem; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div>
+        <div class="loading-text">
+            {% if lang == 'ru' %}Gemini AI создаёт тест...
+            {% elif lang == 'tj' %}Gemini AI тест месозад...
+            {% else %}Gemini AI is generating your quiz...{% endif %}
+        </div>
+        <div class="loading-sub">
+            {% if lang == 'ru' %}Это может занять 10-20 секунд
+            {% elif lang == 'tj' %}Ин 10-20 сония вақт мегирад
+            {% else %}This may take 10-20 seconds{% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- ── SETUP SECTION ── -->
+<div id="setupSection">
+    <div class="ai-quiz-hero">
+        <div class="ai-quiz-badge">
+            <i class="bi bi-stars"></i> AI Quiz
+        </div>
+        <h1>{% if lang == 'ru' %}Тест с искусственным интеллектом{% elif lang == 'tj' %}Тест бо зеҳни сунъӣ{% else %}AI-Powered Quiz{% endif %}</h1>
+        <p>{% if lang == 'ru' %}Выберите предмет и тему — AI создаст персональный тест и проанализирует ваши результаты{% elif lang == 'tj' %}Фан ва мавзуъро интихоб кунед — AI тести шахсӣ месозад ва натиҷаҳоро таҳлил мекунад{% else %}Choose a subject and topic — AI will create a personalized quiz and analyze your results{% endif %}</p>
+    </div>
+
+    <div class="setup-card" id="setupCard">
+        <div class="mb-3">
+            <label for="subjectInput">
+                <i class="bi bi-book me-1"></i>
+                {% if lang == 'ru' %}Предмет{% elif lang == 'tj' %}Фан{% else %}Subject{% endif %}
+            </label>
+            <input type="text" class="form-control" id="subjectInput"
+                   placeholder="{% if lang == 'ru' %}Например: Математика, Физика, Английский язык{% elif lang == 'tj' %}Масалан: Математика, Физика, Забони англисӣ{% else %}e.g. Mathematics, Physics, English{% endif %}">
+        </div>
+
+        <div class="mb-3">
+            <label for="topicInput">
+                <i class="bi bi-bookmark me-1"></i>
+                {% if lang == 'ru' %}Тема{% elif lang == 'tj' %}Мавзӯъ{% else %}Topic{% endif %}
+            </label>
+            <input type="text" class="form-control" id="topicInput"
+                   placeholder="{% if lang == 'ru' %}Например: Квадратные уравнения, Законы Ньютона{% elif lang == 'tj' %}Масалан: Муодилаҳои квадратӣ, Қонунҳои Нютон{% else %}e.g. Quadratic Equations, Newton's Laws{% endif %}">
+        </div>
+
+        <label><i class="bi bi-speedometer2 me-1"></i> {% if lang == 'ru' %}Уровень сложности{% elif lang == 'tj' %}Дараҷаи мушкилӣ{% else %}Difficulty Level{% endif %}</label>
+        <div class="diff-group">
+            <div class="diff-btn" data-diff="easy" id="diffEasy">
+                <span class="diff-icon d-flex justify-content-center gap-1">
+                    <i class="bi bi-star-fill"></i><i class="bi bi-star"></i><i class="bi bi-star"></i>
+                </span>
+                {% if lang == 'ru' %}Лёгкий{% elif lang == 'tj' %}Осон{% else %}Easy{% endif %}
+            </div>
+            <div class="diff-btn active-medium" data-diff="medium" id="diffMedium">
+                <span class="diff-icon d-flex justify-content-center gap-1">
+                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star"></i>
+                </span>
+                {% if lang == 'ru' %}Средний{% elif lang == 'tj' %}Миёна{% else %}Medium{% endif %}
+            </div>
+            <div class="diff-btn" data-diff="hard" id="diffHard">
+                <span class="diff-icon d-flex justify-content-center gap-1">
+                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                </span>
+                {% if lang == 'ru' %}Сложный{% elif lang == 'tj' %}Мушкил{% else %}Hard{% endif %}
+            </div>
+        </div>
+
+        <label><i class="bi bi-hash me-1"></i> {% if lang == 'ru' %}Количество вопросов{% elif lang == 'tj' %}Шумораи саволҳо{% else %}Number of Questions{% endif %}</label>
+        <div class="num-slider-wrap">
+            <input type="range" min="5" max="20" value="10" id="numSlider">
+            <div class="num-display" id="numDisplay">10</div>
+        </div>
+
+        <label><i class="bi bi-translate me-1"></i> {% if lang == 'ru' %}Язык теста{% elif lang == 'tj' %}Забони тест{% else %}Quiz Language{% endif %}</label>
+        <div class="lang-group">
+            <div class="lang-btn {% if lang == 'en' %}active{% endif %}" data-lang="en">
+                <span style="font-size:1.2rem">🇺🇸</span> English
+            </div>
+            <div class="lang-btn {% if lang == 'ru' %}active{% endif %}" data-lang="ru">
+                <span style="font-size:1.2rem">🇷🇺</span> Русский
+            </div>
+            <div class="lang-btn {% if lang == 'tj' %}active{% endif %}" data-lang="tj">
+                <span style="font-size:1.2rem">🇹🇯</span> Тоҷикӣ
+            </div>
+        </div>
+
+        <button class="btn-generate" id="generateBtn">
+            <i class="bi bi-stars fs-5"></i>
+            {% if lang == 'ru' %}Создать тест с AI{% elif lang == 'tj' %}Тест созед бо AI{% else %}Generate AI Quiz{% endif %}
+        </button>
+    </div>
+
+    <!-- Past quizzes -->
+    {% if past_quizzes %}
+    <div class="past-section">
+        <div class="past-title">
+            <i class="bi bi-clock-history"></i>
+            {% if lang == 'ru' %}Последние тесты{% elif lang == 'tj' %}Тестҳои охирин{% else %}Recent Quizzes{% endif %}
+        </div>
+        {% for pq in past_quizzes %}
+        <a href="{% url 'student_ai_quiz_result' pq.pk %}" class="past-item">
+            <div class="past-score {% if pq.get_percentage >= 60 %}good{% else %}bad{% endif %}">
+                {{ pq.get_percentage }}%
+            </div>
+            <div class="flex-grow-1">
+                <div class="past-info-title">{{ pq.subject }}: {{ pq.topic }}</div>
+                <div class="past-info-meta">
+                    {{ pq.score }}/{{ pq.total_questions }} &bull;
+                    {{ pq.get_difficulty_display }} &bull;
+                    {{ pq.created_at|date:"d.m.Y H:i" }}
+                </div>
+            </div>
+            <i class="bi bi-chevron-right text-muted"></i>
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- ── QUIZ PLAY AREA ── -->
+<div id="quizPlayArea" style="max-width:800px;margin:0 auto;padding-bottom:60px;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="font-heading mb-0" style="font-size:1.4rem;" id="quizTitle"></h2>
+        <div class="quiz-timer"><i class="bi bi-clock"></i> <span id="timerDisplay">00:00</span></div>
+    </div>
+    <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div id="questionsContainer"></div>
+    <div class="d-flex justify-content-end mt-4">
+        <button class="btn-finish-quiz" id="finishQuizBtn" disabled>
+            <i class="bi bi-send-check-fill fs-5"></i>
+            {% if lang == 'ru' %}Завершить и проверить{% elif lang == 'tj' %}Анҷом додан ва санҷидан{% else %}Finish & Check{% endif %}
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    const LANG = '{{ lang }}';
+    const CSRF = '{{ csrf_token }}';
+    let selectedDiff = 'medium';
+    let selectedLang = LANG;
+    let quizId = null;
+    let quizQuestions = [];
+    let answers = {};
+    let startTime = 0;
+    let timerInterval = null;
+
+    // Elements
+    const setupSection = document.getElementById('setupSection');
+    const quizPlayArea = document.getElementById('quizPlayArea');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const generateBtn = document.getElementById('generateBtn');
+    const numSlider = document.getElementById('numSlider');
+    const numDisplay = document.getElementById('numDisplay');
+    const subjectInput = document.getElementById('subjectInput');
+    const topicInput = document.getElementById('topicInput');
+    const finishBtn = document.getElementById('finishQuizBtn');
+
+    // Slider
+    numSlider.addEventListener('input', () => { numDisplay.textContent = numSlider.value; });
+
+    // Difficulty
+    document.querySelectorAll('.diff-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.diff-btn').forEach(b => {
+                b.className = 'diff-btn';
+            });
+            const d = btn.dataset.diff;
+            selectedDiff = d;
+            btn.classList.add('active-' + d);
+        });
+    });
+
+    // Language
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            selectedLang = btn.dataset.lang;
+            btn.classList.add('active');
+        });
+    });
+
+    // Generate
+    generateBtn.addEventListener('click', async () => {
+        const subject = subjectInput.value.trim();
+        const topic = topicInput.value.trim();
+        if (!subject || !topic) {
+            const msgs = { ru: 'Заполните предмет и тему', tj: 'Фан ва мавзуъро пур кунед', en: 'Please fill in subject and topic' };
+            alert(msgs[LANG] || msgs.en);
+            return;
+        }
+        generateBtn.disabled = true;
+        loadingOverlay.classList.add('active');
+
+        try {
+            const res = await fetch("{% url 'student_ai_quiz_generate' %}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+                body: JSON.stringify({
+                    subject, topic,
+                    difficulty: selectedDiff,
+                    num_questions: parseInt(numSlider.value),
+                    quiz_lang: selectedLang,
+                })
+            });
+            const data = await res.json();
+            if (data.success) {
+                quizId = data.quiz_id;
+                quizQuestions = data.data.questions;
+                showQuiz(data.data);
+            } else {
+                alert(data.error || 'Error');
+            }
+        } catch (e) {
+            alert('Network error');
+        } finally {
+            generateBtn.disabled = false;
+            loadingOverlay.classList.remove('active');
+        }
+    });
+
+    function showQuiz(data) {
+        setupSection.style.display = 'none';
+        quizPlayArea.style.display = 'block';
+        document.getElementById('quizTitle').textContent = data.title || `${subjectInput.value} — ${topicInput.value}`;
+        answers = {};
+        const container = document.getElementById('questionsContainer');
+        container.innerHTML = '';
+        const total = quizQuestions.length;
+        const lbls = { ru: 'Вопрос', tj: 'Савол', en: 'Question' };
+        const ofLbl = { ru: 'из', tj: 'аз', en: 'of' };
+
+        quizQuestions.forEach((q, idx) => {
+            const card = document.createElement('div');
+            card.className = 'q-card';
+            card.innerHTML = `
+                <div class="q-num">${lbls[LANG]||lbls.en} ${idx+1} ${ofLbl[LANG]||ofLbl.en} ${total}</div>
+                <div class="q-text">${q.text}</div>
+                <div class="q-options">
+                    ${['A','B','C','D'].map(letter => `
+                        <div class="q-opt" data-q="${idx}" data-v="${letter}">
+                            <div class="q-marker">${letter}</div>
+                            <span class="q-label">${q['option_'+letter.toLowerCase()]}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+        // Option click
+        container.querySelectorAll('.q-opt').forEach(opt => {
+            opt.addEventListener('click', () => {
+                const qi = opt.dataset.q;
+                const val = opt.dataset.v;
+                opt.closest('.q-options').querySelectorAll('.q-opt').forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+                answers[qi] = val;
+                updateProgress();
+            });
+        });
+
+        // Timer
+        startTime = Date.now();
+        timerInterval = setInterval(updateTimer, 1000);
+        updateProgress();
+    }
+
+    function updateTimer() {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+        const s = String(elapsed % 60).padStart(2, '0');
+        document.getElementById('timerDisplay').textContent = `${m}:${s}`;
+    }
+
+    function updateProgress() {
+        const answered = Object.keys(answers).length;
+        const total = quizQuestions.length;
+        const pct = Math.round((answered / total) * 100);
+        document.getElementById('progressFill').style.width = pct + '%';
+        finishBtn.disabled = answered < total;
+    }
+
+    // Submit
+    finishBtn.addEventListener('click', async () => {
+        finishBtn.disabled = true;
+        finishBtn.innerHTML = '<i class="bi bi-hourglass-split fs-5"></i> Loading...';
+        clearInterval(timerInterval);
+        const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+
+        try {
+            const res = await fetch("{% url 'student_ai_quiz_submit' %}", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF },
+                body: JSON.stringify({ quiz_id: quizId, answers, time_spent: timeSpent })
+            });
+            const data = await res.json();
+            if (data.success) {
+                window.location.href = `/quiz/student-ai/result/${data.quiz_id}/`;
+            } else {
+                alert(data.error || 'Error');
+                finishBtn.disabled = false;
+                finishBtn.innerHTML = '<i class="bi bi-send-check-fill fs-5"></i> Finish';
+            }
+        } catch (e) {
+            alert('Network error');
+            finishBtn.disabled = false;
+        }
+    });
+})();
+</script>
+{% endblock %}

@@ -503,3 +503,224 @@ def ai_quiz_save(request):
         import traceback
         traceback.print_exc()
         return JsonResponse({'error': str(e)}, status=500)
+
+
+# ═══════════════════════════════════════════════
+#  STUDENT AI QUIZ — Student uchun AI test
+# ═══════════════════════════════════════════════
+
+@login_required
+def student_ai_quiz_page(request):
+    """Student AI Quiz — mavzu tanlash sahifasi."""
+    from .models import StudentAIQuiz
+
+    # Studentning oldingi AI testlari (oxirgi 10 ta)
+    past_quizzes = StudentAIQuiz.objects.filter(
+        student=request.user, is_completed=True
+    ).order_by('-created_at')[:10]
+
+    context = {
+        'past_quizzes': past_quizzes,
+        'lang': request.session.get('lang', 'en'),
+    }
+    return render(request, 'quiz/student_ai_quiz.html', context)
+
+
+@login_required
+def student_ai_quiz_generate(request):
+    """AJAX endpoint — Student uchun AI test yaratish."""
+    import json as json_module
+
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST only'}, status=405)
+
+    try:
+        data = json_module.loads(request.body)
+        subject = data.get('subject', '').strip()
+        topic = data.get('topic', '').strip()
+        difficulty = data.get('difficulty', 'medium').strip()
+        num_questions = int(data.get('num_questions', 10))
+
+        if not subject or not topic:
+            return JsonResponse({'error': 'Subject and topic are required'}, status=400)
+
+        if difficulty not in ('easy', 'medium', 'hard'):
+            difficulty = 'medium'
+
+        num_questions = max(5, min(num_questions, 20))
+        
+        # UI language is from session, but quiz language can be selected
+        session_lang = request.session.get('lang', 'en')
+        quiz_lang = data.get('quiz_lang', session_lang)
+
+        from ai_assistant.utils import generate_student_quiz_with_ai
+        result = generate_student_quiz_with_ai(
+            subject=subject,
+            topic=topic,
+            difficulty=difficulty,
+            num_questions=num_questions,
+            lang=quiz_lang,
+        )
+
+        # StudentAIQuiz yaratish
+        from .models import StudentAIQuiz
+        ai_quiz = StudentAIQuiz.objects.create(
+            student=request.user,
+            subject=subject,
+            topic=topic,
+            difficulty=difficulty,
+            num_questions=num_questions,
+            language=quiz_lang,
+            questions_data=result.get('questions', []),
+            total_questions=len(result.get('questions', [])),
+        )
+
+        return JsonResponse({
+            'success': True,
+            'quiz_id': ai_quiz.pk,
+            'data': result,
+        })
+
+    except ValueError as e:
+        return JsonResponse({'error': str(e)}, status=400)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        lang = request.session.get('lang', 'en')
+        err_msgs = {
+            'ru': 'Произошла ошибка при генерации теста. Попробуйте ещё раз.',
+            'tj': 'Ҳангоми сохтани тест хатогӣ рух дод. Дубора кӯшиш кунед.',
+            'en': 'An error occurred while generating the quiz. Please try again.',
+        }
+        return JsonResponse({'error': err_msgs.get(lang, err_msgs['en'])}, status=500)
+
+
+@login_required
+def student_ai_quiz_submit(request):
+    """AJAX endpoint — Student AI test javoblarini tekshirish."""
+    import json as json_module
+
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST only'}, status=405)
+
+    try:
+        data = json_module.loads(request.body)
+        quiz_id = data.get('quiz_id')
+        answers = data.get('answers', {})  # {'0': 'A', '1': 'C', ...}
+        time_spent = int(data.get('time_spent', 0))
+
+        if not quiz_id:
+            return JsonResponse({'error': 'Quiz ID required'}, status=400)
+
+        from .models import StudentAIQuiz
+        ai_quiz = get_object_or_404(StudentAIQuiz, pk=quiz_id, student=request.user)
+
+        if ai_quiz.is_completed:
+            return JsonResponse({'error': 'Quiz already completed'}, status=400)
+
+        questions = ai_quiz.questions_data
+        score = 0
+        wrong_answers = []
+
+        for i, q in enumerate(questions):
+            user_answer = answers.get(str(i), '').upper()
+            correct = q.get('correct', 'A').upper()
+
+            if user_answer == correct:
+                score += 1
+            else:
+                wrong_answers.append({
+                    'question': q.get('text', ''),
+                    'user_answer': user_answer,
+                    'correct_answer': correct,
+                    'explanation': q.get('explanation', ''),
+                    'options': {
+                        'A': q.get('option_a', ''),
+                        'B': q.get('option_b', ''),
+                        'C': q.get('option_c', ''),
+                        'D': q.get('option_d', ''),
+                    }
+                })
+
+        # Natijani saqlash
+        ai_quiz.score = score
+        ai_quiz.wrong_answers = wrong_answers
+        ai_quiz.time_spent = time_spent
+        ai_quiz.is_completed = True
+        ai_quiz.save()
+
+        percentage = ai_quiz.get_percentage()
+
+        return JsonResponse({
+            'success': True,
+            'quiz_id': ai_quiz.pk,
+            'score': score,
+            'total': ai_quiz.total_questions,
+            'percentage': percentage,
+            'wrong_count': len(wrong_answers),
+        })
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+def student_ai_quiz_result(request, pk):
+    """Student AI Quiz natijasi sahifasi."""
+    from .models import StudentAIQuiz
+    ai_quiz = get_object_or_404(StudentAIQuiz, pk=pk, student=request.user, is_completed=True)
+
+    context = {
+        'ai_quiz': ai_quiz,
+        'lang': request.session.get('lang', 'en'),
+    }
+    return render(request, 'quiz/student_ai_result.html', context)
+
+
+@login_required
+def student_ai_quiz_analysis(request, pk):
+    """AJAX endpoint — AI batafsil tahlil."""
+    from .models import StudentAIQuiz
+    ai_quiz = get_object_or_404(StudentAIQuiz, pk=pk, student=request.user, is_completed=True)
+
+    lang = request.session.get('lang', 'en')
+
+    # Agar tahlil allaqachon mavjud bo'lsa
+    if ai_quiz.ai_detailed_analysis and isinstance(ai_quiz.ai_detailed_analysis, dict) and ai_quiz.ai_detailed_analysis.get('summary'):
+        return JsonResponse({'analysis': ai_quiz.ai_detailed_analysis})
+
+    try:
+        from ai_assistant.utils import analyze_student_quiz_detailed
+
+        quiz_data = {
+            'subject': ai_quiz.subject,
+            'topic': ai_quiz.topic,
+            'difficulty': ai_quiz.difficulty,
+            'score': ai_quiz.score,
+            'total': ai_quiz.total_questions,
+            'wrong_answers': ai_quiz.wrong_answers,
+            'time_spent': ai_quiz.time_spent,
+        }
+
+        analysis = analyze_student_quiz_detailed(quiz_data, lang=lang)
+
+        # DB ga saqlash
+        ai_quiz.ai_detailed_analysis = analysis
+        if not ai_quiz.ai_feedback and analysis.get('summary'):
+            ai_quiz.ai_feedback = analysis['summary']
+        ai_quiz.save()
+
+        return JsonResponse({'analysis': analysis})
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        lang = request.session.get('lang', 'en')
+        err_msgs = {
+            'ru': 'Ошибка при загрузке анализа AI.',
+            'tj': 'Хатогӣ ҳангоми боркунии тахлили AI.',
+            'en': 'Error loading AI analysis.',
+        }
+        return JsonResponse({'error': err_msgs.get(lang, err_msgs['en'])}, status=500)

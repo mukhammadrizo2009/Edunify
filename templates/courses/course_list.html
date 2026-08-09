@@ -25,7 +25,7 @@
 <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
     <a href="?{% if request.GET.category %}category={{ request.GET.category }}{% endif %}"
        class="btn-filter {% if not request.GET.language %}active{% endif %}">
-        🌐 {% if lang == 'ru' %}Все языки{% elif lang == 'tj' %}Хамаи забонхо{% else %}All Languages{% endif %}
+        🌐 {% if lang == 'ru' %}Все языки{% elif lang == 'tj' %}Ҳамаи забонҳо{% else %}All Languages{% endif %}
     </a>
     <a href="?language=en{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}"
        class="btn-filter {% if request.GET.language == 'en' %}active{% endif %}">🇬🇧 English</a>
@@ -101,7 +101,7 @@
     <div class="d-flex flex-wrap justify-content-center gap-2 mb-5">
         <a href="?{% if request.GET.language %}language={{ request.GET.language }}{% endif %}"
            class="btn-filter {% if not request.GET.category %}active{% endif %}">
-            📂 {% if lang == 'ru' %}Все категории{% elif lang == 'tj' %}Хамаи категорияхо{% else %}All Categories{% endif %}
+            📂 {% if lang == 'ru' %}Все категории{% elif lang == 'tj' %}Ҳамаи категорияҳо{% else %}All Categories{% endif %}
         </a>
         {% for cat in categories %}
             <a href="?category={{ cat.pk }}{% if request.GET.language %}&language={{ request.GET.language }}{% endif %}"

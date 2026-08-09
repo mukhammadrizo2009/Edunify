@@ -87,7 +87,7 @@
     text-align: center;
 }
 .profile-fullname {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Outfit', 'Inter', sans-serif;
     font-size: 1.25rem;
     font-weight: 700;
     color: var(--text-main);
@@ -235,7 +235,7 @@
     margin-bottom: 16px;
 }
 .custom-modal-title {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Outfit', 'Inter', sans-serif;
     font-size: 1.3rem;
     font-weight: 700;
     color: var(--text-main);
@@ -351,7 +351,7 @@
     flex-shrink: 0;
 }
 .teacher-upgrade-title {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Outfit', 'Inter', sans-serif;
     font-weight: 700;
     font-size: 0.95rem;
     color: var(--text-main);
@@ -443,7 +443,7 @@
 .stat-icon.green  { background: rgba(16,185,129,.12);  color: #10b981; }
 .stat-icon.orange { background: rgba(245,158,11,.12);  color: #f59e0b; }
 .stat-info-label  { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; margin-bottom: 2px; }
-.stat-info-value  { font-size: 1.45rem; font-weight: 700; color: var(--text-main); font-family: 'Outfit', sans-serif; line-height: 1; }
+.stat-info-value  { font-size: 1.45rem; font-weight: 700; color: var(--text-main); font-family: 'Outfit', 'Inter', sans-serif; line-height: 1; }
 
 /* ── SECTION CARDS ── */
 .section-card {
@@ -458,7 +458,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Outfit', 'Inter', sans-serif;
     font-size: 1.05rem;
     font-weight: 700;
     color: var(--text-main);
@@ -737,17 +737,40 @@
                     <div class="empty-icon"><i class="bi bi-journal-x"></i></div>
                     <p>{% if lang == 'ru' %}Вы ещё не записаны ни на один курс.{% elif lang == 'tj' %}Шумо ба хеч курсе ба кайд гирифта нашудаед.{% else %}You are not enrolled in any courses yet.{% endif %}</p>
                     <a href="{% url 'course_list' %}" class="btn-edit-profile" style="max-width:220px;margin:0 auto;">
-                        <i class="bi bi-search"></i> {% if lang == 'ru' %}Смотреть курсы{% elif lang == 'tj' %}Курсхоро бубинед{% else %}Browse Courses{% endif %}
+                        <i class="bi bi-search"></i> {% if lang == 'ru' %}Смотреть курсы{% elif lang == 'tj' %}Курсҳоро бубинед{% else %}Browse Courses{% endif %}
                     </a>
                 </div>
             {% endif %}
         </div>
 
+        <!-- ── AI QUIZ CARD ── -->
+        <div class="section-card" style="border-color: rgba(124,58,237,.2); position: relative; overflow: hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#7c3aed,#0ea5e9);"></div>
+            <div class="d-flex align-items-center gap-3 mb-3">
+                <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#7c3aed,#6366f1);display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#fff;flex-shrink:0;">
+                    <i class="bi bi-stars"></i>
+                </div>
+                <div>
+                    <h5 class="font-heading mb-1" style="font-size:1.05rem;">
+                        {% if lang == 'ru' %}AI Тест — Проверьте свои знания{% elif lang == 'tj' %}AI Тест — Донишҳои худро санҷед{% else %}AI Quiz — Test Your Knowledge{% endif %}
+                    </h5>
+                    <p class="text-muted mb-0" style="font-size:.82rem;">
+                        {% if lang == 'ru' %}Выберите любой предмет и тему — AI создаст тест и даст подробный анализ{% elif lang == 'tj' %}Ҳар фан ва мавзуъро интихоб кунед — AI тест месозад ва таҳлили муфассал медиҳад{% else %}Choose any subject & topic — AI generates a quiz and gives detailed feedback{% endif %}
+                    </p>
+                </div>
+            </div>
+            <a href="{% url 'student_ai_quiz' %}" class="btn-edit-profile" style="max-width:260px;background:linear-gradient(135deg,#7c3aed,#6366f1);box-shadow:0 4px 14px rgba(124,58,237,.25);">
+                <i class="bi bi-lightning-charge-fill"></i>
+                {% if lang == 'ru' %}Начать AI тест{% elif lang == 'tj' %}AI тестро оғоз кунед{% else %}Start AI Quiz{% endif %}
+            </a>
+        </div>
+
         <!-- Test Natijalari -->
+
         <div class="section-card">
             <div class="section-title">
                 <div class="section-icon"><i class="bi bi-bar-chart-fill"></i></div>
-                {% if lang == 'ru' %}Последние результаты тестов{% elif lang == 'tj' %}Натиҷахои охирини тест{% else %}Recent Quiz Results{% endif %}
+                {% if lang == 'ru' %}Последние результаты тестов{% elif lang == 'tj' %}Натиҷаҳои охирини тест{% else %}Recent Quiz Results{% endif %}
             </div>
 
             {% if recent_results %}
@@ -775,7 +798,7 @@
                                         </span>
                                         <div class="score-bar-wrap">
                                             <div class="score-bar {% if result.get_percentage < 60 %}danger{% endif %}"
-                                                 style="width:{{ result.get_percentage }}%;"></div>
+                                             style="width: {{ result.get_percentage }}%;"></div>
                                         </div>
                                     </td>
                                     <td>

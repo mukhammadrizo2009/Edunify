@@ -3,6 +3,8 @@ from .views import (
     quiz_list_view, quiz_view, quiz_result_view, quiz_ai_feedback_view,
     quiz_create_step1, quiz_create_step2, quiz_create_step3,
     ai_quiz_generate_page, ai_quiz_generate_api, ai_quiz_save,
+    student_ai_quiz_page, student_ai_quiz_generate,
+    student_ai_quiz_submit, student_ai_quiz_result, student_ai_quiz_analysis,
 )
 
 urlpatterns = [
@@ -18,4 +20,10 @@ urlpatterns = [
     path('ai-generate/', ai_quiz_generate_page, name='ai_quiz_generate'),
     path('ai-generate/api/', ai_quiz_generate_api, name='ai_quiz_generate_api'),
     path('ai-generate/save/', ai_quiz_save, name='ai_quiz_save'),
+    # Student: AI Quiz
+    path('student-ai/', student_ai_quiz_page, name='student_ai_quiz'),
+    path('student-ai/generate/', student_ai_quiz_generate, name='student_ai_quiz_generate'),
+    path('student-ai/submit/', student_ai_quiz_submit, name='student_ai_quiz_submit'),
+    path('student-ai/result/<int:pk>/', student_ai_quiz_result, name='student_ai_quiz_result'),
+    path('student-ai/result/<int:pk>/analysis/', student_ai_quiz_analysis, name='student_ai_quiz_analysis'),
 ]

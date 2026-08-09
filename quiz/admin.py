@@ -1,6 +1,6 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
-from .models import Quiz, Question, Result
+from .models import Quiz, Question, Result, StudentAIQuiz
 
 @admin.register(Quiz)
 class QuizAdmin(ModelAdmin):
@@ -24,3 +24,10 @@ class QuestionAdmin(ModelAdmin):
 class ResultAdmin(ModelAdmin):
     list_display = ['student', 'quiz', 'score', 'total_questions', 'time_spent', 'created_at']
     list_filter = ['quiz', 'student']
+
+@admin.register(StudentAIQuiz)
+class StudentAIQuizAdmin(ModelAdmin):
+    list_display = ['student', 'subject', 'topic', 'difficulty', 'score', 'total_questions', 'is_completed', 'created_at']
+    list_filter = ['difficulty', 'language', 'is_completed']
+    search_fields = ['student__username', 'subject', 'topic']
+    readonly_fields = ['questions_data', 'wrong_answers', 'ai_feedback', 'ai_detailed_analysis']

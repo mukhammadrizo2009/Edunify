@@ -80,3 +80,48 @@ class Result(models.Model):
 
     def __str__(self):
         return f"{self.student.username} - {self.quiz.title} - {self.get_percentage()}%"
+
+
+# ═══════════════════════════════════════════════
+#  STUDENT AI QUIZ — AI bilan mustaqil test
+# ═══════════════════════════════════════════════
+
+class StudentAIQuiz(models.Model):
+    """Student o'zi tanlagan mavzu bo'yicha AI yaratgan test."""
+    LANGUAGE_CHOICES = [
+        ('ru', 'Russian'),
+        ('tj', 'Tajik'),
+        ('en', 'English'),
+    ]
+    DIFFICULTY_CHOICES = [
+        ('easy', 'Easy'),
+        ('medium', 'Medium'),
+        ('hard', 'Hard'),
+    ]
+    student = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='ai_quizzes')
+    subject = models.CharField(max_length=200)        # Fan nomi
+    topic = models.CharField(max_length=300)           # Mavzu
+    difficulty = models.CharField(max_length=10, choices=DIFFICULTY_CHOICES, default='medium')
+    num_questions = models.PositiveIntegerField(default=10)
+    language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default='en')
+    questions_data = models.JSONField(default=list)    # AI yaratgan savollar
+    score = models.PositiveIntegerField(null=True, blank=True)
+    total_questions = models.PositiveIntegerField(default=0)
+    wrong_answers = models.JSONField(default=list)     # Noto'g'ri javoblar
+    ai_feedback = models.TextField(blank=True)         # AI tahlili va maslahat
+    ai_detailed_analysis = models.JSONField(default=dict)  # Batafsil AI tahlil
+    time_spent = models.PositiveIntegerField(default=0)    # soniyada
+    is_completed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def get_percentage(self):
+        if self.total_questions == 0:
+            return 0
+        return round((self.score / self.total_questions) * 100)
+
+    def __str__(self):
+        status = f"{self.get_percentage()}%" if self.is_completed else "In Progress"
+        return f"{self.student.username} - {self.subject}: {self.topic} ({status})"

@@ -56,7 +56,7 @@
 
 .create-wrap { max-width: 640px; margin: 0 auto; }
 .step-header { text-align: center; margin-bottom: 32px; }
-.step-header h1 { font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
+.step-header h1 { font-family: 'Outfit', 'Inter', sans-serif; font-size: 1.8rem; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
 .step-header p { color: var(--text-muted); font-size: 0.92rem; }
 
 .step-indicator { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 36px; }
@@ -74,7 +74,7 @@
 .create-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 22px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,.06); }
 .create-card-header { background: linear-gradient(135deg, #059669, #0d9488); padding: 20px 28px; display: flex; align-items: center; gap: 12px; }
 .create-card-header i { font-size: 1.4rem; color: rgba(255,255,255,.9); }
-.create-card-header h2 { font-family: 'Outfit', sans-serif; font-size: 1.05rem; font-weight: 700; color: #fff; margin: 0; }
+.create-card-header h2 { font-family: 'Outfit', 'Inter', sans-serif; font-size: 1.05rem; font-weight: 700; color: #fff; margin: 0; }
 .create-card-body { padding: 28px; }
 
 .field-group { margin-bottom: 22px; }
@@ -152,7 +152,7 @@
             {% if lang == 'ru' %}Уроков для теста не найдено. Сначала
             <a href="{% url 'course_create_step1' %}" style="color:#059669;font-weight:600;text-decoration:underline;">создайте курс и урок</a>,
             или все уроки уже имеют тест.
-            {% elif lang == 'tj' %}Дарсе барои тест ёфта нашуд. Аввал
+            {% elif lang == 'tj' %}Дарсе барои тест ёфт нашуд. Аввал
             <a href="{% url 'course_create_step1' %}" style="color:#059669;font-weight:600;text-decoration:underline;">курс ва дарс созед</a>,
             ё ба ҳамаи дарсхо аллакай тест пайваст аст.
             {% else %}No lessons available for a quiz. First
@@ -218,7 +218,7 @@
                     <div class="field-group" style="margin-bottom:0;">
                         <label class="field-label" for="id_num_questions">
                             <i class="bi bi-list-ol"></i>
-                            {% if lang == 'ru' %}Кол-во вопросов{% elif lang == 'tj' %}Шумораи саволхо{% else %}Number of Questions{% endif %}
+                            {% if lang == 'ru' %}Кол-во вопросов{% elif lang == 'tj' %}Шумораи саволҳо{% else %}Number of Questions{% endif %}
                         </label>
                         <input type="number" id="id_num_questions" name="num_questions"
                                class="field-input" value="5" min="1" max="50" required>
@@ -239,7 +239,7 @@
                 <div style="margin-top:28px;">
                     <button type="submit" class="btn-next" id="nextBtn">
                         <i class="bi bi-arrow-right-circle-fill"></i>
-                        {% if lang == 'ru' %}Следующий шаг — Вопросы{% elif lang == 'tj' %}Қадами навбатӣ — Саволхо{% else %}Next Step — Questions{% endif %}
+                        {% if lang == 'ru' %}Следующий шаг — Вопросы{% elif lang == 'tj' %}Қадами навбатӣ — Саволҳо{% else %}Next Step — Questions{% endif %}
                     </button>
                 </div>
             </form>

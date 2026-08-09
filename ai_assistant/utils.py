@@ -394,3 +394,275 @@ def generate_quiz_with_ai(teacher_prompt, lang='en'):
         if 'JSONDecodeError' in str(type(e).__name__):
             raise ValueError(f"AI javobini JSON sifatida o'qib bo'lmadi: {str(e)}")
         raise
+
+
+# =============================================
+# STUDENT AI QUIZ GENERATOR — Studentlar uchun
+# =============================================
+
+STUDENT_QUIZ_PROMPT = """
+Sen professional ta'lim test generatorisan. Student senga test yaratishni so'raydi.
+Sen FAQAT JSON formatida javob berishing kerak.
+
+QOIDALAR:
+1. Savollar ilmiy jihatdan TO'G'RI va ANIQ bo'lishi kerak
+2. 4 ta variant (A, B, C, D) bo'lishi shart
+3. Faqat BITTA to'g'ri javob bo'lishi kerak
+4. Savollar berilgan fan, mavzu va qiyinlik darajasiga mos bo'lishi kerak
+5. Variantlar mantiqiy va bir-biriga o'xshash bo'lishi kerak, lekin faqat bittasi to'g'ri
+6. Har bir savol aniq va tushunarli bo'lishi kerak
+7. Har bir savol uchun qisqa tushuntirish (explanation) bo'lishi kerak
+
+QIYINLIK DARAJALARI:
+- easy: Oddiy savollar, asosiy tushunchalar, faktlar
+- medium: O'rta murakkablik, tushunishni talab qiladigan savollar
+- hard: Murakkab savollar, tahlil va qo'llashni talab qiladi
+
+MUHIM: Javobingni FAQAT quyidagi JSON formatida ber:
+
+{
+  "title": "Test nomi",
+  "subject": "Fan nomi",
+  "topic": "Mavzu nomi",
+  "questions": [
+    {
+      "text": "Savol matni",
+      "option_a": "A varianti",
+      "option_b": "B varianti",
+      "option_c": "C varianti",
+      "option_d": "D varianti",
+      "correct": "A",
+      "explanation": "Nima uchun A to'g'ri ekanligi haqida qisqa tushuntirish"
+    }
+  ]
+}
+
+MUHIM QOIDALAR:
+- "correct" qiymati faqat "A", "B", "C" yoki "D" bo'lishi kerak
+- Har bir savolda "explanation" bo'lishi SHART
+- Hech qanday izoh yoki qo'shimcha matn YOZMA — FAQAT JSON qaytar
+- Savollar soni aniq ko'rsatilgan miqdorda bo'lsin
+"""
+
+
+def generate_student_quiz_with_ai(subject, topic, difficulty='medium', num_questions=10, lang='en'):
+    """
+    Studentning so'roviga asosan AI yordamida test savollarini yaratadi.
+    Returns: dict with 'title', 'subject', 'topic', 'questions' list
+    Raises: Exception on failure
+    """
+    import json
+    import re
+
+    if not settings.GEMINI_API_KEY or settings.GEMINI_API_KEY == 'your_gemini_api_key':
+        raise ValueError("Gemini API key is not configured.")
+
+    # Til bo'yicha ko'rsatma
+    lang_instruction = {
+        'ru': 'Все вопросы, варианты ответов и объяснения пиши на РУССКОМ языке.',
+        'tj': 'Ҳамаи саволҳо, вариантҳо ва шарҳҳоро бо ЗАБОНИ ТОҶИКӢ нависед.',
+        'en': 'Write all questions, options and explanations in ENGLISH.',
+    }.get(lang, 'Write all questions, options and explanations in ENGLISH.')
+
+    difficulty_instruction = {
+        'easy': 'Oddiy/oson daraja — asosiy tushunchalar, faktlarni bilish',
+        'medium': "O'rtacha daraja — tushunish va qo'llashni talab qiladi",
+        'hard': "Murakkab daraja — chuqur tahlil, sintez va baholashni talab qiladi",
+    }.get(difficulty, "O'rtacha daraja")
+
+    try:
+        client = _get_client()
+        full_prompt = (
+            f"{lang_instruction}\n\n"
+            f"{STUDENT_QUIZ_PROMPT}\n\n"
+            f"Fan: {subject}\n"
+            f"Mavzu: {topic}\n"
+            f"Qiyinlik darajasi: {difficulty} ({difficulty_instruction})\n"
+            f"Savollar soni: {num_questions}\n"
+        )
+
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=full_prompt,
+        )
+
+        raw_text = response.text.strip()
+
+        # JSON ni ajratib olish
+        json_match = re.search(r'```(?:json)?\s*([\s\S]*?)```', raw_text)
+        if json_match:
+            json_str = json_match.group(1).strip()
+        else:
+            start = raw_text.find('{')
+            end = raw_text.rfind('}')
+            if start != -1 and end != -1:
+                json_str = raw_text[start:end + 1]
+            else:
+                raise ValueError("AI javobida JSON topilmadi.")
+
+        data = json.loads(json_str)
+
+        # Validatsiya
+        if 'questions' not in data or not isinstance(data['questions'], list):
+            raise ValueError("AI javobi noto'g'ri formatda — 'questions' topilmadi.")
+
+        if len(data['questions']) == 0:
+            raise ValueError("AI hech qanday savol yaratmadi.")
+
+        # Har bir savolni tekshirish
+        valid_questions = []
+        for i, q in enumerate(data['questions']):
+            if not all(k in q for k in ('text', 'option_a', 'option_b', 'option_c', 'option_d', 'correct')):
+                continue
+            if q['correct'] not in ('A', 'B', 'C', 'D'):
+                q['correct'] = 'A'
+            q.setdefault('explanation', '')
+            valid_questions.append(q)
+
+        if not valid_questions:
+            raise ValueError("AI yaratgan savollar noto'g'ri formatda.")
+
+        data['questions'] = valid_questions
+        data.setdefault('title', f'{subject} — {topic}')
+        data.setdefault('subject', subject)
+        data.setdefault('topic', topic)
+
+        return data
+
+    except json.JSONDecodeError as e:
+        raise ValueError(f"AI javobini JSON sifatida o'qib bo'lmadi: {str(e)}")
+    except Exception as e:
+        if 'JSONDecodeError' in str(type(e).__name__):
+            raise ValueError(f"AI javobini JSON sifatida o'qib bo'lmadi: {str(e)}")
+        raise
+
+
+# =============================================
+# STUDENT AI QUIZ — Batafsil tahlil
+# =============================================
+
+def analyze_student_quiz_detailed(quiz_data, lang='en'):
+    """
+    Student test natijasini batafsil tahlil qiladi.
+    Returns: dict with analysis sections
+    """
+    import json
+    import re
+
+    if not settings.GEMINI_API_KEY or settings.GEMINI_API_KEY == 'your_gemini_api_key':
+        return {
+            'summary': 'AI analysis is not available.',
+            'strengths': [],
+            'weaknesses': [],
+            'recommendations': [],
+            'motivation': '',
+        }
+
+    try:
+        client = _get_client()
+        percentage = round((quiz_data['score'] / quiz_data['total']) * 100) if quiz_data['total'] > 0 else 0
+
+        lang_instruction = {
+            'ru': 'Отвечай ТОЛЬКО на русском языке. Все тексты должны быть на русском.',
+            'tj': 'Фақат ба забони ТОҶИКӢ ҷавоб деҳ. Ҳамаи матнҳо бояд тоҷикӣ бошанд.',
+            'en': 'Answer ONLY in English. All texts must be in English.',
+        }.get(lang, 'Answer ONLY in English.')
+
+        # Xato javoblar haqida ma'lumot
+        wrong_info = ""
+        if quiz_data.get('wrong_answers'):
+            wrong_info = "Noto'g'ri javoblar:\n"
+            for i, w in enumerate(quiz_data['wrong_answers'][:10], 1):
+                wrong_info += f"  {i}. Savol: {w.get('question', 'N/A')}\n"
+                wrong_info += f"     Student javobi: {w.get('user_answer', 'N/A')}, To'g'ri javob: {w.get('correct_answer', 'N/A')}\n"
+                if w.get('explanation'):
+                    wrong_info += f"     Tushuntirish: {w.get('explanation', '')}\n"
+
+        prompt = f"""
+{lang_instruction}
+
+Sen ta'lim ekspertisan. Student testni topshirdi, uning natijalarini BATAFSIL TAHLIL qil.
+
+Ma'lumotlar:
+- Fan: {quiz_data['subject']}
+- Mavzu: {quiz_data['topic']}
+- Qiyinlik: {quiz_data.get('difficulty', 'medium')}
+- Natija: {quiz_data['score']}/{quiz_data['total']} ({percentage}%)
+- Sarflangan vaqt: {max(quiz_data.get('time_spent', 0) // 60, 1)} daqiqa
+- Xato javoblar soni: {len(quiz_data.get('wrong_answers', []))}
+
+{wrong_info}
+
+FAQAT quyidagi JSON formatda javob ber, boshqa hech narsa YOZMA:
+
+{{
+  "summary": "1-2 jumlada umumiy baho (natija, vaqt, daraja haqida)",
+  "score_assessment": "Natija haqida qisqa baho — yaxshi/o'rtacha/yomon",
+  "strengths": ["Kuchli tomoni 1", "Kuchli tomoni 2"],
+  "weaknesses": ["Kamchilik 1", "Kamchilik 2"],
+  "recommendations": [
+    {{
+      "title": "Tavsiya sarlavhasi",
+      "description": "Batafsil tushuntirish — nima qilish kerak"
+    }},
+    {{
+      "title": "Tavsiya sarlavhasi 2",
+      "description": "Batafsil tushuntirish"
+    }}
+  ],
+  "topics_to_review": ["Takrorlash kerak bo'lgan mavzu 1", "Mavzu 2"],
+  "motivation": "Rag'batlantiruvchi va ijobiy xabar — 1-2 jumla",
+  "next_steps": "Keyingi qadamlar haqida 1-2 jumla maslahat"
+}}
+
+MUHIM: Faqat JSON qaytar, boshqa hech narsa yozma!
+"""
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt,
+        )
+
+        raw_text = response.text.strip()
+
+        # JSON ni ajratib olish
+        json_match = re.search(r'```(?:json)?\s*([\s\S]*?)```', raw_text)
+        if json_match:
+            json_str = json_match.group(1).strip()
+        else:
+            start = raw_text.find('{')
+            end = raw_text.rfind('}')
+            if start != -1 and end != -1:
+                json_str = raw_text[start:end + 1]
+            else:
+                return {
+                    'summary': raw_text[:500],
+                    'strengths': [],
+                    'weaknesses': [],
+                    'recommendations': [],
+                    'motivation': '',
+                }
+
+        analysis = json.loads(json_str)
+
+        # Default qiymatlarni qo'yish
+        analysis.setdefault('summary', '')
+        analysis.setdefault('score_assessment', '')
+        analysis.setdefault('strengths', [])
+        analysis.setdefault('weaknesses', [])
+        analysis.setdefault('recommendations', [])
+        analysis.setdefault('topics_to_review', [])
+        analysis.setdefault('motivation', '')
+        analysis.setdefault('next_steps', '')
+
+        return analysis
+
+    except Exception:
+        import traceback
+        traceback.print_exc()
+        return {
+            'summary': 'AI analysis is currently unavailable.',
+            'strengths': [],
+            'weaknesses': [],
+            'recommendations': [],
+            'motivation': '',
+        }

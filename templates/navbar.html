@@ -307,8 +307,8 @@ ul.lang-dropdown-menu .dropdown-item.active i {
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link nav-link-pro {% if request.resolver_match.url_name == 'ai_quiz_generate' %}active{% endif %}"
-                       href="{% url 'ai_quiz_generate' %}">
+                    <a class="nav-link nav-link-pro {% if request.resolver_match.url_name == 'student_ai_quiz' or request.resolver_match.url_name == 'ai_quiz_generate' %}active{% endif %}"
+                       href="{% if user.is_authenticated %}{% if user.role == 'teacher' or user.role == 'admin' %}{% url 'ai_quiz_generate' %}{% else %}{% url 'student_ai_quiz' %}{% endif %}{% else %}{% url 'student_ai_quiz' %}{% endif %}">
                         <span class="nav-icon nav-icon-ai-gen">
                             <i class="bi bi-stars"></i>
                             <span class="ai-live-dot"></span>
@@ -316,6 +316,8 @@ ul.lang-dropdown-menu .dropdown-item.active i {
                         {% if lang == 'tj' %}AI Тест{% elif lang == 'ru' %}AI Тест{% else %}AI Quiz{% endif %}
                     </a>
                 </li>
+
+
             </ul>
 
             <!-- ── Right Actions ──────────────────────── -->

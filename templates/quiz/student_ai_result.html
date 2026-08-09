@@ -1,0 +1,345 @@
+{% extends 'base.html' %}
+{% block title %}{% if lang == 'ru' %}Результат AI теста{% elif lang == 'tj' %}Натиҷаи тести AI{% else %}AI Quiz Result{% endif %} — Edunify{% endblock %}
+
+{% block extra_css %}
+<style>
+.result-wrap { max-width: 860px; margin: 0 auto; padding: 40px 0 80px; }
+
+/* Score Hero */
+.score-hero {
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: 24px; padding: 48px 32px; text-align: center;
+    margin-bottom: 24px; position: relative; overflow: hidden;
+}
+.score-hero::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: linear-gradient(90deg, #7c3aed, #0ea5e9, #059669);
+}
+.score-circle {
+    width: 160px; height: 160px; border-radius: 50%;
+    border: 6px solid var(--border-color); margin: 0 auto 20px;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+}
+.score-circle.great { border-color: #059669; }
+.score-circle.ok { border-color: #f59e0b; }
+.score-circle.poor { border-color: #ef4444; }
+.score-pct { font-family: 'Outfit', 'Inter', sans-serif; font-size: 3rem; font-weight: 800; }
+.score-circle.great .score-pct { color: #059669; }
+.score-circle.ok .score-pct { color: #f59e0b; }
+.score-circle.poor .score-pct { color: #ef4444; }
+.score-detail { font-size: 1rem; color: var(--text-muted); margin-bottom: 4px; }
+.score-meta {
+    display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-top: 16px;
+}
+.score-meta-item {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--bg-darker); border: 1px solid var(--border-color);
+    padding: 8px 16px; border-radius: 12px; font-size: .85rem;
+    font-weight: 600; color: var(--text-main);
+}
+
+/* Section cards */
+.result-section {
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: 20px; padding: 28px; margin-bottom: 20px;
+    transition: var(--theme-transition);
+}
+.result-section-title {
+    font-family: 'Outfit', 'Inter', sans-serif; font-size: 1.05rem;
+    font-weight: 700; color: var(--text-main); margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+    padding-bottom: 14px; border-bottom: 1px solid var(--border-color);
+}
+.result-section-title .rs-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem; color: #fff; flex-shrink: 0;
+}
+
+/* Analysis shimmer */
+.analysis-shimmer { display: flex; flex-direction: column; gap: 10px; }
+.analysis-shimmer .sh-line {
+    height: 16px; border-radius: 8px;
+    background: linear-gradient(90deg, var(--bg-darker) 25%, var(--bg-card) 50%, var(--bg-darker) 75%);
+    background-size: 200% 100%; animation: shimmer 1.5s infinite;
+}
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+/* Strengths / Weaknesses */
+.sw-item {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 10px 0; font-size: .92rem; color: var(--text-main);
+}
+.sw-item i { flex-shrink: 0; margin-top: 2px; font-size: 1rem; }
+.sw-item.strength i { color: #059669; }
+.sw-item.weakness i { color: #ef4444; }
+
+/* Recommendations */
+.rec-card {
+    background: var(--bg-darker); border: 1px solid var(--border-color);
+    border-radius: 14px; padding: 16px; margin-bottom: 10px;
+}
+.rec-card-title { font-weight: 700; font-size: .92rem; color: var(--text-main); margin-bottom: 4px; }
+.rec-card-desc { font-size: .85rem; color: var(--text-muted); line-height: 1.5; }
+
+/* Topics to review */
+.topic-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.2);
+    color: #d97706; padding: 6px 14px; border-radius: 999px;
+    font-size: .82rem; font-weight: 600; margin: 4px;
+}
+[data-theme="dark"] .topic-tag { color: #fbbf24; }
+
+/* Motivation */
+.motivation-box {
+    background: linear-gradient(135deg, rgba(124,58,237,.06), rgba(14,165,233,.06));
+    border: 1px solid rgba(124,58,237,.15); border-radius: 16px;
+    padding: 20px 24px; text-align: center;
+    font-size: 1rem; font-weight: 600; color: var(--text-main); line-height: 1.6;
+}
+
+/* Wrong answers */
+.wrong-item {
+    background: var(--bg-darker); border: 1px solid var(--border-color);
+    border-radius: 14px; padding: 18px; margin-bottom: 12px;
+}
+.wrong-q { font-weight: 700; font-size: .95rem; color: var(--text-main); margin-bottom: 10px; }
+.wrong-answers-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; }
+.wrong-badge { font-size: .82rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
+.wrong-badge.user { color: #ef4444; }
+.wrong-badge.correct { color: #059669; }
+.wrong-explanation {
+    font-size: .84rem; color: var(--text-muted); line-height: 1.5;
+    padding-top: 8px; border-top: 1px solid var(--border-color);
+    font-style: italic;
+}
+
+.btn-actions {
+    display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 24px;
+}
+.btn-action {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 24px; border-radius: 14px; font-weight: 600;
+    font-size: .92rem; text-decoration: none; transition: all .25s ease;
+    font-family: 'Inter', sans-serif; border: none; cursor: pointer;
+}
+.btn-action.primary {
+    background: linear-gradient(135deg, #7c3aed, #6366f1); color: #fff;
+    box-shadow: 0 6px 20px rgba(124,58,237,.25);
+}
+.btn-action.primary:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(124,58,237,.35); color: #fff; }
+.btn-action.secondary {
+    background: var(--bg-darker); border: 1.5px solid var(--border-color); color: var(--text-main);
+}
+.btn-action.secondary:hover { border-color: var(--color-primary); color: var(--color-primary); }
+
+@media (max-width: 768px) {
+    .result-wrap { padding: 20px 0 60px; }
+    .score-hero { padding: 32px 20px; }
+    .score-circle { width: 120px; height: 120px; }
+    .score-pct { font-size: 2.2rem; }
+    .result-section { padding: 20px; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="result-wrap">
+    <!-- Score Hero -->
+    <div class="score-hero">
+        <div class="score-circle {% if ai_quiz.get_percentage >= 80 %}great{% elif ai_quiz.get_percentage >= 50 %}ok{% else %}poor{% endif %}">
+            <div class="score-pct">{{ ai_quiz.get_percentage }}%</div>
+        </div>
+        <h2 class="font-heading mb-2" style="font-size:1.4rem;">{{ ai_quiz.subject }}: {{ ai_quiz.topic }}</h2>
+        <div class="score-detail">
+            {{ ai_quiz.score }} / {{ ai_quiz.total_questions }}
+            {% if lang == 'ru' %}правильных{% elif lang == 'tj' %}дуруст{% else %}correct{% endif %}
+        </div>
+        <div class="score-meta">
+            <div class="score-meta-item">
+                <i class="bi bi-clock"></i>
+                {% with mins=ai_quiz.time_spent|divisibleby:60 %}
+                {{ ai_quiz.time_spent }}
+                {% endwith %}
+                {% if lang == 'ru' %}сек{% elif lang == 'tj' %}сон{% else %}sec{% endif %}
+            </div>
+            <div class="score-meta-item">
+                <i class="bi bi-speedometer2"></i> {{ ai_quiz.get_difficulty_display }}
+            </div>
+            <div class="score-meta-item">
+                <i class="bi bi-calendar3"></i> {{ ai_quiz.created_at|date:"d.m.Y" }}
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Analysis Section (async) -->
+    <div class="result-section" id="analysisSection">
+        <div class="result-section-title">
+            <div class="rs-icon" style="background:linear-gradient(135deg,#7c3aed,#6366f1)">
+                <i class="bi bi-robot"></i>
+            </div>
+            {% if lang == 'ru' %}Анализ искусственного интеллекта{% elif lang == 'tj' %}Таҳлили зеҳни сунъӣ{% else %}AI Analysis & Feedback{% endif %}
+        </div>
+        <!-- Shimmer loader -->
+        <div id="analysisLoader" class="analysis-shimmer">
+            <div class="sh-line" style="width:100%"></div>
+            <div class="sh-line" style="width:85%"></div>
+            <div class="sh-line" style="width:92%"></div>
+            <div class="sh-line" style="width:70%"></div>
+            <p class="text-muted small text-center mt-3 mb-0">
+                <i class="spinner-border spinner-border-sm me-1" style="color:#7c3aed"></i>
+                {% if lang == 'ru' %}AI анализирует результаты...{% elif lang == 'tj' %}AI натиҷаҳоро таҳлил мекунад...{% else %}AI is analyzing your results...{% endif %}
+            </p>
+        </div>
+        <!-- Analysis content (hidden initially) -->
+        <div id="analysisContent" class="d-none"></div>
+    </div>
+
+    <!-- Wrong Answers -->
+    {% if ai_quiz.wrong_answers %}
+    <div class="result-section">
+        <div class="result-section-title">
+            <div class="rs-icon" style="background:linear-gradient(135deg,#ef4444,#f97316)">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+            </div>
+            {% if lang == 'ru' %}Допущенные ошибки ({{ ai_quiz.wrong_answers|length }}){% elif lang == 'tj' %}Хатоҳои иртикобёфта ({{ ai_quiz.wrong_answers|length }}){% else %}Mistakes Made ({{ ai_quiz.wrong_answers|length }}){% endif %}
+        </div>
+        {% for wq in ai_quiz.wrong_answers %}
+        <div class="wrong-item">
+            <div class="wrong-q">{{ forloop.counter }}. {{ wq.question }}</div>
+            <div class="wrong-answers-row">
+                <span class="wrong-badge user">
+                    <i class="bi bi-x-circle-fill"></i>
+                    {% if lang == 'ru' %}Ваш:{% elif lang == 'tj' %}Шумо:{% else %}Yours:{% endif %}
+                    <strong>{{ wq.user_answer }}</strong>
+                    {% if wq.options %}
+                        ({% for k, v in wq.options.items %}{% if k == wq.user_answer %}{{ v }}{% endif %}{% endfor %})
+                    {% endif %}
+                </span>
+                <span class="wrong-badge correct">
+                    <i class="bi bi-check-circle-fill"></i>
+                    {% if lang == 'ru' %}Верный:{% elif lang == 'tj' %}Дуруст:{% else %}Correct:{% endif %}
+                    <strong>{{ wq.correct_answer }}</strong>
+                    {% if wq.options %}
+                        ({% for k, v in wq.options.items %}{% if k == wq.correct_answer %}{{ v }}{% endif %}{% endfor %})
+                    {% endif %}
+                </span>
+            </div>
+            {% if wq.explanation %}
+            <div class="wrong-explanation">💡 {{ wq.explanation }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Actions -->
+    <div class="btn-actions">
+        <a href="{% url 'student_ai_quiz' %}" class="btn-action primary">
+            <i class="bi bi-plus-circle"></i>
+            {% if lang == 'ru' %}Новый тест{% elif lang == 'tj' %}Тести нав{% else %}New Quiz{% endif %}
+        </a>
+        <a href="{% url 'dashboard' %}" class="btn-action secondary">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', async function() {
+    const loader = document.getElementById('analysisLoader');
+    const content = document.getElementById('analysisContent');
+    const LANG = '{{ lang }}';
+
+    try {
+        const res = await fetch("{% url 'student_ai_quiz_analysis' ai_quiz.pk %}");
+        const data = await res.json();
+
+        if (data.analysis) {
+            const a = data.analysis;
+            let html = '';
+
+            // Summary
+            if (a.summary) {
+                html += `<div class="motivation-box mb-3">${a.summary}</div>`;
+            }
+
+            // Strengths
+            if (a.strengths && a.strengths.length) {
+                const sTitle = {ru:'Сильные стороны',tj:'Ҷанбаҳои қавӣ',en:'Strengths'}[LANG]||'Strengths';
+                html += `<h6 class="fw-bold mt-3 mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>${sTitle}</h6>`;
+                a.strengths.forEach(s => {
+                    html += `<div class="sw-item strength"><i class="bi bi-check-lg"></i><span>${s}</span></div>`;
+                });
+            }
+
+            // Weaknesses
+            if (a.weaknesses && a.weaknesses.length) {
+                const wTitle = {ru:'Слабые стороны',tj:'Ҷанбаҳои заиф',en:'Areas to Improve'}[LANG]||'Areas to Improve';
+                html += `<h6 class="fw-bold mt-3 mb-2"><i class="bi bi-exclamation-circle-fill text-danger me-2"></i>${wTitle}</h6>`;
+                a.weaknesses.forEach(w => {
+                    html += `<div class="sw-item weakness"><i class="bi bi-x-lg"></i><span>${w}</span></div>`;
+                });
+            }
+
+            // Recommendations
+            if (a.recommendations && a.recommendations.length) {
+                const rTitle = {ru:'Рекомендации',tj:'Тавсияҳо',en:'Recommendations'}[LANG]||'Recommendations';
+                html += `<h6 class="fw-bold mt-4 mb-2"><i class="bi bi-lightbulb-fill me-2" style="color:#f59e0b"></i>${rTitle}</h6>`;
+                a.recommendations.forEach(r => {
+                    const title = typeof r === 'object' ? r.title : r;
+                    const desc = typeof r === 'object' ? r.description : '';
+                    html += `<div class="rec-card"><div class="rec-card-title">📌 ${title}</div>`;
+                    if (desc) html += `<div class="rec-card-desc">${desc}</div>`;
+                    html += `</div>`;
+                });
+            }
+
+            // Topics to review
+            if (a.topics_to_review && a.topics_to_review.length) {
+                const tTitle = {ru:'Темы для повторения',tj:'Мавзуъҳо барои такрор',en:'Topics to Review'}[LANG]||'Topics to Review';
+                html += `<h6 class="fw-bold mt-4 mb-2"><i class="bi bi-bookmark-star-fill me-2" style="color:#0ea5e9"></i>${tTitle}</h6><div>`;
+                a.topics_to_review.forEach(t => { html += `<span class="topic-tag"><i class="bi bi-arrow-repeat"></i>${t}</span>`; });
+                html += `</div>`;
+            }
+
+            // Motivation
+            if (a.motivation) {
+                html += `<div class="motivation-box mt-4">✨ ${a.motivation}</div>`;
+            }
+
+            // Next steps
+            if (a.next_steps) {
+                html += `<div class="mt-3 p-3" style="border-radius:12px;background:var(--bg-darker);border:1px solid var(--border-color);">
+                    <strong><i class="bi bi-signpost-2-fill me-1" style="color:#7c3aed"></i>
+                    ${({ru:'Следующие шаги',tj:'Қадамҳои оянда',en:'Next Steps'})[LANG]||'Next Steps'}:</strong>
+                    <span class="text-muted"> ${a.next_steps}</span></div>`;
+            }
+
+            content.innerHTML = html;
+            loader.classList.add('d-none');
+            content.classList.remove('d-none');
+        } else {
+            showError();
+        }
+    } catch(e) {
+        showError();
+    }
+
+    function showError() {
+        const msgs = {
+            ru: 'Не удалось загрузить анализ AI.',
+            tj: 'Таҳлили AI бор карда нашуд.',
+            en: 'Could not load AI analysis.'
+        };
+        content.innerHTML = `<p class="text-muted">${msgs[LANG]||msgs.en}</p>`;
+        loader.classList.add('d-none');
+        content.classList.remove('d-none');
+    }
+});
+</script>
+{% endblock %}
