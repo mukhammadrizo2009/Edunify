@@ -133,4 +133,18 @@
   setArrows();
   window.addEventListener('resize', setArrows);
 
+  /* ── TIMELINE LINE FILL ANIMATION ── */
+  const timeline = document.querySelector('.hiw-timeline');
+  if (timeline) {
+    const timelineObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          timelineObserver.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.2 });
+    timelineObserver.observe(timeline);
+  }
+
 })();
