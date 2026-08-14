@@ -552,27 +552,33 @@
 
 <!-- ═══════════ CTA BANNER ═══════════ -->
 <section class="lp-cta reveal-up" style="--delay:0s">
-  <div class="lp-cta__glow" aria-hidden="true"></div>
+  <div class="lp-cta__glow-wrapper">
+    <div class="lp-cta__glow-1"></div>
+    <div class="lp-cta__glow-2"></div>
+  </div>
+  
   <h2 class="lp-cta__title">
-    {% if lang == 'ru' %}Начните учиться сегодня{% elif lang == 'tj' %}Имрӯз ба омӯзиш оғоз кунед{% else %}Start
-    learning today{% endif %}
+    {% if lang == 'ru' %}Начните учиться <span class="lp-cta__title-accent">сегодня</span>
+    {% elif lang == 'tj' %}Имрӯз ба омӯзиш <span class="lp-cta__title-accent">оғоз кунед</span>
+    {% else %}Start learning <span class="lp-cta__title-accent">today</span>{% endif %}
   </h2>
+  
   <p class="lp-cta__sub">
-    {% if lang == 'ru' %}Присоединяйтесь к 500+ ученикам. Бесплатно. Прямо сейчас.
-    {% elif lang == 'tj' %}Ба 500+ хонандагон ҳамроҳ шавед. Ройгон. Ҳозир.
-    {% else %}Join 500+ students. Free. Right now.{% endif %}
+    {% if lang == 'ru' %}Присоединяйтесь к 500+ ученикам. Откройте для себя возможности искусственного интеллекта в образовании. Абсолютно бесплатно.
+    {% elif lang == 'tj' %}Ба 500+ хонандагон ҳамроҳ шавед. Имкониятҳои зеҳни сунъиро дар таълим кашф кунед. Комилан ройгон.
+    {% else %}Join 500+ students. Discover the power of artificial intelligence in education. Completely free.{% endif %}
   </p>
+  
   <div class="lp-cta__btns">
-    <a href="{% url 'course_list' %}" class="lp-btn lp-btn--white">
-      {% if lang == 'ru' %}Посмотреть курсы{% elif lang == 'tj' %}Дидани курсҳо{% else %}View Courses{% endif %}
+    <a href="{% url 'course_list' %}" class="lp-btn lp-btn--primary">
+      <span>{% if lang == 'ru' %}Посмотреть курсы{% elif lang == 'tj' %}Дидани курсҳо{% else %}View Courses{% endif %}</span>
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-          stroke-linejoin="round" />
+        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
       </svg>
     </a>
     {% if not user.is_authenticated %}
-    <a href="{% url 'register' %}" class="lp-btn lp-btn--outline-white">
-      {% if lang == 'ru' %}Зарегистрироваться бесплатно{% elif lang == 'tj' %}Рӯйхатгирии ройгон{% else %}Sign Up Free{% endif %}
+    <a href="{% url 'register' %}" class="lp-btn lp-btn--ghost">
+      {% if lang == 'ru' %}Зарегистрироваться{% elif lang == 'tj' %}Рӯйхатгирӣ{% else %}Sign Up Free{% endif %}
     </a>
     {% endif %}
   </div>

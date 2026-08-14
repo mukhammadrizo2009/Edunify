@@ -283,119 +283,181 @@
     border-color: rgba(52, 211, 153, 0.2);
 }
 
-/* Question Preview Cards */
+/* Question Preview Cards - PREMIUM REDESIGN */
 .q-preview {
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 20px;
-    margin-bottom: 16px;
+    border-radius: 24px;
+    margin-bottom: 24px;
     overflow: hidden;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    position: relative;
 }
 [data-theme="dark"] .q-preview {
-    border-color: rgba(255,255,255,0.08);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    background: rgba(20,20,24,0.6);
+    backdrop-filter: blur(12px);
+    border-color: rgba(255,255,255,0.06);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 .q-preview:hover {
-    border-color: rgba(139, 92, 246, 0.4);
-    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.08);
+    transform: translateY(-4px);
+    border-color: rgba(139, 92, 246, 0.3);
+    box-shadow: 0 20px 40px rgba(139, 92, 246, 0.1);
 }
 [data-theme="dark"] .q-preview:hover {
     border-color: rgba(167, 139, 250, 0.4);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(167,139,250,0.2) inset;
 }
+
 .q-preview-head {
     display: flex;
     align-items: flex-start;
-    gap: 14px;
-    padding: 18px 22px;
+    gap: 16px;
+    padding: 24px 28px;
     background: var(--bg-darker);
     border-bottom: 1px solid var(--border-color);
 }
 [data-theme="dark"] .q-preview-head {
-    background: rgba(0,0,0,0.15);
-    border-bottom-color: rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.2);
+    border-bottom-color: rgba(255,255,255,0.04);
 }
 .q-preview-num {
-    width: 32px;
-    height: 32px;
-    border-radius: 10px;
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
     background: linear-gradient(135deg, #7c3aed, #6d28d9);
     display: flex;
     align-items: center;
     justify-content: center;
     color: #ffffff;
-    font-size: 0.9rem;
-    font-weight: 700;
+    font-size: 1rem;
+    font-weight: 800;
     flex-shrink: 0;
-    box-shadow: 0 4px 10px rgba(124, 58, 237, 0.2);
+    box-shadow: 0 6px 16px rgba(124, 58, 237, 0.3);
 }
 .q-preview-text {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Outfit', 'Inter', sans-serif;
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     color: var(--text-main);
     flex: 1;
-    line-height: 1.5;
-    margin-top: 4px;
+    line-height: 1.6;
+    margin-top: 2px;
 }
+
 .q-preview-body {
-    padding: 20px 22px;
+    padding: 24px 28px;
 }
+
 .q-options {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 16px;
 }
 @media(max-width: 600px) {
     .q-options { grid-template-columns: 1fr; }
 }
+
 .q-opt {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 12px 16px;
-    border-radius: 12px;
-    font-size: 0.9rem;
+    gap: 12px;
+    padding: 16px 20px;
+    border-radius: 16px;
+    font-size: 0.95rem;
     color: var(--text-main);
-    background: var(--bg-darker);
-    border: 1px solid var(--border-color);
-    transition: all 0.25s ease;
+    background: var(--bg-card);
+    border: 2px solid var(--border-color);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
 }
 [data-theme="dark"] .q-opt {
-    background: rgba(0,0,0,0.2);
-    border-color: rgba(255,255,255,0.08);
+    background: rgba(0,0,0,0.15);
+    border-color: rgba(255,255,255,0.06);
 }
 .q-opt:hover {
-    border-color: rgba(139, 92, 246, 0.3);
-    background: rgba(139, 92, 246, 0.02);
+    border-color: rgba(139, 92, 246, 0.4);
+    background: rgba(139, 92, 246, 0.03);
+    transform: scale(1.01);
 }
 [data-theme="dark"] .q-opt:hover {
-    border-color: rgba(167, 139, 250, 0.3);
-    background: rgba(167, 139, 250, 0.05);
+    border-color: rgba(167, 139, 250, 0.4);
+    background: rgba(167, 139, 250, 0.08);
 }
-.q-opt.correct {
-    background: rgba(16, 185, 129, 0.08);
-    border-color: rgba(16, 185, 129, 0.4);
-    color: #059669;
-    font-weight: 600;
-}
-[data-theme="dark"] .q-opt.correct {
-    background: rgba(16, 185, 129, 0.15);
-    border-color: rgba(16, 185, 129, 0.4);
-    color: #34d399;
-}
+
 .q-opt-letter {
-    font-weight: 700;
+    font-weight: 800;
     color: var(--text-muted);
-    min-width: 20px;
+    min-width: 24px;
+    font-size: 1.05rem;
 }
-.q-opt.correct .q-opt-letter {
+
+.q-opt .correct-icon {
+    display: none;
+    margin-left: auto;
+    font-size: 1.1rem;
+}
+
+/* Revealed State */
+.show-answers .q-opt.correct {
+    background: rgba(16, 185, 129, 0.08);
+    border-color: #10b981;
+    color: #059669;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);
+}
+[data-theme="dark"] .show-answers .q-opt.correct {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: #10b981;
+    color: #34d399;
+}
+.show-answers .q-opt.correct .q-opt-letter {
     color: #059669;
 }
-[data-theme="dark"] .q-opt.correct .q-opt-letter {
+[data-theme="dark"] .show-answers .q-opt.correct .q-opt-letter {
     color: #34d399;
+}
+.show-answers .q-opt.correct .correct-icon {
+    display: block;
+    color: #10b981;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Button Reveal Style */
+.btn-reveal {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
+}
+.btn-reveal:hover {
+    border-color: #8b5cf6;
+    color: #8b5cf6;
+    background: rgba(139, 92, 246, 0.05);
+}
+.btn-reveal.active {
+    background: #10b981;
+    border-color: #10b981;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+.btn-reveal.active:hover {
+    background: #059669;
 }
 
 /* Save Section */
@@ -686,6 +748,14 @@
                 {% if lang == 'ru' %}Сгенерированные вопросы{% elif lang == 'tj' %}Саволҳои эҷодшуда{% else %}Generated Questions{% endif %}
                 <span class="results-count" id="resultsCount">0</span>
             </div>
+            <button type="button" class="btn-reveal" id="revealBtn" onclick="toggleAnswers()">
+                <i class="bi bi-eye"></i> 
+                <span id="revealText">
+                    {% if lang == 'ru' %}Показать ответы
+                    {% elif lang == 'tj' %}Нишон додани ҷавобҳо
+                    {% else %}Show Answers{% endif %}
+                </span>
+            </button>
         </div>
         <div id="questionsContainer"></div>
 
@@ -806,6 +876,16 @@ function generateQuiz() {
 function renderQuestions() {
     const container = document.getElementById('questionsContainer');
     document.getElementById('resultsCount').textContent = generatedQuestions.length;
+    
+    // Reset answers visibility state
+    answersVisible = false;
+    container.classList.remove('show-answers');
+    const btn = document.getElementById('revealBtn');
+    if(btn) {
+        btn.innerHTML = `<i class="bi bi-eye"></i> <span id="revealText">{% if lang == 'ru' %}Показать ответы{% elif lang == 'tj' %}Нишон додани ҷавобҳо{% else %}Show Answers{% endif %}</span>`;
+        btn.classList.remove('active');
+    }
+
     let html = '';
     generatedQuestions.forEach((q, i) => {
         const letters = ['A','B','C','D'];
@@ -813,11 +893,28 @@ function renderQuestions() {
         let optsHtml = '';
         opts.forEach((opt, j) => {
             const isCorrect = letters[j] === q.correct;
-            optsHtml += `<div class="q-opt ${isCorrect?'correct':''}"><span class="q-opt-letter">${letters[j]}.</span> ${escHtml(opt)} ${isCorrect?'<i class="bi bi-check-circle-fill" style="margin-left:auto;font-size:.8rem;"></i>':''}</div>`;
+            optsHtml += `<div class="q-opt ${isCorrect?'correct':''}"><span class="q-opt-letter">${letters[j]}.</span> ${escHtml(opt)} <i class="bi bi-check-circle-fill correct-icon"></i></div>`;
         });
         html += `<div class="q-preview"><div class="q-preview-head"><div class="q-preview-num">${i+1}</div><div class="q-preview-text">${escHtml(q.text)}</div></div><div class="q-preview-body"><div class="q-options">${optsHtml}</div></div></div>`;
     });
     container.innerHTML = html;
+}
+
+let answersVisible = false;
+function toggleAnswers() {
+    answersVisible = !answersVisible;
+    const container = document.getElementById('questionsContainer');
+    const btn = document.getElementById('revealBtn');
+    
+    if (answersVisible) {
+        container.classList.add('show-answers');
+        btn.innerHTML = `<i class="bi bi-eye-slash"></i> <span id="revealText">{% if lang == 'ru' %}Скрыть ответы{% elif lang == 'tj' %}Пинҳон кардани ҷавобҳо{% else %}Hide Answers{% endif %}</span>`;
+        btn.classList.add('active');
+    } else {
+        container.classList.remove('show-answers');
+        btn.innerHTML = `<i class="bi bi-eye"></i> <span id="revealText">{% if lang == 'ru' %}Показать ответы{% elif lang == 'tj' %}Нишон додани ҷавобҳо{% else %}Show Answers{% endif %}</span>`;
+        btn.classList.remove('active');
+    }
 }
 
 function escHtml(s) {
