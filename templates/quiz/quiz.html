@@ -4,144 +4,189 @@
 {% block extra_css %}
 <style>
 /* ════════════════════════════════════════
-   QUIZ TAKE PAGE — Premium Emerald Theme
+   QUIZ TAKE PAGE — Clean Minimal Theme
 ════════════════════════════════════════ */
-.quiz-take-wrap {
-    padding: 50px 0 100px;
-    background: var(--bg-main);
-    min-height: 85vh;
+:root {
+    --bg-dark: #0f1014;
+    --card-bg: #16171b;
+    --item-bg: #1c1d22;
+    --border-subtle: #27282f;
+    --text-main: #ffffff;
+    --text-muted: #8b8d98;
+    
+    --color-primary: #a855f7; /* purple */
+    --color-primary-glow: rgba(168, 85, 247, 0.1);
 }
+
+body[data-theme="dark"] {
+    background-color: var(--bg-dark);
+}
+[data-theme="light"] {
+    --bg-dark: #f8fafc;
+    --card-bg: #ffffff;
+    --item-bg: #f1f5f9;
+    --border-subtle: #e2e8f0;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --color-primary: #8b5cf6;
+    --color-primary-glow: rgba(139, 92, 246, 0.1);
+}
+
+.quiz-take-wrap {
+    padding: 60px 20px 120px;
+    min-height: 85vh;
+    font-family: 'Inter', sans-serif;
+}
+
+.container-custom {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Header */
 .quiz-header {
     text-align: center;
     margin-bottom: 40px;
 }
-.quiz-header-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(5,150,105,0.1); color: #059669;
-    padding: 6px 14px; border-radius: 999px;
-    font-size: 0.85rem; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 0.05em; margin-bottom: 16px;
-    border: 1px solid rgba(5,150,105,0.2);
-}
-[data-theme="dark"] .quiz-header-badge { color: #34d399; }
 .quiz-header h1 {
-    font-family: 'Inter', sans-serif;
-    font-size: 2.4rem; font-weight: 800;
+    font-size: 2.2rem; font-weight: 700;
     color: var(--text-main); margin-bottom: 12px;
 }
 .quiz-header p {
-    color: var(--text-muted); font-size: 1.05rem;
+    color: var(--text-muted); font-size: 1rem;
 }
 
+/* Question Cards */
 .question-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    border: 1px solid var(--border-subtle);
     border-radius: 20px;
-    padding: 36px;
+    padding: 32px 40px;
     margin-bottom: 24px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.02);
-    transition: var(--theme-transition);
-}
-.question-badge {
-    font-family: 'Inter', sans-serif;
-    color: var(--text-muted);
-    font-size: 0.95rem; font-weight: 600;
-    margin-bottom: 16px;
-}
-.question-text {
-    font-size: 1.3rem; font-weight: 700; color: var(--text-main);
-    margin-bottom: 28px; line-height: 1.5; font-family: 'Inter', sans-serif;
 }
 
+.question-badge {
+    display: inline-block;
+    background: var(--item-bg);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-muted);
+    font-size: 0.85rem; font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+}
+[data-theme="light"] .question-badge {
+    background: var(--item-bg);
+    border-color: var(--border-subtle);
+}
+
+.question-text {
+    font-size: 1.25rem; font-weight: 700; color: var(--text-main);
+    margin-bottom: 24px; line-height: 1.5;
+}
+
+/* Options */
 .quiz-options-group {
-    display: flex; flex-direction: column; gap: 14px;
+    display: flex; flex-direction: column; gap: 12px;
 }
 .quiz-option {
     display: flex; align-items: center;
     padding: 16px 20px;
-    background: var(--bg-main);
-    border: 1.5px solid var(--border-color);
+    background: var(--item-bg);
+    border: 1px solid transparent;
     border-radius: 16px;
     cursor: pointer;
     transition: all 0.2s ease;
     position: relative;
 }
+[data-theme="light"] .quiz-option {
+    background: var(--item-bg);
+    border: 1px solid transparent;
+}
+
+.quiz-option:hover {
+    border-color: rgba(168, 85, 247, 0.4);
+}
+
+.quiz-option.selected {
+    background: var(--color-primary-glow);
+    border-color: var(--color-primary);
+}
+
 .quiz-option input[type="radio"] {
     position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0;
 }
 .quiz-option .option-marker {
     display: flex; align-items: center; justify-content: center;
-    width: 32px; height: 32px; border-radius: 8px;
-    background: var(--bg-card); border: 1.5px solid var(--border-color);
+    width: 34px; height: 34px; border-radius: 10px;
+    background: rgba(255,255,255,0.08);
+    color: var(--text-muted);
     margin-right: 16px; transition: all 0.2s ease;
-    font-weight: 700; font-family: 'Inter', sans-serif;
-    color: var(--text-muted); font-size: 0.95rem;
+    font-weight: 600; font-size: 0.95rem;
 }
+[data-theme="light"] .quiz-option .option-marker { background: rgba(0,0,0,0.06); }
+
 .quiz-option .option-text {
-    font-size: 1.05rem; font-weight: 500; color: var(--text-main); transition: color 0.2s ease;
+    font-size: 1rem; font-weight: 500; color: var(--text-main);
+    flex-grow: 1;
 }
 
-/* Hover & Selected states */
-.quiz-option:hover {
-    border-color: rgba(5,150,105,0.4);
-    background: var(--bg-card);
+.quiz-option .check-icon {
+    opacity: 0; transform: scale(0.8); transition: all 0.2s ease;
+    color: var(--color-primary); font-size: 1.25rem;
 }
-.quiz-option.selected {
-    border-color: #059669;
-    background: rgba(5,150,105,0.04);
-}
+
 .quiz-option.selected .option-marker {
-    background: #059669;
-    border-color: #059669;
+    background: linear-gradient(135deg, #a855f7, #6366f1);
     color: #fff;
 }
-[data-theme="dark"] .quiz-option.selected { background: rgba(5,150,105,0.08); }
+.quiz-option.selected .check-icon {
+    opacity: 1; transform: scale(1);
+}
+.quiz-option.selected .option-text {
+    font-weight: 600;
+}
 
+/* Submit Section */
 .submit-wrap {
     margin-top: 40px;
     display: flex; justify-content: flex-end;
 }
 .btn-submit-test {
     display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-    background: linear-gradient(135deg, #059669, #0d9488);
-    color: #fff; padding: 16px 36px; border-radius: 14px;
-    font-weight: 700; font-size: 1.05rem; font-family: 'Inter', sans-serif;
-    border: none; cursor: pointer; transition: all 0.3s ease;
-    box-shadow: 0 8px 24px rgba(5,150,105,0.25);
+    background: var(--color-primary);
+    color: #fff; padding: 14px 32px; border-radius: 14px;
+    font-weight: 600; font-size: 1rem;
+    border: none; cursor: pointer; transition: background 0.2s;
 }
 .btn-submit-test:hover {
-    transform: translateY(-2px); box-shadow: 0 12px 28px rgba(5,150,105,0.35);
+    background: #9333ea;
 }
 .btn-submit-test:disabled {
-    opacity: 0.7; cursor: not-allowed; transform: none; box-shadow: none;
+    opacity: 0.7; cursor: not-allowed;
 }
+.btn-submit-test i { font-size: 1.1rem; }
 
 @media (max-width: 768px) {
-    .quiz-take-wrap { padding: 30px 0 60px; }
-    .quiz-header { margin-bottom: 30px; text-align: left; }
-    .quiz-header h1 { font-size: 1.8rem; }
-    .question-card { padding: 24px; border-radius: 18px; }
-    .question-text { font-size: 1.15rem; }
-    .quiz-option { padding: 14px 16px; }
-    .quiz-option .option-marker { width: 28px; height: 28px; font-size: 0.85rem; margin-right: 12px; }
+    .quiz-take-wrap { padding: 40px 16px 80px; }
+    .question-card { padding: 24px; border-radius: 16px; }
+    .question-text { font-size: 1.15rem; margin-bottom: 20px; }
+    .quiz-option { padding: 14px 16px; border-radius: 12px; }
+    .quiz-option .option-marker { width: 30px; height: 30px; font-size: 0.9rem; margin-right: 12px; }
     .quiz-option .option-text { font-size: 0.95rem; }
-    .submit-wrap { justify-content: center; }
-    .btn-submit-test { width: 100%; }
+    .btn-submit-test { width: 100%; justify-content: center; }
 }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="quiz-take-wrap">
-    <div class="container" style="max-width: 800px;">
+    <div class="container-custom">
         <div class="quiz-header">
-            <div class="quiz-header-badge">
-                <i class="bi bi-journal-check"></i>
-                {% if lang == 'tj' %}Тест{% elif lang == 'ru' %}Тест{% else %}Quiz{% endif %}
-            </div>
             <h1>{{ quiz.title }}</h1>
             <p>
-                {% if lang == 'ru' %}Ответьте на все вопросы и проверьте свой результат.
+                {% if lang == 'uz' %}Barcha savollarga javob bering va natijangizni tekshiring.
+                {% elif lang == 'ru' %}Ответьте на все вопросы и проверьте свой результат.
                 {% elif lang == 'tj' %}Ба ҳамаи саволҳо ҷавоб диҳед ва натиҷаатонро санҷед.
                 {% else %}Answer all questions and check your result.{% endif %}
             </p>
@@ -154,7 +199,8 @@
             {% for question in questions %}
                 <div class="question-card" id="q-{{ question.id }}">
                     <div class="question-badge">
-                        {% if lang == 'ru' %}Вопрос {{ forloop.counter }} из {{ questions.count }}
+                        {% if lang == 'uz' %}{{ questions.count }} tadan {{ forloop.counter }}-savol
+                        {% elif lang == 'ru' %}Вопрос {{ forloop.counter }} из {{ questions.count }}
                         {% elif lang == 'tj' %}Савол {{ forloop.counter }} аз {{ questions.count }}
                         {% else %}Question {{ forloop.counter }} of {{ questions.count }}{% endif %}
                     </div>
@@ -170,24 +216,28 @@
                             <input type="radio" name="question_{{ question.id }}" value="A" required>
                             <div class="option-marker">A</div>
                             <span class="option-text">{% if lang == 'ru' and question.option_a_ru %}{{ question.option_a_ru }}{% elif lang == 'tj' and question.option_a_tj %}{{ question.option_a_tj }}{% elif lang == 'en' and question.option_a_en %}{{ question.option_a_en }}{% else %}{{ question.option_a }}{% endif %}</span>
+                            <i class="bi bi-check-circle-fill check-icon"></i>
                         </label>
 
                         <label class="quiz-option">
                             <input type="radio" name="question_{{ question.id }}" value="B" required>
                             <div class="option-marker">B</div>
                             <span class="option-text">{% if lang == 'ru' and question.option_b_ru %}{{ question.option_b_ru }}{% elif lang == 'tj' and question.option_b_tj %}{{ question.option_b_tj }}{% elif lang == 'en' and question.option_b_en %}{{ question.option_b_en }}{% else %}{{ question.option_b }}{% endif %}</span>
+                            <i class="bi bi-check-circle-fill check-icon"></i>
                         </label>
 
                         <label class="quiz-option">
                             <input type="radio" name="question_{{ question.id }}" value="C" required>
                             <div class="option-marker">C</div>
                             <span class="option-text">{% if lang == 'ru' and question.option_c_ru %}{{ question.option_c_ru }}{% elif lang == 'tj' and question.option_c_tj %}{{ question.option_c_tj }}{% elif lang == 'en' and question.option_c_en %}{{ question.option_c_en }}{% else %}{{ question.option_c }}{% endif %}</span>
+                            <i class="bi bi-check-circle-fill check-icon"></i>
                         </label>
 
                         <label class="quiz-option">
                             <input type="radio" name="question_{{ question.id }}" value="D" required>
                             <div class="option-marker">D</div>
                             <span class="option-text">{% if lang == 'ru' and question.option_d_ru %}{{ question.option_d_ru }}{% elif lang == 'tj' and question.option_d_tj %}{{ question.option_d_tj }}{% elif lang == 'en' and question.option_d_en %}{{ question.option_d_en }}{% else %}{{ question.option_d }}{% endif %}</span>
+                            <i class="bi bi-check-circle-fill check-icon"></i>
                         </label>
                     </div>
                 </div>
@@ -195,8 +245,7 @@
             
             <div class="submit-wrap">
                 <button type="submit" class="btn-submit-test" id="submitTestBtn">
-                    <i class="bi bi-send-check-fill fs-5"></i>
-                    {% if lang == 'ru' %}Завершить тест и проверить{% elif lang == 'tj' %}Тестро анҷом додан{% else %}Finish & Submit Answers{% endif %}
+                    {% if lang == 'uz' %}Yakunlash{% elif lang == 'ru' %}Завершить{% elif lang == 'tj' %}Анҷом додан{% else %}Finish{% endif %}
                 </button>
             </div>
         </form>
@@ -212,23 +261,16 @@
         options.forEach(option => {
             const radio = option.querySelector('input[type="radio"]');
             
-            // On click or change
             const updateSelection = () => {
                 if(radio.checked) {
                     const group = option.closest(".quiz-options-group");
                     group.querySelectorAll(".quiz-option").forEach(opt => {
                         opt.classList.remove("selected");
-                        opt.querySelector('.option-marker').innerHTML = opt.querySelector('.option-marker').getAttribute('data-letter');
                     });
                     option.classList.add("selected");
-                    // Keep letter visually when checked, icon is handled by ::after in CSS
                 }
             };
             
-            // Store original letter
-            const marker = option.querySelector('.option-marker');
-            marker.setAttribute('data-letter', marker.innerHTML);
-
             option.addEventListener("click", function() {
                 radio.checked = true;
                 updateSelection();
@@ -243,8 +285,16 @@
         const form = document.getElementById('quizForm');
         form.addEventListener('submit', function() {
             const btn = document.getElementById('submitTestBtn');
-            btn.innerHTML = '<i class="bi bi-hourglass-split fs-5"></i> Processing...';
-            btn.style.opacity = '0.8';
+            const lang = '{{ lang }}';
+            const processingText = {
+                'uz': 'Yuklanmoqda...',
+                'ru': 'Обработка...',
+                'tj': 'Коркард...',
+                'en': 'Processing...'
+            }[lang] || 'Processing...';
+
+            btn.innerHTML = processingText;
+            btn.style.opacity = '0.7';
             btn.style.pointerEvents = 'none';
         });
     });

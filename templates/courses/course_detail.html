@@ -2,145 +2,402 @@
 
 {% block title %}{{ course.title }} - Edunify{% endblock %}
 
+{% block extra_css %}
+<style>
+/* ════════════════════════════════════════
+   COURSE DETAIL PAGE — Clean Minimal Theme
+════════════════════════════════════════ */
+:root {
+    --bg-dark: #0f1014;
+    --card-bg: #16171b;
+    --item-bg: #1c1d22;
+    --border-subtle: #27282f;
+    --text-main: #ffffff;
+    --text-muted: #8b8d98;
+    
+    --color-primary: #38bdf8; /* light blue */
+}
+
+body[data-theme="dark"] {
+    background-color: var(--bg-dark);
+}
+[data-theme="light"] {
+    --bg-dark: #f8fafc;
+    --card-bg: #ffffff;
+    --item-bg: #f1f5f9;
+    --border-subtle: #e2e8f0;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --color-primary: #0284c7;
+}
+
+.course-page-wrap {
+    padding: 40px 20px 100px;
+    font-family: 'Inter', sans-serif;
+}
+.container-custom {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* Card container */
+.content-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 24px;
+}
+
+/* Course Header Info */
+.course-badge {
+    display: inline-block;
+    background: var(--color-primary);
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 6px;
+    margin-bottom: 24px;
+}
+.course-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: 16px;
+    line-height: 1.3;
+}
+.course-desc {
+    font-size: 1rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 32px;
+}
+
+/* Meta Info */
+.meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-subtle);
+}
+.meta-block {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.meta-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+.meta-value {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Lessons List */
+.section-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.section-title i {
+    color: var(--color-primary);
+}
+
+.lesson-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.lesson-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    transition: background 0.2s;
+}
+.lesson-item:hover {
+    background: var(--item-bg);
+}
+.lesson-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.lesson-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: var(--item-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 50%;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+.lesson-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin: 0;
+}
+.btn-read {
+    background: var(--color-primary);
+    color: #fff;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity 0.2s;
+}
+.btn-read:hover {
+    opacity: 0.9;
+    color: #fff;
+}
+.lesson-locked {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Sidebar */
+.sidebar-card {
+    position: sticky;
+    top: 90px;
+    padding: 24px;
+}
+.sidebar-img-placeholder {
+    width: 100%;
+    height: 200px;
+    background: var(--item-bg);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    border: 1px solid var(--border-subtle);
+}
+.sidebar-img {
+    width: 100%;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    border: 1px solid var(--border-subtle);
+}
+.enroll-btn {
+    background: var(--color-primary);
+    color: #fff;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    display: block;
+    width: 100%;
+    transition: opacity 0.2s;
+}
+.enroll-btn:hover {
+    opacity: 0.9;
+    color: #fff;
+}
+.enrolled-badge {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    color: #22c55e;
+    padding: 16px;
+    border-radius: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+@media (max-width: 992px) {
+    .meta-row { gap: 20px; }
+}
+@media (max-width: 768px) {
+    .course-page-wrap { padding: 32px 16px 80px; }
+    .content-card { padding: 24px; }
+    .course-title { font-size: 1.8rem; }
+    .lesson-item { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .btn-read { width: 100%; text-align: center; }
+}
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row g-4">
-    <!-- Course Info Card -->
-    <div class="col-lg-8">
-        <div class="glass-card mb-4">
-            <span class="badge bg-purple-glow mb-3">
-                {% if lang == 'tj' and course.category.name_tj %}{{ course.category.name_tj }}
-                {% elif lang == 'ru' and course.category.name_ru %}{{ course.category.name_ru }}
-                {% elif lang == 'en' and course.category.name_en %}{{ course.category.name_en }}
-                {% else %}{{ course.category.name }}{% endif %}
-            </span>
-            <h1 class="font-heading text-gradient mb-3">
-                {% if lang == 'tj' and course.title_tj %}{{ course.title_tj }}
-                {% elif lang == 'ru' and course.title_ru %}{{ course.title_ru }}
-                {% elif lang == 'en' and course.title_en %}{{ course.title_en }}
-                {% else %}{{ course.title }}{% endif %}
-            </h1>
+<div class="course-page-wrap">
+    <div class="container-custom">
+        <div class="row g-4">
             
-            <p class="text-muted leading-relaxed">
-                {% if lang == 'tj' and course.description_tj %}{{ course.description_tj }}
-                {% elif lang == 'ru' and course.description_ru %}{{ course.description_ru }}
-                {% elif lang == 'en' and course.description_en %}{{ course.description_en }}
-                {% else %}{{ course.description }}{% endif %}
-            </p>
+            <!-- Main Content -->
+            <div class="col-lg-8">
+                
+                <!-- Course Info Card -->
+                <div class="content-card">
+                    <div class="course-badge">
+                        {% if lang == 'tj' and course.category.name_tj %}{{ course.category.name_tj }}
+                        {% elif lang == 'ru' and course.category.name_ru %}{{ course.category.name_ru }}
+                        {% elif lang == 'en' and course.category.name_en %}{{ course.category.name_en }}
+                        {% elif lang == 'uz' and course.category.name %}{{ course.category.name }}
+                        {% else %}{{ course.category.name }}{% endif %}
+                    </div>
+                    
+                    <h1 class="course-title">
+                        {% if lang == 'tj' and course.title_tj %}{{ course.title_tj }}
+                        {% elif lang == 'ru' and course.title_ru %}{{ course.title_ru }}
+                        {% elif lang == 'en' and course.title_en %}{{ course.title_en }}
+                        {% else %}{{ course.title }}{% endif %}
+                    </h1>
+                    
+                    <div class="course-desc">
+                        {% if lang == 'tj' and course.description_tj %}{{ course.description_tj }}
+                        {% elif lang == 'ru' and course.description_ru %}{{ course.description_ru }}
+                        {% elif lang == 'en' and course.description_en %}{{ course.description_en }}
+                        {% else %}{{ course.description }}{% endif %}
+                    </div>
+                    
+                    <div class="meta-row">
+                        <div class="meta-block">
+                            <div class="meta-label">
+                                {% if lang == 'ru' %}Автор{% elif lang == 'tj' %}Муаллиф{% elif lang == 'uz' %}Muallif{% else %}Author{% endif %}
+                            </div>
+                            <div class="meta-value"><i class="bi bi-person-fill"></i> {{ course.teacher.username }}</div>
+                        </div>
+                        <div class="meta-block">
+                            <div class="meta-label">
+                                {% if lang == 'ru' %}Уроков{% elif lang == 'tj' %}Дарсҳо{% elif lang == 'uz' %}Darslar{% else %}Lessons{% endif %}
+                            </div>
+                            <div class="meta-value">
+                                <i class="bi bi-play-circle-fill"></i> {{ course.get_lessons_count }}
+                                <span style="font-size: 0.85em; font-weight: normal; color: var(--text-muted);">
+                                    {% if lang == 'ru' %}шт{% elif lang == 'tj' %}та{% elif lang == 'uz' %}ta{% else %}pcs{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="meta-block">
+                            <div class="meta-label">
+                                {% if lang == 'ru' %}Записаны{% elif lang == 'tj' %}Ба қайд гирифта шуданд{% elif lang == 'uz' %}Ro'yxatdan o'tganlar{% else %}Enrolled{% endif %}
+                            </div>
+                            <div class="meta-value">
+                                <i class="bi bi-people-fill"></i> {{ course.get_enrolled_count }}
+                                <span style="font-size: 0.85em; font-weight: normal; color: var(--text-muted);">
+                                    {% if lang == 'ru' %}студентов{% elif lang == 'tj' %}донишҷӯ{% elif lang == 'uz' %}talaba{% else %}students{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="meta-block">
+                            <div class="meta-label">
+                                {% if lang == 'ru' %}Создан{% elif lang == 'tj' %}Сохта шуд{% elif lang == 'uz' %}Yaratildi{% else %}Created{% endif %}
+                            </div>
+                            <div class="meta-value"><i class="bi bi-calendar-event"></i> {{ course.created_at|date:"d.m.Y" }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lessons List -->
+                <div class="content-card">
+                    <div class="section-title">
+                        <i class="bi bi-list-stars"></i>
+                        {% if lang == 'ru' %}Уроки курса{% elif lang == 'tj' %}Дарсҳои курс{% elif lang == 'uz' %}Kurs darslari{% else %}Course Lessons{% endif %}
+                    </div>
+                    
+                    {% if lessons %}
+                        <div class="lesson-list">
+                            {% for lesson in lessons %}
+                                <div class="lesson-item">
+                                    <div class="lesson-info">
+                                        <div class="lesson-number">{{ forloop.counter }}</div>
+                                        <h5 class="lesson-title">
+                                            {% if lang == 'tj' and lesson.title_tj %}{{ lesson.title_tj }}
+                                            {% elif lang == 'ru' and lesson.title_ru %}{{ lesson.title_ru }}
+                                            {% elif lang == 'en' and lesson.title_en %}{{ lesson.title_en }}
+                                            {% else %}{{ lesson.title }}{% endif %}
+                                        </h5>
+                                    </div>
+                                    
+                                    {% if is_enrolled %}
+                                        <a href="{% url 'lesson_detail' lesson.pk %}" class="btn-read">
+                                            {% if lang == 'ru' %}Читать{% elif lang == 'tj' %}Хондан{% elif lang == 'uz' %}O'qish{% else %}Read{% endif %} &rarr;
+                                        </a>
+                                    {% else %}
+                                        <div class="lesson-locked">
+                                            <i class="bi bi-lock-fill"></i>
+                                            {% if lang == 'ru' %}Заблокировано{% elif lang == 'tj' %}Қулфшуда{% elif lang == 'uz' %}Qulflangan{% else %}Locked{% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-4">
+                            {% if lang == 'ru' %}В этот курс ещё не добавлены уроки.
+                            {% elif lang == 'tj' %}Ба ин курс ҳануз дарсҳо илова нашудаанд.
+                            {% elif lang == 'uz' %}Bu kursga hali darslar qo'shilmagan.
+                            {% else %}No lessons have been added to this course yet.{% endif %}
+                        </p>
+                    {% endif %}
+                </div>
+                
+            </div>
             
-            <div class="row pt-3 mt-4 g-3" style="border-top: 1px solid var(--border-color);">
-                <div class="col-6 col-md-3">
-                    <div class="text-muted small">
-                        {% if lang == 'ru' %}Автор{% elif lang == 'tj' %}Муаллиф{% else %}Author{% endif %}
-                    </div>
-                    <div class="fw-bold"><i class="bi bi-person-fill me-1"></i> {{ course.teacher.username }}</div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="text-muted small">
-                        {% if lang == 'ru' %}Уроков{% elif lang == 'tj' %}Дарсхо{% else %}Lessons{% endif %}
-                    </div>
-                    <div class="fw-bold">
-                        <i class="bi bi-play-circle-fill me-1"></i> {{ course.get_lessons_count }}
-                        {% if lang == 'ru' %}шт{% elif lang == 'tj' %}та{% else %}pcs{% endif %}
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="text-muted small">
-                        {% if lang == 'ru' %}Записаны{% elif lang == 'tj' %}Ба қайд гирифта шуданд{% else %}Enrolled{% endif %}
-                    </div>
-                    <div class="fw-bold">
-                        <i class="bi bi-people-fill me-1"></i> {{ course.get_enrolled_count }}
-                        {% if lang == 'ru' %}студентов{% elif lang == 'tj' %}донишчу{% else %}students{% endif %}
-                    </div>
-                </div>
-                <div class="col-6 col-md-3">
-                    <div class="text-muted small">
-                        {% if lang == 'ru' %}Создан{% elif lang == 'tj' %}Сохта шуд{% else %}Created{% endif %}
-                    </div>
-                    <div class="fw-bold"><i class="bi bi-calendar-event me-1"></i> {{ course.created_at|date:"d.m.Y" }}</div>
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="content-card sidebar-card">
+                    {% if course.thumbnail %}
+                        <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="sidebar-img">
+                    {% else %}
+                        <div class="sidebar-img-placeholder">
+                            <span class="text-muted">
+                                {% if lang == 'uz' %}Rasm yo'q{% elif lang == 'ru' %}Нет фото{% elif lang == 'tj' %}Акс нест{% else %}No Image{% endif %}
+                            </span>
+                        </div>
+                    {% endif %}
+                    
+                    {% if is_enrolled %}
+                        <div class="enrolled-badge">
+                            <i class="bi bi-check-circle-fill fs-5"></i>
+                            <div>
+                                {% if lang == 'ru' %}Вы записаны на этот курс!
+                                {% elif lang == 'tj' %}Шумо ба ин курс ба қайд гирифта шудаед!
+                                {% elif lang == 'uz' %}Siz bu kursga ro'yxatdan o'tgansiz!
+                                {% else %}You are enrolled in this course!{% endif %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <h4 class="mb-2" style="font-weight: 700; color: var(--text-main); font-size: 1.2rem;">
+                            {% if lang == 'ru' %}Бесплатное участие{% elif lang == 'tj' %}Иштироки ройгон{% elif lang == 'uz' %}Bepul qatnashish{% else %}Free Enrollment{% endif %}
+                        </h4>
+                        <p class="text-muted mb-4" style="font-size: 0.95rem;">
+                            {% if lang == 'ru' %}Запишитесь прямо сейчас и начните учиться!
+                            {% elif lang == 'tj' %}Ҳозир ба қайд гиред ва омӯзишро шурӯъ кунед!
+                            {% elif lang == 'uz' %}Hoziroq ro'yxatdan o'ting va o'rganishni boshlang!
+                            {% else %}Enroll now and start learning!{% endif %}
+                        </p>
+                        <a href="{% url 'enroll' course.pk %}" class="enroll-btn">
+                            {% if lang == 'ru' %}Записаться на курс{% elif lang == 'tj' %}Ба курс ба қайд гирифтан{% elif lang == 'uz' %}Kursga yozilish{% else %}Enroll in Course{% endif %}
+                        </a>
+                    {% endif %}
                 </div>
             </div>
-        </div>
-
-        <!-- Lessons List -->
-        <div class="glass-card">
-            <h3 class="font-heading mb-4">
-                <i class="bi bi-list-stars me-2 text-gradient"></i>
-                {% if lang == 'ru' %}Уроки курса{% elif lang == 'tj' %}Дарсхои курс{% else %}Course Lessons{% endif %}
-            </h3>
-            {% if lessons %}
-                <div class="list-group list-group-flush bg-transparent">
-                    {% for lesson in lessons %}
-                        <div class="list-group-item bg-transparent border-secondary py-3 px-0 d-flex align-items-center justify-content-between">
-                            <div class="d-flex align-items-center gap-3">
-                                <span class="badge bg-darker border border-secondary text-muted rounded-circle p-2" style="width: 35px; height: 35px; display: inline-flex; align-items: center; justify-content: center;">
-                                    {{ forloop.counter }}
-                                </span>
-                                <div>
-                                    <h5 class="mb-0">
-                                        {% if lang == 'tj' and lesson.title_tj %}{{ lesson.title_tj }}
-                                        {% elif lang == 'ru' and lesson.title_ru %}{{ lesson.title_ru }}
-                                        {% elif lang == 'en' and lesson.title_en %}{{ lesson.title_en }}
-                                        {% else %}{{ lesson.title }}{% endif %}
-                                    </h5>
-                                </div>
-                            </div>
-                            
-                            {% if is_enrolled %}
-                                <a href="{% url 'lesson_detail' lesson.pk %}" class="btn btn-purple btn-sm">
-                                    {% if lang == 'ru' %}Читать{% elif lang == 'tj' %}Хондан{% else %}Read{% endif %}
-                                    <i class="bi bi-arrow-right-short ms-1"></i>
-                                </a>
-                            {% else %}
-                                <span class="text-muted">
-                                    <i class="bi bi-lock-fill"></i>
-                                    {% if lang == 'ru' %}Заблокировано{% elif lang == 'tj' %}Қулфшуда{% else %}Locked{% endif %}
-                                </span>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p class="text-muted text-center py-4">
-                    {% if lang == 'ru' %}В этот курс ещё не добавлены уроки.
-                    {% elif lang == 'tj' %}Ба ин курс хануз дарсхо илова нашудаанд.
-                    {% else %}No lessons have been added to this course yet.{% endif %}
-                </p>
-            {% endif %}
-        </div>
-    </div>
-    
-    <!-- Sidebar action -->
-    <div class="col-lg-4">
-        <div class="glass-card text-center sticky-top" style="top: 90px; z-index: 1;">
-            {% if course.thumbnail %}
-                <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="w-100 rounded-3 mb-4" style="max-height: 200px; object-fit: cover;">
-            {% else %}
-                <div class="w-100 rounded-3 mb-4 py-5 d-flex align-items-center justify-content-center bg-darker border border-secondary">
-                    <i class="bi bi-journal-code display-1 text-muted"></i>
-                </div>
-            {% endif %}
             
-            {% if is_enrolled %}
-                <div class="alert alert-success mb-0 rounded-3">
-                    <i class="bi bi-patch-check-fill me-2"></i>
-                    {% if lang == 'ru' %}Вы записаны на этот курс!
-                    {% elif lang == 'tj' %}Шумо ба ин курс ба кайд гирифта шудаед!
-                    {% else %}You are enrolled in this course!{% endif %}
-                </div>
-            {% else %}
-                <h4 class="mb-3">
-                    {% if lang == 'ru' %}Бесплатное участие{% elif lang == 'tj' %}Иштироки ройгон{% else %}Free Enrollment{% endif %}
-                </h4>
-                <p class="text-muted small mb-4">
-                    {% if lang == 'ru' %}Запишитесь прямо сейчас и начните учиться!
-                    {% elif lang == 'tj' %}Хозир ба кайд гиред ва омузишро шуруъ кунед!
-                    {% else %}Enroll now and start learning!{% endif %}
-                </p>
-                <a href="{% url 'enroll' course.pk %}" class="btn btn-purple w-100 py-3 font-heading fs-5">
-                    <i class="bi bi-pencil-square me-2"></i>
-                    {% if lang == 'ru' %}Записаться на курс{% elif lang == 'tj' %}Ба курс ба кайд гирифтан{% else %}Enroll in Course{% endif %}
-                </a>
-            {% endif %}
         </div>
     </div>
 </div>

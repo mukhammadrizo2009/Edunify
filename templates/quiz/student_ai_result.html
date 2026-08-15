@@ -1,234 +1,497 @@
 {% extends 'base.html' %}
-{% block title %}{% if lang == 'ru' %}Результат AI теста{% elif lang == 'tj' %}Натиҷаи тести AI{% else %}AI Quiz Result{% endif %} — Edunify{% endblock %}
+{% block title %}{% if lang == 'uz' %}AI Test Natijasi{% elif lang == 'ru' %}Результат AI теста{% elif lang == 'tj' %}Натиҷаи тести AI{% else %}AI Quiz Result{% endif %} — Edunify{% endblock %}
 
 {% block extra_css %}
 <style>
-.result-wrap { max-width: 860px; margin: 0 auto; padding: 40px 0 80px; }
-
-/* Score Hero */
-.score-hero {
-    background: var(--bg-card); border: 1px solid var(--border-color);
-    border-radius: 24px; padding: 48px 32px; text-align: center;
-    margin-bottom: 24px; position: relative; overflow: hidden;
-}
-.score-hero::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
-    background: linear-gradient(90deg, #7c3aed, #0ea5e9, #059669);
-}
-.score-circle {
-    width: 160px; height: 160px; border-radius: 50%;
-    border: 6px solid var(--border-color); margin: 0 auto 20px;
-    display: flex; align-items: center; justify-content: center;
-    position: relative;
-}
-.score-circle.great { border-color: #059669; }
-.score-circle.ok { border-color: #f59e0b; }
-.score-circle.poor { border-color: #ef4444; }
-.score-pct { font-family: 'Outfit', 'Inter', sans-serif; font-size: 3rem; font-weight: 800; }
-.score-circle.great .score-pct { color: #059669; }
-.score-circle.ok .score-pct { color: #f59e0b; }
-.score-circle.poor .score-pct { color: #ef4444; }
-.score-detail { font-size: 1rem; color: var(--text-muted); margin-bottom: 4px; }
-.score-meta {
-    display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-top: 16px;
-}
-.score-meta-item {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: var(--bg-darker); border: 1px solid var(--border-color);
-    padding: 8px 16px; border-radius: 12px; font-size: .85rem;
-    font-weight: 600; color: var(--text-main);
+/* ════════════════════════════════════════
+   RESULT PAGE — Clean & Professional Theme
+════════════════════════════════════════ */
+:root {
+    --bg-dark: #0f1014;
+    --card-bg: #16171b;
+    --item-bg: #1c1d22;
+    --border-subtle: #27282f;
+    --text-main: #ffffff;
+    --text-muted: #8b8d98;
+    
+    --color-green: #22c55e;
+    --color-blue: #3b82f6;
+    --color-yellow: #f59e0b;
+    --color-purple: #a855f7;
+    --color-pink: #ec4899;
+    --color-red: #ef4444;
 }
 
-/* Section cards */
-.result-section {
-    background: var(--bg-card); border: 1px solid var(--border-color);
-    border-radius: 20px; padding: 28px; margin-bottom: 20px;
-    transition: var(--theme-transition);
+body[data-theme="dark"] {
+    background-color: var(--bg-dark);
 }
-.result-section-title {
-    font-family: 'Outfit', 'Inter', sans-serif; font-size: 1.05rem;
-    font-weight: 700; color: var(--text-main); margin-bottom: 16px;
-    display: flex; align-items: center; gap: 10px;
-    padding-bottom: 14px; border-bottom: 1px solid var(--border-color);
-}
-.result-section-title .rs-icon {
-    width: 36px; height: 36px; border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1rem; color: #fff; flex-shrink: 0;
+[data-theme="light"] {
+    --bg-dark: #f8fafc;
+    --card-bg: #ffffff;
+    --item-bg: #f1f5f9;
+    --border-subtle: #e2e8f0;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
 }
 
-/* Analysis shimmer */
-.analysis-shimmer { display: flex; flex-direction: column; gap: 10px; }
-.analysis-shimmer .sh-line {
-    height: 16px; border-radius: 8px;
-    background: linear-gradient(90deg, var(--bg-darker) 25%, var(--bg-card) 50%, var(--bg-darker) 75%);
-    background-size: 200% 100%; animation: shimmer 1.5s infinite;
+.result-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 40px 20px 80px;
+    font-family: 'Inter', sans-serif;
 }
-@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
 
-/* Strengths / Weaknesses */
-.sw-item {
-    display: flex; align-items: flex-start; gap: 10px;
-    padding: 10px 0; font-size: .92rem; color: var(--text-main);
+/* Base Card */
+.content-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    padding: 40px;
+    margin-bottom: 24px;
 }
-.sw-item i { flex-shrink: 0; margin-top: 2px; font-size: 1rem; }
-.sw-item.strength i { color: #059669; }
-.sw-item.weakness i { color: #ef4444; }
 
-/* Recommendations */
+/* Hero Section */
+.hero-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.circular-chart {
+    display: block;
+    margin: 0 auto 24px;
+    max-width: 160px;
+    max-height: 160px;
+}
+.circle-bg {
+    fill: none;
+    stroke: var(--item-bg);
+    stroke-width: 3;
+}
+.circle {
+    fill: none;
+    stroke-width: 3;
+    stroke-linecap: round;
+    animation: fillRing 1.5s ease-out forwards;
+}
+@keyframes fillRing {
+    from { stroke-dasharray: 0, 100; }
+    to { stroke-dasharray: var(--pct), 100; }
+}
+
+.great .circle { stroke: var(--color-green); }
+.ok .circle { stroke: var(--color-yellow); }
+.poor .circle { stroke: var(--color-red); }
+
+.percentage {
+    fill: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-anchor: middle;
+}
+.great .percentage { fill: var(--color-green); }
+.ok .percentage { fill: var(--color-yellow); }
+.poor .percentage { fill: var(--color-red); }
+
+.hero-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 8px;
+}
+.hero-subtitle {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    margin-bottom: 40px;
+}
+
+/* Meta Grid */
+.meta-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    width: 100%;
+}
+.meta-item {
+    background: var(--item-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 20px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+.meta-icon-wrapper {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+}
+.bg-green { background-color: var(--color-green); }
+.bg-blue { background-color: var(--color-blue); }
+.bg-yellow { background-color: var(--color-yellow); }
+.bg-purple { background-color: var(--color-purple); }
+
+.meta-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+.meta-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+/* Bento/Sections */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 24px;
+}
+.section-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+}
+
+/* Grid Layout for Dynamic Content */
+#analysisContent {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Recommendation Cards */
+.rec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+}
 .rec-card {
-    background: var(--bg-darker); border: 1px solid var(--border-color);
-    border-radius: 14px; padding: 16px; margin-bottom: 10px;
+    background: var(--item-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
-.rec-card-title { font-weight: 700; font-size: .92rem; color: var(--text-main); margin-bottom: 4px; }
-.rec-card-desc { font-size: .85rem; color: var(--text-muted); line-height: 1.5; }
+.rec-icon {
+    color: var(--color-blue);
+    font-size: 1.5rem;
+}
+.rec-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.4;
+}
+.rec-desc {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
 
-/* Topics to review */
+/* Topic Tags */
+.topic-tags-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
 .topic-tag {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.2);
-    color: #d97706; padding: 6px 14px; border-radius: 999px;
-    font-size: .82rem; font-weight: 600; margin: 4px;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+    padding: 10px 18px;
+    border-radius: 99px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
-[data-theme="dark"] .topic-tag { color: #fbbf24; }
+[data-theme="light"] .topic-tag {
+    color: #2563eb;
+}
 
-/* Motivation */
+/* Strengths / Weaknesses Lists */
+.sw-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.sw-item {
+    background: var(--item-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+.sw-item span { color: var(--text-main); }
+.sw-item.strength i { color: var(--color-green); font-size: 1.2rem; }
+.sw-item.weakness i { color: var(--color-red); font-size: 1.2rem; }
+
+/* Mistakes */
+.mistake-item {
+    background: var(--item-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 16px;
+}
+.m-question {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 20px;
+}
+.m-answers {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.m-ans-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+}
+.m-ans-row.wrong {
+    background: rgba(239, 68, 68, 0.05);
+    border: 1px solid rgba(239, 68, 68, 0.1);
+}
+.m-ans-row.correct {
+    background: rgba(34, 197, 94, 0.05);
+    border: 1px solid rgba(34, 197, 94, 0.1);
+}
+.m-ans-row i { font-size: 1.2rem; }
+.m-ans-row.wrong i { color: var(--color-red); }
+.m-ans-row.correct i { color: var(--color-green); }
+.m-ans-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+.m-ans-text {
+    color: var(--text-main);
+    font-weight: 500;
+}
+.m-explanation {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-subtle);
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    display: flex;
+    gap: 12px;
+}
+.m-explanation i { color: var(--color-yellow); font-size: 1.2rem; }
+
+/* Motivation Box */
 .motivation-box {
-    background: linear-gradient(135deg, rgba(124,58,237,.06), rgba(14,165,233,.06));
-    border: 1px solid rgba(124,58,237,.15); border-radius: 16px;
-    padding: 20px 24px; text-align: center;
-    font-size: 1rem; font-weight: 600; color: var(--text-main); line-height: 1.6;
+    text-align: center;
+    padding: 32px;
+    font-size: 1.1rem;
+    color: var(--text-main);
+    line-height: 1.6;
+    background: var(--item-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    font-weight: 500;
 }
 
-/* Wrong answers */
-.wrong-item {
-    background: var(--bg-darker); border: 1px solid var(--border-color);
-    border-radius: 14px; padding: 18px; margin-bottom: 12px;
+/* Actions */
+.actions-row {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 32px;
 }
-.wrong-q { font-weight: 700; font-size: .95rem; color: var(--text-main); margin-bottom: 10px; }
-.wrong-answers-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; }
-.wrong-badge { font-size: .82rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; }
-.wrong-badge.user { color: #ef4444; }
-.wrong-badge.correct { color: #059669; }
-.wrong-explanation {
-    font-size: .84rem; color: var(--text-muted); line-height: 1.5;
-    padding-top: 8px; border-top: 1px solid var(--border-color);
-    font-style: italic;
+.btn-primary {
+    background: var(--color-blue);
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    transition: opacity 0.2s;
 }
+.btn-primary:hover { opacity: 0.9; color: #fff; }
+.btn-secondary {
+    background: var(--item-bg);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-main);
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+.btn-secondary:hover { background: var(--border-subtle); color: var(--text-main); }
 
-.btn-actions {
-    display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 24px;
+/* Loader */
+.analysis-loader {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
-.btn-action {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 12px 24px; border-radius: 14px; font-weight: 600;
-    font-size: .92rem; text-decoration: none; transition: all .25s ease;
-    font-family: 'Inter', sans-serif; border: none; cursor: pointer;
+.shimmer-line {
+    height: 120px;
+    border-radius: 16px;
+    background: var(--item-bg);
+    position: relative;
+    overflow: hidden;
 }
-.btn-action.primary {
-    background: linear-gradient(135deg, #7c3aed, #6366f1); color: #fff;
-    box-shadow: 0 6px 20px rgba(124,58,237,.25);
+.shimmer-line::after {
+    content: "";
+    position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+    transform: translateX(-100%);
+    animation: shimmer 1.5s infinite;
 }
-.btn-action.primary:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(124,58,237,.35); color: #fff; }
-.btn-action.secondary {
-    background: var(--bg-darker); border: 1.5px solid var(--border-color); color: var(--text-main);
+[data-theme="light"] .shimmer-line::after {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
 }
-.btn-action.secondary:hover { border-color: var(--color-primary); color: var(--color-primary); }
+@keyframes shimmer { 100% { transform: translateX(100%); } }
 
 @media (max-width: 768px) {
-    .result-wrap { padding: 20px 0 60px; }
-    .score-hero { padding: 32px 20px; }
-    .score-circle { width: 120px; height: 120px; }
-    .score-pct { font-size: 2.2rem; }
-    .result-section { padding: 20px; }
+    .meta-grid { grid-template-columns: repeat(2, 1fr); }
+    .content-card { padding: 24px; }
+}
+@media (max-width: 480px) {
+    .meta-grid { grid-template-columns: 1fr; }
 }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="result-wrap">
-    <!-- Score Hero -->
-    <div class="score-hero">
-        <div class="score-circle {% if ai_quiz.get_percentage >= 80 %}great{% elif ai_quiz.get_percentage >= 50 %}ok{% else %}poor{% endif %}">
-            <div class="score-pct">{{ ai_quiz.get_percentage }}%</div>
-        </div>
-        <h2 class="font-heading mb-2" style="font-size:1.4rem;">{{ ai_quiz.subject }}: {{ ai_quiz.topic }}</h2>
-        <div class="score-detail">
-            {{ ai_quiz.score }} / {{ ai_quiz.total_questions }}
-            {% if lang == 'ru' %}правильных{% elif lang == 'tj' %}дуруст{% else %}correct{% endif %}
-        </div>
-        <div class="score-meta">
-            <div class="score-meta-item">
-                <i class="bi bi-clock"></i>
-                {% with mins=ai_quiz.time_spent|divisibleby:60 %}
-                {{ ai_quiz.time_spent }}
-                {% endwith %}
-                {% if lang == 'ru' %}сек{% elif lang == 'tj' %}сон{% else %}sec{% endif %}
+<div class="result-container">
+    
+    <!-- Hero Section -->
+    <div class="content-card hero-section">
+        {% with pct=ai_quiz.get_percentage %}
+        <svg viewBox="0 0 36 36" class="circular-chart {% if pct >= 80 %}great{% elif pct >= 50 %}ok{% else %}poor{% endif %}" style="--pct: {{ pct }};">
+            <path class="circle-bg"
+              d="M18 2.0845
+                a 15.9155 15.9155 0 0 1 0 31.831
+                a 15.9155 15.9155 0 0 1 0 -31.831"
+            />
+            <path class="circle"
+              stroke-dasharray="0, 100"
+              d="M18 2.0845
+                a 15.9155 15.9155 0 0 1 0 31.831
+                a 15.9155 15.9155 0 0 1 0 -31.831"
+            />
+            <text x="18" y="20.8" class="percentage">{{ pct }}%</text>
+        </svg>
+        {% endwith %}
+
+        <h1 class="hero-title">{{ ai_quiz.subject }}</h1>
+        <p class="hero-subtitle">{{ ai_quiz.topic }}</p>
+
+        <div class="meta-grid">
+            <div class="meta-item">
+                <div class="meta-icon-wrapper bg-green"><i class="bi bi-check2-all"></i></div>
+                <div class="meta-value">{{ ai_quiz.score }}/{{ ai_quiz.total_questions }}</div>
+                <div class="meta-label">{% if lang == 'uz' %}To'g'ri{% elif lang == 'ru' %}Верно{% elif lang == 'tj' %}Дуруст{% else %}Correct{% endif %}</div>
             </div>
-            <div class="score-meta-item">
-                <i class="bi bi-speedometer2"></i> {{ ai_quiz.get_difficulty_display }}
+            <div class="meta-item">
+                <div class="meta-icon-wrapper bg-blue"><i class="bi bi-stopwatch"></i></div>
+                <div class="meta-value">
+                    {% with mins=ai_quiz.time_spent|divisibleby:60 %}
+                    {{ ai_quiz.time_spent }}
+                    {% endwith %}
+                    <span style="font-size: 0.9em; font-weight: normal;">{% if lang == 'uz' %}s{% elif lang == 'ru' %}сек{% elif lang == 'tj' %}сон{% else %}sec{% endif %}</span>
+                </div>
+                <div class="meta-label">{% if lang == 'uz' %}Vaqt{% elif lang == 'ru' %}Время{% elif lang == 'tj' %}Вақт{% else %}Time{% endif %}</div>
             </div>
-            <div class="score-meta-item">
-                <i class="bi bi-calendar3"></i> {{ ai_quiz.created_at|date:"d.m.Y" }}
+            <div class="meta-item">
+                <div class="meta-icon-wrapper bg-yellow"><i class="bi bi-lightning-charge"></i></div>
+                <div class="meta-value">{{ ai_quiz.get_difficulty_display }}</div>
+                <div class="meta-label">{% if lang == 'uz' %}Qiyinchilik{% elif lang == 'ru' %}Сложность{% elif lang == 'tj' %}Сатҳ{% else %}Level{% endif %}</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-icon-wrapper bg-purple"><i class="bi bi-calendar-event"></i></div>
+                <div class="meta-value">{{ ai_quiz.created_at|date:"d.m.Y" }}</div>
+                <div class="meta-label">{% if lang == 'uz' %}Sana{% elif lang == 'ru' %}Дата{% elif lang == 'tj' %}Сана{% else %}Date{% endif %}</div>
             </div>
         </div>
     </div>
 
-    <!-- AI Analysis Section (async) -->
-    <div class="result-section" id="analysisSection">
-        <div class="result-section-title">
-            <div class="rs-icon" style="background:linear-gradient(135deg,#7c3aed,#6366f1)">
-                <i class="bi bi-robot"></i>
-            </div>
-            {% if lang == 'ru' %}Анализ искусственного интеллекта{% elif lang == 'tj' %}Таҳлили зеҳни сунъӣ{% else %}AI Analysis & Feedback{% endif %}
-        </div>
-        <!-- Shimmer loader -->
-        <div id="analysisLoader" class="analysis-shimmer">
-            <div class="sh-line" style="width:100%"></div>
-            <div class="sh-line" style="width:85%"></div>
-            <div class="sh-line" style="width:92%"></div>
-            <div class="sh-line" style="width:70%"></div>
-            <p class="text-muted small text-center mt-3 mb-0">
-                <i class="spinner-border spinner-border-sm me-1" style="color:#7c3aed"></i>
-                {% if lang == 'ru' %}AI анализирует результаты...{% elif lang == 'tj' %}AI натиҷаҳоро таҳлил мекунад...{% else %}AI is analyzing your results...{% endif %}
-            </p>
-        </div>
-        <!-- Analysis content (hidden initially) -->
-        <div id="analysisContent" class="d-none"></div>
+    <!-- AI Analysis Loader -->
+    <div id="analysisLoader" class="content-card analysis-loader">
+        <div class="shimmer-line" style="height: 40px; width: 200px; margin-bottom: 16px;"></div>
+        <div class="shimmer-line"></div>
+        <div class="shimmer-line"></div>
     </div>
 
-    <!-- Wrong Answers -->
+    <!-- AI Analysis Content Container -->
+    <div id="analysisContent" class="d-none"></div>
+
+    <!-- Mistakes Section -->
     {% if ai_quiz.wrong_answers %}
-    <div class="result-section">
-        <div class="result-section-title">
-            <div class="rs-icon" style="background:linear-gradient(135deg,#ef4444,#f97316)">
-                <i class="bi bi-exclamation-triangle-fill"></i>
+    <div class="content-card">
+        <div class="section-header">
+            <div class="section-icon bg-red">
+                <i class="bi bi-exclamation-triangle"></i>
             </div>
-            {% if lang == 'ru' %}Допущенные ошибки ({{ ai_quiz.wrong_answers|length }}){% elif lang == 'tj' %}Хатоҳои иртикобёфта ({{ ai_quiz.wrong_answers|length }}){% else %}Mistakes Made ({{ ai_quiz.wrong_answers|length }}){% endif %}
+            {% if lang == 'uz' %}Xatolar tahlili{% elif lang == 'ru' %}Анализ ошибок{% elif lang == 'tj' %}Таҳлили хатоҳо{% else %}Mistakes Analysis{% endif %}
         </div>
+
         {% for wq in ai_quiz.wrong_answers %}
-        <div class="wrong-item">
-            <div class="wrong-q">{{ forloop.counter }}. {{ wq.question }}</div>
-            <div class="wrong-answers-row">
-                <span class="wrong-badge user">
+        <div class="mistake-item">
+            <div class="m-question">{{ forloop.counter }}. {{ wq.question }}</div>
+            <div class="m-answers">
+                <div class="m-ans-row wrong">
                     <i class="bi bi-x-circle-fill"></i>
-                    {% if lang == 'ru' %}Ваш:{% elif lang == 'tj' %}Шумо:{% else %}Yours:{% endif %}
-                    <strong>{{ wq.user_answer }}</strong>
-                    {% if wq.options %}
-                        ({% for k, v in wq.options.items %}{% if k == wq.user_answer %}{{ v }}{% endif %}{% endfor %})
-                    {% endif %}
-                </span>
-                <span class="wrong-badge correct">
+                    <div>
+                        <div class="m-ans-label">{% if lang == 'uz' %}Sizning javobingiz{% elif lang == 'ru' %}Ваш ответ{% elif lang == 'tj' %}Ҷавоби шумо{% else %}Your answer{% endif %}</div>
+                        <div class="m-ans-text">{{ wq.user_answer }} {% if wq.options %}<span style="opacity: 0.7;">({% for k, v in wq.options.items %}{% if k == wq.user_answer %}{{ v }}{% endif %}{% endfor %})</span>{% endif %}</div>
+                    </div>
+                </div>
+                <div class="m-ans-row correct">
                     <i class="bi bi-check-circle-fill"></i>
-                    {% if lang == 'ru' %}Верный:{% elif lang == 'tj' %}Дуруст:{% else %}Correct:{% endif %}
-                    <strong>{{ wq.correct_answer }}</strong>
-                    {% if wq.options %}
-                        ({% for k, v in wq.options.items %}{% if k == wq.correct_answer %}{{ v }}{% endif %}{% endfor %})
-                    {% endif %}
-                </span>
+                    <div>
+                        <div class="m-ans-label">{% if lang == 'uz' %}To'g'ri javob{% elif lang == 'ru' %}Верный ответ{% elif lang == 'tj' %}Ҷавоби дуруст{% else %}Correct answer{% endif %}</div>
+                        <div class="m-ans-text">{{ wq.correct_answer }} {% if wq.options %}<span style="opacity: 0.7;">({% for k, v in wq.options.items %}{% if k == wq.correct_answer %}{{ v }}{% endif %}{% endfor %})</span>{% endif %}</div>
+                    </div>
+                </div>
             </div>
             {% if wq.explanation %}
-            <div class="wrong-explanation">💡 {{ wq.explanation }}</div>
+            <div class="m-explanation">
+                <i class="bi bi-lightbulb-fill"></i>
+                <div>{{ wq.explanation }}</div>
+            </div>
             {% endif %}
         </div>
         {% endfor %}
@@ -236,15 +499,15 @@
     {% endif %}
 
     <!-- Actions -->
-    <div class="btn-actions">
-        <a href="{% url 'student_ai_quiz' %}" class="btn-action primary">
-            <i class="bi bi-plus-circle"></i>
-            {% if lang == 'ru' %}Новый тест{% elif lang == 'tj' %}Тести нав{% else %}New Quiz{% endif %}
+    <div class="actions-row">
+        <a href="{% url 'student_ai_quiz' %}" class="btn-primary">
+            {% if lang == 'uz' %}Yangi AI Test Yaratish{% elif lang == 'ru' %}Новый AI тест{% elif lang == 'tj' %}Тести нави AI{% else %}New AI Quiz{% endif %}
         </a>
-        <a href="{% url 'dashboard' %}" class="btn-action secondary">
-            <i class="bi bi-speedometer2"></i> Dashboard
+        <a href="{% url 'dashboard' %}" class="btn-secondary">
+            {% if lang == 'uz' %}Bosh sahifa{% elif lang == 'ru' %}На главную{% elif lang == 'tj' %}Саҳифаи асосӣ{% else %}Dashboard{% endif %}
         </a>
     </div>
+
 </div>
 {% endblock %}
 
@@ -255,6 +518,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     const content = document.getElementById('analysisContent');
     const LANG = '{{ lang }}';
 
+    const t = (ru, tj, uz, en) => {
+        if (LANG === 'ru') return ru;
+        if (LANG === 'tj') return tj;
+        if (LANG === 'uz') return uz;
+        return en;
+    };
+
     try {
         const res = await fetch("{% url 'student_ai_quiz_analysis' ai_quiz.pk %}");
         const data = await res.json();
@@ -263,61 +533,89 @@ document.addEventListener('DOMContentLoaded', async function() {
             const a = data.analysis;
             let html = '';
 
-            // Summary
+            // AI Summary
             if (a.summary) {
-                html += `<div class="motivation-box mb-3">${a.summary}</div>`;
-            }
-
-            // Strengths
-            if (a.strengths && a.strengths.length) {
-                const sTitle = {ru:'Сильные стороны',tj:'Ҷанбаҳои қавӣ',en:'Strengths'}[LANG]||'Strengths';
-                html += `<h6 class="fw-bold mt-3 mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>${sTitle}</h6>`;
-                a.strengths.forEach(s => {
-                    html += `<div class="sw-item strength"><i class="bi bi-check-lg"></i><span>${s}</span></div>`;
-                });
-            }
-
-            // Weaknesses
-            if (a.weaknesses && a.weaknesses.length) {
-                const wTitle = {ru:'Слабые стороны',tj:'Ҷанбаҳои заиф',en:'Areas to Improve'}[LANG]||'Areas to Improve';
-                html += `<h6 class="fw-bold mt-3 mb-2"><i class="bi bi-exclamation-circle-fill text-danger me-2"></i>${wTitle}</h6>`;
-                a.weaknesses.forEach(w => {
-                    html += `<div class="sw-item weakness"><i class="bi bi-x-lg"></i><span>${w}</span></div>`;
-                });
-            }
-
-            // Recommendations
-            if (a.recommendations && a.recommendations.length) {
-                const rTitle = {ru:'Рекомендации',tj:'Тавсияҳо',en:'Recommendations'}[LANG]||'Recommendations';
-                html += `<h6 class="fw-bold mt-4 mb-2"><i class="bi bi-lightbulb-fill me-2" style="color:#f59e0b"></i>${rTitle}</h6>`;
-                a.recommendations.forEach(r => {
-                    const title = typeof r === 'object' ? r.title : r;
-                    const desc = typeof r === 'object' ? r.description : '';
-                    html += `<div class="rec-card"><div class="rec-card-title">📌 ${title}</div>`;
-                    if (desc) html += `<div class="rec-card-desc">${desc}</div>`;
-                    html += `</div>`;
-                });
+                html += `<div class="content-card" style="padding: 32px;">
+                    <div style="font-size: 1.1rem; color: var(--text-main); line-height: 1.6; text-align: center;">
+                        ${a.summary}
+                    </div>
+                </div>`;
             }
 
             // Topics to review
             if (a.topics_to_review && a.topics_to_review.length) {
-                const tTitle = {ru:'Темы для повторения',tj:'Мавзуъҳо барои такрор',en:'Topics to Review'}[LANG]||'Topics to Review';
-                html += `<h6 class="fw-bold mt-4 mb-2"><i class="bi bi-bookmark-star-fill me-2" style="color:#0ea5e9"></i>${tTitle}</h6><div>`;
-                a.topics_to_review.forEach(t => { html += `<span class="topic-tag"><i class="bi bi-arrow-repeat"></i>${t}</span>`; });
+                const tTitle = t('Темы для повторения', 'Мавзуъҳо барои такрор', 'Takrorlash uchun mavzular', 'Topics to Review');
+                html += `<div class="content-card">
+                    <div class="section-header">
+                        <div class="section-icon bg-blue"><i class="bi bi-hash"></i></div>
+                        ${tTitle}
+                    </div>
+                    <div class="topic-tags-container">`;
+                a.topics_to_review.forEach(topic => { html += `<div class="topic-tag"># ${topic}</div>`; });
+                html += `</div></div>`;
+            }
+
+            // Recommendations
+            if (a.recommendations && a.recommendations.length) {
+                const rTitle = t('Рекомендации', 'Тавсияҳо', 'Tavsiyalar', 'Recommendations');
+                html += `<div class="content-card">
+                    <div class="section-header">
+                        <div class="section-icon bg-pink"><i class="bi bi-compass"></i></div>
+                        ${rTitle}
+                    </div>
+                    <div class="rec-grid">`;
+                a.recommendations.forEach(r => {
+                    const title = typeof r === 'object' ? r.title : r;
+                    const desc = typeof r === 'object' ? r.description : '';
+                    html += `<div class="rec-card">
+                        <i class="bi bi-lightbulb-fill rec-icon"></i>
+                        <div>
+                            <div class="rec-title">${title}</div>
+                            ${desc ? `<div class="rec-desc mt-2">${desc}</div>` : ''}
+                        </div>
+                    </div>`;
+                });
+                html += `</div></div>`;
+            }
+
+            // Strengths and Weaknesses
+            if ((a.strengths && a.strengths.length) || (a.weaknesses && a.weaknesses.length)) {
+                html += `<div class="content-card">
+                    <div class="row g-4">`;
+                
+                if (a.strengths && a.strengths.length) {
+                    const sTitle = t('Сильные стороны', 'Ҷанбаҳои қавӣ', 'Kuchli tomonlar', 'Strengths');
+                    html += `<div class="col-md-6">
+                        <div class="section-header">
+                            <div class="section-icon bg-green"><i class="bi bi-award"></i></div>
+                            ${sTitle}
+                        </div>
+                        <div class="sw-list">`;
+                    a.strengths.forEach(s => { html += `<div class="sw-item strength"><i class="bi bi-check-circle-fill"></i><span>${s}</span></div>`; });
+                    html += `</div></div>`;
+                }
+
+                if (a.weaknesses && a.weaknesses.length) {
+                    const wTitle = t('Слабые стороны', 'Ҷанбаҳои заиф', 'Zaif tomonlar', 'Areas to Improve');
+                    html += `<div class="col-md-6">
+                        <div class="section-header">
+                            <div class="section-icon bg-yellow"><i class="bi bi-graph-down-arrow"></i></div>
+                            ${wTitle}
+                        </div>
+                        <div class="sw-list">`;
+                    a.weaknesses.forEach(w => { html += `<div class="sw-item weakness"><i class="bi bi-x-circle-fill"></i><span>${w}</span></div>`; });
+                    html += `</div></div>`;
+                }
+                
+                html += `</div></div>`;
+            }
+
+            // Motivation Banner
+            if (a.motivation || a.next_steps) {
+                html += `<div class="motivation-box">`;
+                if (a.motivation) html += `<div>${a.motivation}</div>`;
+                if (a.next_steps) html += `<div style="margin-top: 16px; color: var(--text-muted); font-size: 0.95rem;">${a.next_steps}</div>`;
                 html += `</div>`;
-            }
-
-            // Motivation
-            if (a.motivation) {
-                html += `<div class="motivation-box mt-4">✨ ${a.motivation}</div>`;
-            }
-
-            // Next steps
-            if (a.next_steps) {
-                html += `<div class="mt-3 p-3" style="border-radius:12px;background:var(--bg-darker);border:1px solid var(--border-color);">
-                    <strong><i class="bi bi-signpost-2-fill me-1" style="color:#7c3aed"></i>
-                    ${({ru:'Следующие шаги',tj:'Қадамҳои оянда',en:'Next Steps'})[LANG]||'Next Steps'}:</strong>
-                    <span class="text-muted"> ${a.next_steps}</span></div>`;
             }
 
             content.innerHTML = html;
@@ -334,9 +632,13 @@ document.addEventListener('DOMContentLoaded', async function() {
         const msgs = {
             ru: 'Не удалось загрузить анализ AI.',
             tj: 'Таҳлили AI бор карда нашуд.',
+            uz: 'AI tahlilini yuklab bo\'lmadi.',
             en: 'Could not load AI analysis.'
         };
-        content.innerHTML = `<p class="text-muted">${msgs[LANG]||msgs.en}</p>`;
+        content.innerHTML = `<div class="content-card text-center text-muted">
+            <i class="bi bi-exclamation-triangle" style="font-size: 2rem; color: var(--color-red); margin-bottom: 12px; display: block;"></i>
+            ${t(msgs.ru, msgs.tj, msgs.uz, msgs.en)}
+        </div>`;
         loader.classList.add('d-none');
         content.classList.remove('d-none');
     }

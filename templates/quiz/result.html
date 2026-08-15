@@ -1,124 +1,419 @@
 {% extends 'base.html' %}
 
 {% block title %}
-{% if lang == 'ru' %}Результат{% elif lang == 'tj' %}Натиҷа{% else %}Result{% endif %}: {{ result.quiz.title }} - Edunify
+{% if lang == 'uz' %}Natija{% elif lang == 'ru' %}Результат{% elif lang == 'tj' %}Натиҷа{% else %}Result{% endif %}: {{ result.quiz.title }} - Edunify
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ════════════════════════════════════════
+   STANDARD RESULT PAGE — Clean Minimal Theme
+════════════════════════════════════════ */
+:root {
+    --bg-dark: #0f1014;
+    --card-bg: #16171b;
+    --item-bg: #1c1d22;
+    --border-subtle: #27282f;
+    --text-main: #ffffff;
+    --text-muted: #8b8d98;
+    
+    --color-primary: #38bdf8; /* light blue theme */
+    --color-red: #ef4444;
+    --color-green: #22c55e;
+}
+
+body[data-theme="dark"] {
+    background-color: var(--bg-dark);
+}
+[data-theme="light"] {
+    --bg-dark: #f8fafc;
+    --card-bg: #ffffff;
+    --item-bg: #f1f5f9;
+    --border-subtle: #e2e8f0;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --color-primary: #0284c7;
+}
+
+.result-container {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 60px 20px 100px;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Card container */
+.content-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 24px;
+    padding: 48px 32px;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.page-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin-bottom: 40px;
+}
+
+/* Circular Score */
+.score-circle-wrap {
+    position: relative;
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 32px;
+}
+.circular-chart {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.circle-bg {
+    fill: none;
+    stroke: var(--item-bg);
+    stroke-width: 2.5;
+}
+.circle {
+    fill: none;
+    stroke: var(--color-primary);
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    animation: fillRing 1.5s ease-out forwards;
+}
+@keyframes fillRing {
+    from { stroke-dasharray: 0, 100; }
+    to { stroke-dasharray: var(--pct), 100; }
+}
+.score-content {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    width: 100%;
+}
+.score-number {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: var(--text-main);
+    line-height: 1;
+    margin-bottom: 4px;
+    font-family: 'Outfit', 'Inter', sans-serif;
+}
+.score-total {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* Percent & Badges */
+.percentage-text {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 24px;
+}
+.percentage-highlight {
+    color: var(--color-primary);
+}
+
+.badges-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 40px;
+}
+.badge-custom {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+.badge-fail {
+    background: #dc2626; /* bright red like screenshot */
+    color: white;
+}
+.badge-pass {
+    background: var(--color-green);
+    color: white;
+}
+.badge-time {
+    background: var(--item-bg);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-muted);
+}
+
+/* Action Buttons */
+.actions-row {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--color-primary);
+    color: var(--color-primary);
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+.btn-outline:hover {
+    background: rgba(56, 189, 248, 0.1);
+    color: var(--color-primary);
+}
+.btn-solid {
+    background: var(--color-primary);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: opacity 0.2s;
+    border: 1px solid var(--color-primary);
+}
+.btn-solid:hover {
+    opacity: 0.9;
+    color: #fff;
+}
+
+/* Additional Sections */
+.section-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    padding: 32px;
+    margin-bottom: 24px;
+    text-align: left;
+}
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.section-title i {
+    color: var(--color-primary);
+    font-size: 1.4rem;
+}
+
+/* AI Feedback */
+#aiFeedbackText {
+    background: var(--item-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    padding: 24px;
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+.shimmer-line {
+    height: 16px;
+    border-radius: 8px;
+    background: var(--item-bg);
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+}
+.shimmer-line::after {
+    content: "";
+    position: absolute; top: 0; right: 0; bottom: 0; left: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+    transform: translateX(-100%);
+    animation: shimmer 1.5s infinite;
+}
+[data-theme="light"] .shimmer-line::after { background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); }
+@keyframes shimmer { 100% { transform: translateX(100%); } }
+
+/* Wrong Questions */
+.mistake-item {
+    background: var(--item-bg);
+    border: 1px solid var(--border-subtle);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+}
+.m-question {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-main);
+    margin-bottom: 16px;
+    line-height: 1.5;
+}
+.m-answers {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.m-ans-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.9rem;
+}
+.m-ans-row i { font-size: 1.1rem; }
+.m-ans-row.wrong { color: var(--color-red); }
+.m-ans-row.correct { color: var(--color-green); }
+.m-ans-row span { color: var(--text-main); font-weight: 500; }
+
+@media (max-width: 768px) {
+    .result-container { padding: 40px 16px 80px; }
+    .content-card { padding: 32px 24px; }
+    .actions-row { flex-direction: column; }
+    .btn-outline, .btn-solid { justify-content: center; }
+}
+</style>
 {% endblock %}
 
 {% block content %}
-<div class="row justify-content-center py-4">
-    <div class="col-lg-8">
-        <div class="glass-card mb-4 text-center py-5">
-            <h2 class="font-heading text-gradient mb-4">
-                {% if lang == 'ru' %}Результаты теста{% elif lang == 'tj' %}Натиҷахои тест{% else %}Quiz Results{% endif %}
-            </h2>
-            
-            <div class="d-inline-flex align-items-center justify-content-center rounded-circle border border-purple border-3 mb-4" style="width: 150px; height: 150px; background: rgba(139, 92, 246, 0.1);">
-                <div class="text-center">
-                    <span class="display-4 fw-bold text-white">{{ result.score }}</span>
-                    <span class="text-muted d-block small">
-                        / {{ result.total_questions }}
-                        {% if lang == 'ru' %}верных{% elif lang == 'tj' %}дуруст{% else %}correct{% endif %}
-                    </span>
-                </div>
-            </div>
-            
-            <h3 class="mb-4 text-white">
-                {% if lang == 'ru' %}Ваш результат:{% elif lang == 'tj' %}Натиҷаи шумо:{% else %}Your Score:{% endif %}
-                <span class="text-gradient font-heading">{{ result.get_percentage }}%</span>
-            </h3>
-            
-            <div class="d-flex justify-content-center gap-3 mb-3">
-                {% if result.is_passed %}
-                    <span class="badge bg-success fs-6 px-3 py-2">
-                        <i class="bi bi-patch-check-fill me-1"></i>
-                        {% if lang == 'ru' %}Тест пройден{% elif lang == 'tj' %}Тест гузаронида шуд{% else %}Test Passed{% endif %}
-                    </span>
-                {% else %}
-                    <span class="badge bg-danger fs-6 px-3 py-2">
-                        <i class="bi bi-x-circle-fill me-1"></i>
-                        {% if lang == 'ru' %}Не пройден{% elif lang == 'tj' %}Нагузашт{% else %}Failed{% endif %}
-                    </span>
-                {% endif %}
-                <span class="badge bg-dark border border-secondary text-muted fs-6 px-3 py-2">
-                    <i class="bi bi-clock me-1"></i> {{ result.time_spent }}
-                    {% if lang == 'ru' %}сек{% elif lang == 'tj' %}сон{% else %}sec{% endif %}
-                </span>
-            </div>
-            
-            <div class="d-flex justify-content-center gap-3 mt-4">
-                <a href="{% url 'lesson_detail' result.quiz.lesson.pk %}" class="btn btn-outline-purple">
-                    <i class="bi bi-arrow-left me-1"></i>
-                    {% if lang == 'ru' %}Вернуться к уроку{% elif lang == 'tj' %}Бозгашт ба дарс{% else %}Back to Lesson{% endif %}
-                </a>
-                <a href="{% url 'dashboard' %}" class="btn btn-purple">
-                    <i class="bi bi-speedometer2 me-1"></i> Dashboard
-                </a>
-            </div>
+<div class="result-container">
+    <div class="content-card">
+        <div class="page-title">
+            {% if lang == 'uz' %}Test natijalari
+            {% elif lang == 'ru' %}Результаты теста
+            {% elif lang == 'tj' %}Натиҷаҳои тест
+            {% else %}Quiz Results{% endif %}
         </div>
         
-        <!-- Asynchronous AI Feedback Section -->
-        <div class="glass-card">
-            <h4 class="font-heading mb-4 d-flex align-items-center gap-2">
-                <i class="bi bi-robot text-gradient fs-4"></i>
-                {% if lang == 'ru' %}Анализ искусственного интеллекта
-                {% elif lang == 'tj' %}Тахлили зехни сунъӣ
-                {% else %}AI Analysis{% endif %}
-            </h4>
-            
-            <div id="aiFeedbackContainer">
-                <!-- Shimmer Loader -->
-                <div id="aiFeedbackLoader">
-                    <div class="shimmer-loader" style="width: 100%;"></div>
-                    <div class="shimmer-loader" style="width: 90%;"></div>
-                    <div class="shimmer-loader" style="width: 95%;"></div>
-                    <div class="shimmer-loader" style="width: 60%;"></div>
-                    <p class="text-muted small text-center mt-3 mb-0">
-                        <i class="spinner-border spinner-border-sm text-purple me-1" role="status"></i>
-                        {% if lang == 'ru' %}Gemini AI анализирует ваши результаты, пожалуйста подождите...
-                        {% elif lang == 'tj' %}Gemini AI натиҷахои шуморо тахлил мекунад, лутфан интизор шавед...
-                        {% else %}Gemini AI is analyzing your results, please wait...{% endif %}
-                    </p>
-                </div>
-                
-                <!-- Feedback Content -->
-                <div id="aiFeedbackContent" class="d-none">
-                    <div class="p-3 border border-secondary bg-darker rounded-3 leading-relaxed fs-6 text-white" id="aiFeedbackText" style="white-space: pre-line;"></div>
+        <div class="score-circle-wrap">
+            <svg viewBox="0 0 36 36" class="circular-chart" style="--pct: {{ result.get_percentage }};">
+                <path class="circle-bg"
+                  d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+                <path class="circle"
+                  stroke-dasharray="0, 100"
+                  d="M18 2.0845
+                    a 15.9155 15.9155 0 0 1 0 31.831
+                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                />
+            </svg>
+            <div class="score-content">
+                <div class="score-number">{{ result.score }}</div>
+                <div class="score-total">
+                    / {{ result.total_questions }}
+                    {% if lang == 'uz' %}to'g'ri{% elif lang == 'ru' %}верных{% elif lang == 'tj' %}дуруст{% else %}correct{% endif %}
                 </div>
             </div>
         </div>
         
-        <!-- Wrong Questions review -->
-        {% if result.wrong_questions %}
-            <div class="glass-card mt-4">
-                <h4 class="font-heading mb-4 text-danger">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                    {% if lang == 'ru' %}Допущенные ошибки{% elif lang == 'tj' %}Хатоҳои иртикобёфта{% else %}Mistakes Made{% endif %}
-                </h4>
-                <div class="list-group list-group-flush bg-transparent">
-                    {% for wq in result.wrong_questions %}
-                        <div class="list-group-item bg-transparent border-secondary py-3 px-0">
-                            <h6 class="font-heading text-light mb-2">
-                                {% if lang == 'ru' %}Вопрос:{% elif lang == 'tj' %}Савол:{% else %}Question:{% endif %}
-                                {{ wq.question }}
-                            </h6>
-                            <div class="d-flex gap-4">
-                                <span class="text-danger small">
-                                    <i class="bi bi-x-circle-fill me-1"></i>
-                                    {% if lang == 'ru' %}Ваш ответ:{% elif lang == 'tj' %}Ҷавоби шумо:{% else %}Your answer:{% endif %}
-                                    <strong>{{ wq.user_answer }}</strong>
-                                </span>
-                                <span class="text-success small">
-                                    <i class="bi bi-check-circle-fill me-1"></i>
-                                    {% if lang == 'ru' %}Правильный ответ:{% elif lang == 'tj' %}Ҷавоби дуруст:{% else %}Correct answer:{% endif %}
-                                    <strong>{{ wq.correct_answer }}</strong>
-                                </span>
+        <div class="percentage-text">
+            {% if lang == 'uz' %}Sizning natijangiz:{% elif lang == 'ru' %}Ваш результат:{% elif lang == 'tj' %}Натиҷаи шумо:{% else %}Your Score:{% endif %}
+            <span class="percentage-highlight">{{ result.get_percentage }}%</span>
+        </div>
+        
+        <div class="badges-row">
+            {% if result.is_passed %}
+                <div class="badge-custom badge-pass">
+                    <i class="bi bi-check-circle-fill"></i>
+                    {% if lang == 'uz' %}O'tdi{% elif lang == 'ru' %}Пройден{% elif lang == 'tj' %}Гузашт{% else %}Passed{% endif %}
+                </div>
+            {% else %}
+                <div class="badge-custom badge-fail">
+                    <i class="bi bi-x-circle-fill"></i>
+                    {% if lang == 'uz' %}O'tolmadi{% elif lang == 'ru' %}Не пройден{% elif lang == 'tj' %}Нагузашт{% else %}Failed{% endif %}
+                </div>
+            {% endif %}
+            
+            <div class="badge-custom badge-time">
+                <i class="bi bi-clock"></i>
+                {{ result.time_spent }}
+                {% if lang == 'uz' %}son{% elif lang == 'ru' %}сек{% elif lang == 'tj' %}сон{% else %}sec{% endif %}
+            </div>
+        </div>
+        
+        <div class="actions-row">
+            <a href="{% url 'lesson_detail' result.quiz.lesson.pk %}" class="btn-outline">
+                <i class="bi bi-arrow-left"></i>
+                {% if lang == 'uz' %}Darsga qaytish{% elif lang == 'ru' %}К уроку{% elif lang == 'tj' %}Бозгашт ба дарс{% else %}Back to Lesson{% endif %}
+            </a>
+            <a href="{% url 'dashboard' %}" class="btn-solid">
+                <i class="bi bi-speedometer2"></i> Dashboard
+            </a>
+        </div>
+    </div>
+    
+    <!-- AI Feedback Section -->
+    <div class="section-card">
+        <div class="section-title">
+            <i class="bi bi-robot"></i>
+            {% if lang == 'uz' %}AI Tahlili{% elif lang == 'ru' %}Анализ AI{% elif lang == 'tj' %}Таҳлили зеҳни сунъӣ{% else %}AI Analysis{% endif %}
+        </div>
+        
+        <div id="aiFeedbackContainer">
+            <!-- Loader -->
+            <div id="aiFeedbackLoader">
+                <div class="shimmer-line" style="width: 100%;"></div>
+                <div class="shimmer-line" style="width: 90%;"></div>
+                <div class="shimmer-line" style="width: 95%;"></div>
+                <div class="shimmer-line" style="width: 60%;"></div>
+                <div style="text-align: center; margin-top: 16px; color: var(--text-muted); font-size: 0.85rem;">
+                    <i class="bi bi-hourglass-split"></i> 
+                    {% if lang == 'uz' %}Gemini AI tahlil qilmoqda...
+                    {% elif lang == 'ru' %}Gemini AI анализирует...
+                    {% elif lang == 'tj' %}Gemini AI таҳлил мекунад...
+                    {% else %}Gemini AI is analyzing...{% endif %}
+                </div>
+            </div>
+            
+            <!-- Content -->
+            <div id="aiFeedbackContent" class="d-none">
+                <div id="aiFeedbackText" style="white-space: pre-line;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Wrong Questions review -->
+    {% if result.wrong_questions %}
+        <div class="section-card">
+            <div class="section-title" style="color: var(--color-red);">
+                <i class="bi bi-exclamation-triangle" style="color: var(--color-red);"></i>
+                {% if lang == 'uz' %}Qilingan xatolar{% elif lang == 'ru' %}Допущенные ошибки{% elif lang == 'tj' %}Хатоҳои иртикобёфта{% else %}Mistakes Made{% endif %}
+            </div>
+            
+            <div>
+                {% for wq in result.wrong_questions %}
+                    <div class="mistake-item">
+                        <div class="m-question">
+                            <span style="color: var(--text-muted); font-size: 0.9em;">
+                                {% if lang == 'uz' %}Savol:{% elif lang == 'ru' %}Вопрос:{% elif lang == 'tj' %}Савол:{% else %}Question:{% endif %}
+                            </span> 
+                            <br>
+                            {{ wq.question }}
+                        </div>
+                        <div class="m-answers">
+                            <div class="m-ans-row wrong">
+                                <i class="bi bi-x-circle-fill"></i>
+                                {% if lang == 'uz' %}Sizning javobingiz:{% elif lang == 'ru' %}Ваш ответ:{% elif lang == 'tj' %}Ҷавоби шумо:{% else %}Your answer:{% endif %}
+                                <span>{{ wq.user_answer }}</span>
+                            </div>
+                            <div class="m-ans-row correct">
+                                <i class="bi bi-check-circle-fill"></i>
+                                {% if lang == 'uz' %}To'g'ri javob:{% elif lang == 'ru' %}Правильный ответ:{% elif lang == 'tj' %}Ҷавоби дуруст:{% else %}Correct answer:{% endif %}
+                                <span>{{ wq.correct_answer }}</span>
                             </div>
                         </div>
-                    {% endfor %}
-                </div>
+                    </div>
+                {% endfor %}
             </div>
-        {% endif %}
-    </div>
+        </div>
+    {% endif %}
+
 </div>
 {% endblock %}
 
@@ -128,6 +423,14 @@
         const loader = document.getElementById("aiFeedbackLoader");
         const content = document.getElementById("aiFeedbackContent");
         const textContainer = document.getElementById("aiFeedbackText");
+        const LANG = '{{ lang }}';
+        
+        const t = (ru, tj, uz, en) => {
+            if (LANG === 'ru') return ru;
+            if (LANG === 'tj') return tj;
+            if (LANG === 'uz') return uz;
+            return en;
+        };
         
         try {
             const response = await fetch("{% url 'quiz_ai_feedback' result.pk %}");
@@ -138,12 +441,12 @@
                 loader.classList.add("d-none");
                 content.classList.remove("d-none");
             } else {
-                textContainer.innerText = "{% if lang == 'ru' %}Ошибка загрузки анализа.{% elif lang == 'tj' %}Хатои бор кардани тахлил.{% else %}Error loading analysis.{% endif %}";
+                textContainer.innerHTML = `<span style="color: var(--color-red)"><i class="bi bi-exclamation-circle me-2"></i>${t('Ошибка загрузки анализа.', 'Хатои бор кардани таҳлил.', 'Tahlilni yuklashda xatolik.', 'Error loading analysis.')}</span>`;
                 loader.classList.add("d-none");
                 content.classList.remove("d-none");
             }
         } catch (err) {
-            textContainer.innerText = "{% if lang == 'ru' %}Не удалось подключиться к AI.{% elif lang == 'tj' %}Ба AI пайваст карда намешавад.{% else %}Could not connect to AI service.{% endif %}";
+            textContainer.innerHTML = `<span style="color: var(--color-red)"><i class="bi bi-wifi-off me-2"></i>${t('Не удалось подключиться к AI.', 'Ба AI пайваст карда намешавад.', 'AI xizmatiga ulanib bo\'lmadi.', 'Could not connect to AI service.')}</span>`;
             loader.classList.add("d-none");
             content.classList.remove("d-none");
         }
