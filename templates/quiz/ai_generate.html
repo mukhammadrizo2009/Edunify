@@ -700,6 +700,11 @@
                 </div>
                 
                 <div class="field-group" style="margin-bottom:0;">
+                    <label class="field-label" for="topicInput"><i class="bi bi-card-heading"></i> {% if lang == 'ru' %}Тема{% elif lang == 'tj' %}Мавзӯъ{% else %}Topic{% endif %}</label>
+                    <input type="text" id="topicInput" class="field-input" placeholder="{% if lang == 'ru' %}Например: Древний Египет{% elif lang == 'tj' %}Масалан: Мисри Қадим{% else %}Example: Ancient Egypt{% endif %}">
+                </div>
+                
+                <div class="field-group" style="margin-bottom:0;">
                     <label class="field-label" for="gradeInput"><i class="bi bi-mortarboard"></i> {% if lang == 'ru' %}Класс (Уровень){% elif lang == 'tj' %}Синф (Сатҳ){% else %}Grade (Level){% endif %}</label>
                     <input type="text" id="gradeInput" class="field-input" placeholder="{% if lang == 'ru' %}Например: 5 класс{% elif lang == 'tj' %}Масалан: Синфи 5{% else %}Example: 5th grade{% endif %}">
                 </div>
@@ -718,7 +723,7 @@
                     </select>
                 </div>
                 
-                <div class="field-group" style="margin-bottom:0; grid-column: 1 / -1;">
+                <div class="field-group" style="margin-bottom:0;">
                     <label class="field-label" for="languageSelect"><i class="bi bi-translate"></i> {% if lang == 'ru' %}Язык теста{% elif lang == 'tj' %}Забони тест{% else %}Quiz Language{% endif %}</label>
                     <select id="languageSelect" class="field-input">
                         <option value="Русский">Русский</option>
@@ -824,18 +829,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function generateQuiz() {
     const subject = document.getElementById('subjectInput').value.trim();
+    const topic = document.getElementById('topicInput').value.trim();
     const grade = document.getElementById('gradeInput').value.trim();
     const count = document.getElementById('countInput').value.trim();
     const difficulty = document.getElementById('difficultySelect').value;
     const language = document.getElementById('languageSelect').value;
 
-    if (!subject || !grade || !count) {
+    if (!subject || !topic || !grade || !count) {
         document.getElementById('errorText').textContent = '{% if lang == "ru" %}Пожалуйста, заполните все поля.{% elif lang == "tj" %}Лутфан ҳамаи майдонҳоро пур кунед.{% else %}Please fill in all fields.{% endif %}';
         document.getElementById('errorBox').style.display = 'flex';
         return;
     }
 
-    const prompt = `Fan / Subject: ${subject}\nSinf / Grade: ${grade}\nSavollar soni / Number of questions: ${count}\nQiyinchilik darajasi / Difficulty: ${difficulty}\nTest Tili / Quiz Language: ${language}\n\nUshbu ma'lumotlar asosida test savollarini faqat "${language}" tilida tuzing. Savollar ko'rsatilgan qiyinchilik darajasiga mos bo'lsin. Barcha savollar, variantlar va to'g'ri javoblar aynan "${language}" tilida bo'lishi qat'iyan talab qilinadi. (Generate the quiz strictly and only in ${language} language).`;
+    const prompt = `Fan / Subject: ${subject}\nMavzu / Topic: ${topic}\nSinf / Grade: ${grade}\nSavollar soni / Number of questions: ${count}\nQiyinchilik darajasi / Difficulty: ${difficulty}\nTest Tili / Quiz Language: ${language}\n\nUshbu ma'lumotlar asosida test savollarini faqat "${language}" tilida tuzing. Savollar ko'rsatilgan qiyinchilik darajasiga va ${topic} mavzusiga mos bo'lsin. Barcha savollar, variantlar va to'g'ri javoblar aynan "${language}" tilida bo'lishi qat'iyan talab qilinadi. (Generate the quiz strictly and only in ${language} language, focused on the topic: ${topic}).`;
 
     const btn = document.getElementById('generateBtn');
     btn.classList.add('loading');
@@ -859,7 +865,7 @@ function generateQuiz() {
         }
         if (data.success && data.data) {
             generatedQuestions = data.data.questions || [];
-            document.getElementById('quizTitle').value = data.data.title || `${subject} - ${grade}`;
+            document.getElementById('quizTitle').value = data.data.title || `${subject} - ${topic}`;
             renderQuestions();
             document.getElementById('resultsSection').style.display = 'block';
             document.getElementById('resultsSection').scrollIntoView({behavior:'smooth',block:'start'});
