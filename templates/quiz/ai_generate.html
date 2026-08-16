@@ -788,6 +788,11 @@
                 <input type="number" id="passingScore" class="field-input" value="60" min="1" max="100">
             </div>
 
+            <div class="field-group">
+                <label class="field-label" for="quizThumbnail"><i class="bi bi-image"></i> {% if lang == 'ru' %}Обложка теста (необязательно){% elif lang == 'tj' %}Муқоваи тест (Ихтиёрӣ){% else %}Quiz Thumbnail (Optional){% endif %}</label>
+                <input type="file" id="quizThumbnail" class="field-input" accept="image/*" style="padding: 10px 16px;">
+            </div>
+
             <div id="saveError" style="display:none;" class="alert-err">
                 <i class="bi bi-exclamation-triangle-fill" style="flex-shrink:0;margin-top:1px;"></i>
                 <span id="saveErrorText"></span>
@@ -940,6 +945,7 @@ function saveQuiz() {
     const lessonId = document.getElementById('lessonSelect').value;
     const title = document.getElementById('quizTitle').value.trim();
     const passingScore = document.getElementById('passingScore').value;
+    const thumbnail = document.getElementById('quizThumbnail').files[0];
 
     document.getElementById('saveError').style.display = 'none';
     document.getElementById('saveSuccess').style.display = 'none';
@@ -959,15 +965,19 @@ function saveQuiz() {
     btn.disabled = true;
     btn.innerHTML = '<i class="bi bi-hourglass-split"></i> {% if lang == "ru" %}Сохранение...{% elif lang == "tj" %}Сабт мешавад...{% else %}Saving...{% endif %}';
 
+    const formData = new FormData();
+    formData.append('lesson_id', lessonId);
+    formData.append('title', title);
+    formData.append('passing_score', passingScore || 60);
+    formData.append('questions', JSON.stringify(generatedQuestions));
+    if (thumbnail) {
+        formData.append('thumbnail', thumbnail);
+    }
+
     fetch('{% url "ai_quiz_save" %}', {
         method: 'POST',
-        headers: {'Content-Type':'application/json','X-CSRFToken':csrfToken},
-        body: JSON.stringify({
-            lesson_id: lessonId,
-            title: title,
-            passing_score: parseInt(passingScore) || 60,
-            questions: generatedQuestions
-        })
+        headers: {'X-CSRFToken':csrfToken},
+        body: formData
     })
     .then(r => r.json())
     .then(data => {

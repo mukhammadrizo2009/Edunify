@@ -422,11 +422,20 @@ def ai_quiz_save(request):
         return JsonResponse({'error': 'POST only'}, status=405)
 
     try:
-        data = json_module.loads(request.body)
-        lesson_id = data.get('lesson_id')
-        title = data.get('title', '').strip()
-        passing_score = int(data.get('passing_score', 60))
-        questions_data = data.get('questions', [])
+        # Ma'lumotlarni form-data yoki JSON formatidan olish
+        if request.content_type.startswith('multipart/form-data'):
+            lesson_id = request.POST.get('lesson_id')
+            title = request.POST.get('title', '').strip()
+            passing_score = int(request.POST.get('passing_score', 60))
+            questions_data = json_module.loads(request.POST.get('questions', '[]'))
+            thumbnail = request.FILES.get('thumbnail')
+        else:
+            data = json_module.loads(request.body)
+            lesson_id = data.get('lesson_id')
+            title = data.get('title', '').strip()
+            passing_score = int(data.get('passing_score', 60))
+            questions_data = data.get('questions', [])
+            thumbnail = None
 
         if not lesson_id:
             return JsonResponse({'error': 'Lesson ID required'}, status=400)
@@ -443,6 +452,7 @@ def ai_quiz_save(request):
             title=title or f"{lesson.title} — AI Test",
             passing_score=max(1, min(passing_score, 100)),
             language=request.session.get('quiz_draft_lang', 'en'),
+            thumbnail=thumbnail,
         )
 
         # Savollarni yaratish
