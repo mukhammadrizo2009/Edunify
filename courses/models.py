@@ -1,5 +1,6 @@
 from django.db import models
 from users.models import CustomUser
+from django.utils.text import slugify
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -32,6 +33,20 @@ class Course(models.Model):
     language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default='en')
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    slug = models.SlugField(max_length=255, null=True, blank=True, allow_unicode=True, unique=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base = slugify(self.title, allow_unicode=True)
+            if not base:
+                base = "course"
+            unique_slug = base
+            counter = 1
+            while Course.objects.filter(slug=unique_slug).exclude(pk=self.pk).exists():
+                unique_slug = f"{base}-{counter}"
+                counter += 1
+            self.slug = unique_slug
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.title

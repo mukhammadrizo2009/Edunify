@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block title %}{% if action == 'create' %}{% if lang == 'ru' %}Добавить урок{% elif lang == 'tj' %}Илова кардани дарс{% else %}Add Lesson{% endif %}{% else %}{% if lang == 'ru' %}Редактировать урок{% elif lang == 'tj' %}Таҳрири дарс{% else %}Edit Lesson{% endif %}{% endif %} | Edunify{% endblock %}
+
+{% block extra_css %}
+<style>
+.create-wrap { max-width: 700px; margin: 0 auto; padding-top: 40px; padding-bottom: 60px; }
+.step-header { text-align: center; margin-bottom: 32px; }
+.step-header h1 {
+    font-family: 'Outfit', 'Inter', sans-serif; font-size: 1.8rem;
+    font-weight: 700; color: var(--text-main); margin-bottom: 6px;
+}
+
+.create-card {
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: 22px; overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,.06); margin-bottom: 20px;
+}
+.create-card-header {
+    background: linear-gradient(135deg, #059669, #0d9488);
+    padding: 18px 28px; display: flex; align-items: center; gap: 12px;
+}
+.create-card-header i { font-size: 1.4rem; color: rgba(255,255,255,.9); }
+.create-card-header h2 { font-family: 'Outfit', 'Inter', sans-serif; font-size: 1.05rem; font-weight: 700; color: #fff; margin: 0; }
+.create-card-body { padding: 28px; }
+
+.field-group { margin-bottom: 22px; }
+.field-label { display: flex; align-items: center; gap: 7px; font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
+.field-label i { color: #059669; font-size: 0.9rem; }
+.field-input {
+    width: 100%; background: var(--bg-darker); border: 1.5px solid var(--border-color);
+    color: var(--text-main); border-radius: 12px; padding: 11px 14px; font-size: 0.92rem;
+    transition: border-color 0.2s, box-shadow 0.2s; font-family: 'Inter', sans-serif;
+}
+.field-input:focus { outline: none; border-color: #059669; box-shadow: 0 0 0 3px rgba(5,150,105,.15); background: var(--bg-card); }
+.field-input::placeholder { color: var(--text-muted); }
+textarea.field-input { resize: vertical; min-height: 120px; }
+
+.btn-next {
+    display: flex; align-items: center; justify-content: center; gap: 9px; width: 100%;
+    background: linear-gradient(135deg, #059669, #0d9488); color: #fff !important;
+    border: none; border-radius: 13px; padding: 14px 24px; font-size: 0.95rem; font-weight: 700;
+    cursor: pointer; transition: all 0.25s ease; box-shadow: 0 4px 16px rgba(5,150,105,.3);
+    font-family: 'Inter', sans-serif; margin-top: 8px;
+}
+.btn-next:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(5,150,105,.4); }
+.btn-back {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    color: var(--text-muted) !important; text-decoration: none;
+    font-size: 0.88rem; font-weight: 600; margin-bottom: 24px; transition: color 0.2s;
+}
+.btn-back:hover { color: #059669 !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="create-wrap">
+
+    <div class="step-header">
+        <h1>
+            {% if action == 'create' %}
+                <i class="bi bi-journal-plus" style="color:#059669;margin-right:8px;"></i>
+                {% if lang == 'ru' %}Добавить урок{% elif lang == 'tj' %}Илова кардани дарс{% else %}Add Lesson{% endif %}
+            {% else %}
+                <i class="bi bi-pencil-square" style="color:#059669;margin-right:8px;"></i>
+                {% if lang == 'ru' %}Редактировать урок{% elif lang == 'tj' %}Таҳрири дарс{% else %}Edit Lesson{% endif %}
+            {% endif %}
+        </h1>
+        <p class="text-muted" style="font-size: 0.9rem;">
+            {% if lang == 'ru' %}Курс:{% elif lang == 'tj' %}Курс:{% else %}Course:{% endif %} <strong>{{ course.title }}</strong>
+        </p>
+    </div>
+
+    <a href="{% url 'course_detail' course.slug %}" class="btn-back">
+        <i class="bi bi-arrow-left"></i>
+        {% if lang == 'ru' %}Назад к курсу{% elif lang == 'tj' %}Бозгашт ба курс{% else %}Back to Course{% endif %}
+    </a>
+
+    <form method="post" id="lessonForm">
+        {% csrf_token %}
+
+        <div class="create-card">
+            <div class="create-card-header">
+                <i class="bi bi-book-half"></i>
+                <h2>{% if lang == 'ru' %}Содержание урока{% elif lang == 'tj' %}Мазмуни дарс{% else %}Lesson Content{% endif %}</h2>
+            </div>
+            <div class="create-card-body">
+
+                <div class="field-group">
+                    <label class="field-label" for="id_title">
+                        <i class="bi bi-type"></i>
+                        {% if lang == 'ru' %}Название урока{% elif lang == 'tj' %}Номи дарс{% else %}Lesson Title{% endif %}
+                    </label>
+                    <input type="text" id="id_title" name="title"
+                           class="field-input"
+                           value="{{ lesson.title|default:'' }}"
+                           required>
+                </div>
+
+                <div class="field-group" style="margin-bottom:0;">
+                    <label class="field-label" for="id_content">
+                        <i class="bi bi-text-paragraph"></i>
+                        {% if lang == 'ru' %}Материал урока{% elif lang == 'tj' %}Маводи дарс{% else %}Lesson Material{% endif %}
+                    </label>
+                    <textarea id="id_content" name="content"
+                              class="field-input" rows="8"
+                              required>{{ lesson.content|default:'' }}</textarea>
+                </div>
+
+            </div>
+        </div>
+
+        <button type="submit" class="btn-next" id="saveBtn">
+            <i class="bi bi-check-circle-fill"></i>
+            {% if action == 'create' %}
+                {% if lang == 'ru' %}Сохранить урок{% elif lang == 'tj' %}Захира кардани дарс{% else %}Save Lesson{% endif %}
+            {% else %}
+                {% if lang == 'ru' %}Обновить урок{% elif lang == 'tj' %}Навсозии дарс{% else %}Update Lesson{% endif %}
+            {% endif %}
+        </button>
+    </form>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('lessonForm').addEventListener('submit', function() {
+    const btn = document.getElementById('saveBtn');
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading...';
+    btn.disabled = true;
+});
+</script>
+{% endblock %}

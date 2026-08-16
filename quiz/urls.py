@@ -9,7 +9,7 @@ from .views import (
 
 urlpatterns = [
     path('', quiz_list_view, name='quiz_list'),
-    path('<int:pk>/', quiz_view, name='quiz'),
+    path('<str:slug>/', quiz_view, name='quiz'),
     path('result/<int:pk>/', quiz_result_view, name='quiz_result'),
     path('result/<int:pk>/ai-feedback/', quiz_ai_feedback_view, name='quiz_ai_feedback'),
     # Teacher: test yaratish

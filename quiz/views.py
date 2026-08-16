@@ -45,8 +45,8 @@ def teacher_required(view_func):
     return wrapper
 
 @login_required
-def quiz_view(request, pk):
-    quiz = get_object_or_404(Quiz, pk=pk)
+def quiz_view(request, slug):
+    quiz = get_object_or_404(Quiz, slug=slug)
     questions = quiz.questions.all()
 
     # Faqat yozilgan o'quvchilar test ishlay oladi
@@ -54,7 +54,7 @@ def quiz_view(request, pk):
         student=request.user
     ).exists()
     if not is_enrolled:
-        return redirect('course_detail', pk=quiz.lesson.course.pk)
+        return redirect('course_detail', slug=quiz.lesson.course.slug)
 
     if request.method == 'POST':
         start_time = int(request.POST.get('start_time', 0))
@@ -169,10 +169,10 @@ def quiz_create_step1(request):
 def quiz_create_step2(request):
     """2-qadam: qaysi dars, nechta savol."""
     user = request.user
-    # Faqat o'qituvchining o'z darslari (allaqachon quiz yo'q bo'lganlar)
+    # Faqat o'qituvchining o'z darslari
     my_lessons = Lesson.objects.filter(
         course__teacher=user
-    ).exclude(quiz__isnull=False).select_related('course')
+    ).select_related('course')
 
     if request.method == 'POST':
         lesson_id     = request.POST.get('lesson')
@@ -198,16 +198,6 @@ def quiz_create_step2(request):
 
         lesson = get_object_or_404(Lesson, pk=lesson_id, course__teacher=user)
 
-        if Quiz.objects.filter(lesson=lesson).exists():
-            lang = request.session.get('lang', 'en')
-            if lang == 'ru':
-                msg = "Для этого урока тест уже существует."
-            elif lang == 'tj':
-                msg = "Барои ин дарс аллакай тест мавҷуд аст."
-            else:
-                msg = "A quiz already exists for this lesson."
-            messages.error(request, msg)
-            return redirect('quiz_create_step1')
 
         quiz = Quiz.objects.create(
             lesson=lesson,
@@ -372,10 +362,10 @@ def quiz_create_step3(request, pk, num):
 def ai_quiz_generate_page(request):
     """AI yordamida test yaratish sahifasi."""
     user = request.user
-    # Faqat quiz yo'q bo'lgan darslar
+    # Faqat quiz yo'q bo'lgan darslar (Endi barcha darslar)
     my_lessons = Lesson.objects.filter(
         course__teacher=user
-    ).exclude(quiz__isnull=False).select_related('course')
+    ).select_related('course')
 
     context = {
         'my_lessons': my_lessons,
@@ -446,15 +436,6 @@ def ai_quiz_save(request):
 
         user = request.user
         lesson = get_object_or_404(Lesson, pk=lesson_id, course__teacher=user)
-
-        if Quiz.objects.filter(lesson=lesson).exists():
-            lang = request.session.get('lang', 'en')
-            err_msgs = {
-                'ru': 'Для этого урока тест уже существует.',
-                'tj': 'Барои ин дарс аллакай тест мавҷуд аст.',
-                'en': 'A quiz already exists for this lesson.',
-            }
-            return JsonResponse({'error': err_msgs.get(lang, err_msgs['en'])}, status=400)
 
         # Quiz yaratish
         quiz = Quiz.objects.create(

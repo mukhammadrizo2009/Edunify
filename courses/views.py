@@ -65,8 +65,8 @@ def course_list_view(request):
     return render(request, 'courses/course_list.html', context)
 
 
-def course_detail_view(request, pk):
-    course = get_object_or_404(Course, pk=pk, is_active=True)
+def course_detail_view(request, slug):
+    course = get_object_or_404(Course, slug=slug, is_active=True)
     lessons = course.lessons.all()
     is_enrolled = False
     if request.user.is_authenticated:
@@ -100,7 +100,7 @@ def enroll_view(request, pk):
         else:
             msg = f"Successfully enrolled in course: {course.title}!"
         messages.success(request, msg)
-    return redirect('course_detail', pk=pk)
+    return redirect('course_detail', slug=course.slug)
 
 
 @login_required
@@ -118,12 +118,12 @@ def lesson_detail_view(request, pk):
         else:
             msg = "Enroll in the course to view this lesson!"
         messages.error(request, msg)
-        return redirect('course_detail', pk=lesson.course.pk)
+        return redirect('course_detail', slug=lesson.course.slug)
     lang = request.session.get('lang', 'en')
     context = {
         'lesson': lesson,
         'lang': lang,
-        'has_quiz': hasattr(lesson, 'quiz'),
+        'quizzes': lesson.quizzes.all(),
     }
     return render(request, 'courses/lesson_detail.html', context)
 
@@ -367,3 +367,60 @@ def course_edit_view(request, pk):
     }
     return render(request, 'courses/course_edit.html', context)
 
+
+@teacher_required
+def lesson_create_view(request, course_pk):
+    course = get_object_or_404(Course, pk=course_pk, teacher=request.user)
+    lang = request.session.get('lang', 'en')
+
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        content = request.POST.get('content', '').strip()
+        if title and content:
+            order = course.lessons.count() + 1
+            Lesson.objects.create(
+                course=course,
+                title=title,
+                content=content,
+                order=order
+            )
+            messages.success(request, "Lesson added successfully." if lang == 'en' else ("Дарс илова карда шуд." if lang == 'tj' else "Урок успешно добавлен."))
+            return redirect('course_detail', slug=course.slug)
+        else:
+            messages.error(request, "Title and content are required.")
+
+    return render(request, 'courses/lesson_form.html', {'course': course, 'lang': lang, 'action': 'create'})
+
+
+@teacher_required
+def lesson_edit_view(request, pk):
+    lesson = get_object_or_404(Lesson, pk=pk, course__teacher=request.user)
+    lang = request.session.get('lang', 'en')
+
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        content = request.POST.get('content', '').strip()
+        if title and content:
+            lesson.title = title
+            lesson.content = content
+            lesson.save()
+            messages.success(request, "Lesson updated successfully." if lang == 'en' else ("Дарс нав карда шуд." if lang == 'tj' else "Урок успешно обновлен."))
+            return redirect('course_detail', slug=lesson.course.slug)
+        else:
+            messages.error(request, "Title and content are required.")
+
+    return render(request, 'courses/lesson_form.html', {'lesson': lesson, 'course': lesson.course, 'lang': lang, 'action': 'edit'})
+
+
+@teacher_required
+def lesson_delete_view(request, pk):
+    lesson = get_object_or_404(Lesson, pk=pk, course__teacher=request.user)
+    lang = request.session.get('lang', 'en')
+    
+    if request.method == 'POST':
+        course_pk = lesson.course.pk
+        lesson.delete()
+        messages.success(request, "Lesson deleted successfully." if lang == 'en' else ("Дарс нест карда шуд." if lang == 'tj' else "Урок успешно удален."))
+        return redirect('course_detail', slug=lesson.course.slug)
+    
+    return redirect('course_detail', slug=lesson.course.slug)

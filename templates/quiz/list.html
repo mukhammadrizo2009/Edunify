@@ -381,7 +381,12 @@
                 <div class="quiz-content">
                     <div class="quiz-badges">
                         <div class="badge-group">
-                            <span class="badge-item"><i class="bi bi-journal-code"></i> {{ quiz.lesson.course.category|default:'Course' }}</span>
+                            <span class="badge-item"><i class="bi bi-journal-code"></i>
+                                {% if lang == 'tj' and quiz.lesson.course.category.name_tj %}{{ quiz.lesson.course.category.name_tj }}
+                                {% elif lang == 'ru' and quiz.lesson.course.category.name_ru %}{{ quiz.lesson.course.category.name_ru }}
+                                {% elif lang == 'en' and quiz.lesson.course.category.name_en %}{{ quiz.lesson.course.category.name_en }}
+                                {% else %}{{ quiz.lesson.course.category.name }}{% endif %}
+                            </span>
                             <span class="badge-item badge-primary">
                                 {% if quiz.language == 'ru' %}🇷🇺 RU
                                 {% elif quiz.language == 'tj' %}🇹🇯 TJ
@@ -405,11 +410,11 @@
                     </ul>
 
                     {% if request.user.is_authenticated and quiz.lesson.course.pk in enrolled_course_ids %}
-                    <a href="{% url 'quiz' pk=quiz.pk %}" class="btn-action btn-start">
+                    <a href="{% url 'quiz' slug=quiz.slug %}" class="btn-action btn-start">
                         <i class="bi bi-play-fill fs-5"></i> {% if lang == 'tj' %}Тестро оғоз кардан{% elif lang == 'ru' %}Начать тест{% else %}Start Quiz{% endif %}
                     </a>
                     {% else %}
-                    <a href="{% url 'course_detail' pk=quiz.lesson.course.pk %}" class="btn-action btn-enroll">
+                    <a href="{% url 'course_detail' slug=quiz.lesson.course.slug %}" class="btn-action btn-enroll">
                         <i class="bi bi-lock-fill"></i> {% if lang == 'tj' %}Ба курс аъзо шавед{% elif lang == 'ru' %}Запишитесь на курс{% else %}Enroll to Unlock{% endif %}
                     </a>
                     {% endif %}

@@ -177,7 +177,7 @@
                                 <i class="bi bi-person-circle text-gradient"></i>
                                 <span class="text-muted small">{{ course.teacher.username }}</span>
                             </div>
-                            <a href="{% url 'course_detail' course.pk %}"
+                            <a href="{% url 'course_detail' course.slug %}"
                                class="btn btn-sm btn-purple rounded-pill px-3">
                                 {% if lang == 'ru' %}Учиться{% elif lang == 'tj' %}Омузед{% else %}Learn{% endif %}
                             </a>

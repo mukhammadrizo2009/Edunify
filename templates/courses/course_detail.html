@@ -178,6 +178,44 @@ body[data-theme="dark"] {
     gap: 6px;
 }
 
+/* Custom Action Buttons */
+.btn-add-lesson {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.9rem; font-weight: 600;
+    color: var(--color-primary); background: rgba(56, 189, 248, 0.1);
+    border: 1.5px solid rgba(56, 189, 248, 0.3);
+    padding: 8px 16px; border-radius: 10px;
+    text-decoration: none; transition: all 0.2s ease;
+}
+.btn-add-lesson:hover {
+    background: var(--color-primary); color: #fff;
+    transform: translateY(-1px); box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
+}
+[data-theme="light"] .btn-add-lesson {
+    background: rgba(2, 132, 199, 0.08); border-color: rgba(2, 132, 199, 0.2);
+}
+
+.lesson-actions { display: flex; gap: 8px; align-items: center; }
+.btn-action-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 38px; height: 38px; border-radius: 10px; font-size: 1.05rem;
+    border: 1.5px solid transparent; transition: all 0.2s ease;
+    background: var(--item-bg);
+}
+.btn-action-icon.edit { color: #10b981; }
+.btn-action-icon.edit:hover {
+    background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3);
+    color: #059669; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(16, 185, 129, 0.15);
+}
+[data-theme="dark"] .btn-action-icon.edit:hover { color: #34d399; }
+
+.btn-action-icon.delete { color: #ef4444; border: none; padding: 0; cursor: pointer; }
+.btn-action-icon.delete:hover {
+    background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3);
+    color: #dc2626; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(239, 68, 68, 0.15); border-style: solid; border-width: 1.5px;
+}
+[data-theme="dark"] .btn-action-icon.delete:hover { color: #f87171; }
+
 /* Sidebar */
 .sidebar-card {
     position: sticky;
@@ -314,9 +352,16 @@ body[data-theme="dark"] {
 
                 <!-- Lessons List -->
                 <div class="content-card">
-                    <div class="section-title">
-                        <i class="bi bi-list-stars"></i>
-                        {% if lang == 'ru' %}Уроки курса{% elif lang == 'tj' %}Дарсҳои курс{% elif lang == 'uz' %}Kurs darslari{% else %}Course Lessons{% endif %}
+                    <div class="section-title d-flex justify-content-between w-100">
+                        <div>
+                            <i class="bi bi-list-stars"></i>
+                            {% if lang == 'ru' %}Уроки курса{% elif lang == 'tj' %}Дарсҳои курс{% elif lang == 'uz' %}Kurs darslari{% else %}Course Lessons{% endif %}
+                        </div>
+                        {% if user == course.teacher %}
+                        <a href="{% url 'lesson_create' course.pk %}" class="btn-add-lesson">
+                            <i class="bi bi-plus-lg"></i> {% if lang == 'ru' %}Добавить{% elif lang == 'tj' %}Илова кардан{% else %}Add Lesson{% endif %}
+                        </a>
+                        {% endif %}
                     </div>
                     
                     {% if lessons %}
@@ -333,7 +378,52 @@ body[data-theme="dark"] {
                                         </h5>
                                     </div>
                                     
-                                    {% if is_enrolled %}
+                                    {% if user == course.teacher %}
+                                        <div class="lesson-actions ms-auto me-3">
+                                            <a href="{% url 'lesson_edit' lesson.pk %}" class="btn-action-icon edit" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <form method="POST" action="{% url 'lesson_delete' lesson.pk %}" class="m-0 p-0">
+                                                {% csrf_token %}
+                                                <button type="button" class="btn-action-icon delete" title="Delete" data-bs-toggle="modal" data-bs-target="#deleteLessonModal{{ lesson.pk }}">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+
+                                                <!-- Delete Confirmation Modal -->
+                                                <div class="modal fade" id="deleteLessonModal{{ lesson.pk }}" tabindex="-1" aria-labelledby="deleteLessonModalLabel{{ lesson.pk }}" aria-hidden="true">
+                                                    <div class="modal-dialog modal-dialog-centered">
+                                                        <div class="modal-content" style="background: var(--card-bg); border: 1px solid var(--border-subtle); border-radius: 16px;">
+                                                            <div class="modal-header border-0 pb-0">
+                                                                <h5 class="modal-title text-danger fw-bold" id="deleteLessonModalLabel{{ lesson.pk }}">
+                                                                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                                                    {% if lang == 'ru' %}Удалить урок?{% elif lang == 'tj' %}Дарсро нест кунед?{% else %}Delete Lesson?{% endif %}
+                                                                </h5>
+                                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <p style="color: var(--text-main); font-size: 1rem;">
+                                                                    {% if lang == 'ru' %}Вы уверены, что хотите удалить этот урок?{% elif lang == 'tj' %}Шумо мутмаин ҳастед, ки ин дарсро нест кардан мехоҳед?{% else %}Are you sure you want to delete this lesson?{% endif %}
+                                                                </p>
+                                                                <p class="text-muted small mb-0">
+                                                                    {% if lang == 'ru' %}Это действие нельзя отменить.{% elif lang == 'tj' %}Ин амалро бекор кардан ғайриимкон аст.{% else %}This action cannot be undone.{% endif %}
+                                                                </p>
+                                                            </div>
+                                                            <div class="modal-footer border-0 pt-0">
+                                                                <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="border-radius: 8px; font-weight: 600;">
+                                                                    {% if lang == 'ru' %}Отмена{% elif lang == 'tj' %}Бекор кардан{% else %}Cancel{% endif %}
+                                                                </button>
+                                                                <button type="submit" class="btn btn-danger" style="border-radius: 8px; font-weight: 600;">
+                                                                    {% if lang == 'ru' %}Да, удалить{% elif lang == 'tj' %}Бале, нест кунед{% else %}Yes, Delete{% endif %}
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    {% endif %}
+                                    
+                                    {% if is_enrolled or user == course.teacher %}
                                         <a href="{% url 'lesson_detail' lesson.pk %}" class="btn-read">
                                             {% if lang == 'ru' %}Читать{% elif lang == 'tj' %}Хондан{% elif lang == 'uz' %}O'qish{% else %}Read{% endif %} &rarr;
                                         </a>

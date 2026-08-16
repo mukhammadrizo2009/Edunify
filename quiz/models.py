@@ -1,6 +1,7 @@
 from django.db import models
 from users.models import CustomUser
 from courses.models import Lesson
+from django.utils.text import slugify
 
 class Quiz(models.Model):
     LANGUAGE_CHOICES = [
@@ -8,12 +9,26 @@ class Quiz(models.Model):
         ('tj', 'Tajik'),
         ('en', 'English'),
     ]
-    lesson = models.OneToOneField(Lesson, on_delete=models.CASCADE, related_name='quiz')
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name='quizzes')
     title = models.CharField(max_length=200)
     thumbnail = models.ImageField(upload_to='quizzes/', null=True, blank=True)
     passing_score = models.PositiveIntegerField(default=60)
     language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES, default='en')
     created_at = models.DateTimeField(auto_now_add=True)
+    slug = models.SlugField(max_length=255, null=True, blank=True, allow_unicode=True, unique=True)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base = slugify(self.title, allow_unicode=True)
+            if not base:
+                base = "quiz"
+            unique_slug = base
+            counter = 1
+            while Quiz.objects.filter(slug=unique_slug).exclude(pk=self.pk).exists():
+                unique_slug = f"{base}-{counter}"
+                counter += 1
+            self.slug = unique_slug
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.lesson.title} - Quiz"

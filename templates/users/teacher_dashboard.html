@@ -536,7 +536,7 @@
                     </div>
                     <div class="row-actions">
                         <a href="{% url 'course_edit' course.pk %}" class="row-btn row-btn-edit" title="Edit"><i class="bi bi-pencil-square"></i></a>
-                        <a href="{% url 'course_detail' course.pk %}" class="row-btn row-btn-view" title="View"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'course_detail' course.slug %}" class="row-btn row-btn-view" title="View"><i class="bi bi-eye"></i></a>
                     </div>
                 </div>
                 {% endfor %}
@@ -582,7 +582,7 @@
                     </div>
                     <div class="row-actions">
                         <a href="{% url 'quiz_edit' quiz.pk %}" class="row-btn row-btn-edit" title="Edit"><i class="bi bi-pencil-square"></i></a>
-                        <a href="{% url 'quiz' quiz.pk %}" class="row-btn row-btn-view" title="View"><i class="bi bi-eye"></i></a>
+                        <a href="{% url 'quiz' quiz.slug %}" class="row-btn row-btn-view" title="View"><i class="bi bi-eye"></i></a>
                     </div>
                 </div>
                 {% endfor %}

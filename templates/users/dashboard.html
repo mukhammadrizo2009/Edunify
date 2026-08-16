@@ -715,7 +715,7 @@
 
             {% if enrolled_courses %}
                 {% for enrollment in enrolled_courses %}
-                    <a href="{% url 'course_detail' enrollment.course.pk %}" class="course-item">
+                    <a href="{% url 'course_detail' enrollment.course.slug %}" class="course-item">
                         <div class="course-item-icon">
                             <i class="bi bi-play-circle-fill"></i>
                         </div>

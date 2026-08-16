@@ -8,7 +8,7 @@
     <div class="col-lg-8">
         <div class="glass-card mb-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <a href="{% url 'course_detail' lesson.course.pk %}" class="btn btn-sm btn-outline-purple rounded-pill">
+                <a href="{% url 'course_detail' lesson.course.slug %}" class="btn btn-sm btn-outline-purple rounded-pill">
                     <i class="bi bi-arrow-left me-1"></i>
                     {% if lang == 'ru' %}Назад к курсу{% elif lang == 'tj' %}Бозгашт ба курс{% else %}Back to Course{% endif %}
                 </a>
@@ -28,24 +28,32 @@
                 {% else %}{{ lesson.content|linebreaks }}{% endif %}
             </div>
             
-            {% if has_quiz %}
-                <div class="border-top border-secondary pt-4 mt-5 d-flex justify-content-between align-items-center">
-                    <div>
-                        <h4>
-                            {% if lang == 'ru' %}Тест для закрепления темы
-                            {% elif lang == 'tj' %}Тест барои мустаҳкам кардани мавзӯ
-                            {% else %}Quiz to Reinforce the Topic{% endif %}
-                        </h4>
-                        <p class="text-muted small mb-0">
-                            {% if lang == 'ru' %}Пройдите тест по этому уроку и проанализируйте свои знания с помощью AI.
-                            {% elif lang == 'tj' %}Тести ин дарсро гузаред ва донишхои худро тавассути AI тахлил кунед.
-                            {% else %}Take the quiz for this lesson and analyze your knowledge with AI.{% endif %}
-                        </p>
+            {% if quizzes %}
+                <div class="border-top border-secondary pt-4 mt-5">
+                    <h4 class="mb-3">
+                        {% if lang == 'ru' %}Тесты для закрепления темы
+                        {% elif lang == 'tj' %}Тестҳо барои мустаҳкам кардани мавзӯ
+                        {% else %}Quizzes to Reinforce the Topic{% endif %}
+                    </h4>
+                    <p class="text-muted small mb-4">
+                        {% if lang == 'ru' %}Пройдите тесты по этому уроку и проанализируйте свои знания с помощью AI.
+                        {% elif lang == 'tj' %}Тестҳои ин дарсро гузаред ва донишхои худро тавассути AI тахлил кунед.
+                        {% else %}Take the quizzes for this lesson and analyze your knowledge with AI.{% endif %}
+                    </p>
+                    <div class="d-flex flex-column gap-3">
+                        {% for q in quizzes %}
+                        <div class="d-flex justify-content-between align-items-center p-3" style="background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid var(--border-color);">
+                            <div>
+                                <h5 class="mb-1 text-light">{{ q.title }}</h5>
+                                <small class="text-muted">{{ q.get_questions_count }} {% if lang == 'ru' %}вопросов{% elif lang == 'tj' %}савол{% else %}questions{% endif %}</small>
+                            </div>
+                            <a href="{% url 'quiz' q.slug %}" class="btn btn-purple btn-sm px-3 font-heading">
+                                <i class="bi bi-patch-question me-2"></i>
+                                {% if lang == 'ru' %}Начать{% elif lang == 'tj' %}Оғоз{% else %}Start{% endif %}
+                            </a>
+                        </div>
+                        {% endfor %}
                     </div>
-                    <a href="{% url 'quiz' lesson.quiz.pk %}" class="btn btn-purple btn-lg px-4 font-heading">
-                        <i class="bi bi-patch-question me-2"></i>
-                        {% if lang == 'ru' %}Начать тест{% elif lang == 'tj' %}Тестро оғоз кунед{% else %}Start Quiz{% endif %}
-                    </a>
                 </div>
             {% endif %}
         </div>
