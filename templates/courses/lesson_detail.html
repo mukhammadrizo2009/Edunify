@@ -2,26 +2,110 @@
 
 {% block title %}{{ lesson.title }} - Edunify{% endblock %}
 
+{% block extra_css %}
+<style>
+/* Premium Reading Experience (Medium/Substack style) */
+.glass-card-reader {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: 40px 50px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.02);
+}
+[data-theme="dark"] .glass-card-reader {
+    background: rgba(20,20,24,0.6);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+@media(max-width: 768px) {
+    .glass-card-reader { padding: 30px 20px; }
+}
+
+.lesson-header-title {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-size: 2.4rem;
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    margin-bottom: 2rem;
+    color: var(--text-main);
+}
+@media(max-width: 768px) {
+    .lesson-header-title { font-size: 1.8rem; }
+}
+
+.lesson-content {
+    /* Classic beautiful serif for reading */
+    font-family: source-serif-pro, Georgia, Cambria, "Times New Roman", Times, serif;
+    font-size: 1.25rem; /* ~20px for excellent readability */
+    line-height: 1.8;
+    color: #292929; /* Soft black for light mode */
+    max-width: 680px; /* Optimal reading width (65-75 chars) */
+    word-wrap: break-word;
+    margin-bottom: 3rem;
+}
+[data-theme="dark"] .lesson-content {
+    color: rgba(255, 255, 255, 0.85); /* Softer white for dark mode */
+}
+.lesson-content p {
+    margin-bottom: 1.8rem;
+    letter-spacing: -0.003em;
+}
+.lesson-content h1, .lesson-content h2, .lesson-content h3 {
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-weight: 700;
+    margin-top: 2.5rem;
+    margin-bottom: 1.2rem;
+    line-height: 1.3;
+    color: var(--text-main);
+    letter-spacing: -0.01em;
+}
+.lesson-content h2 { font-size: 1.75rem; }
+.lesson-content h3 { font-size: 1.4rem; }
+.lesson-content strong, .lesson-content b {
+    font-weight: 600;
+    color: var(--text-main);
+}
+.lesson-content blockquote {
+    border-left: 4px solid #8b5cf6;
+    padding-left: 20px;
+    margin-left: 0;
+    font-style: italic;
+    color: var(--text-muted);
+    font-size: 1.35rem;
+    line-height: 1.6;
+    margin-bottom: 1.8rem;
+}
+.lesson-content ul, .lesson-content ol {
+    margin-bottom: 1.8rem;
+    padding-left: 1.2rem;
+}
+.lesson-content li {
+    margin-bottom: 0.6rem;
+}
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="row g-4">
     <!-- Lesson Content -->
     <div class="col-lg-8">
-        <div class="glass-card mb-4">
+        <div class="glass-card-reader mb-4">
             <div class="d-flex justify-content-between align-items-center mb-4">
-                <a href="{% url 'course_detail' lesson.course.slug %}" class="btn btn-sm btn-outline-purple rounded-pill">
+                <a href="{% url 'course_detail' lesson.course.slug %}" class="btn btn-sm btn-outline-purple rounded-pill px-3">
                     <i class="bi bi-arrow-left me-1"></i>
                     {% if lang == 'ru' %}Назад к курсу{% elif lang == 'tj' %}Бозгашт ба курс{% else %}Back to Course{% endif %}
                 </a>
             </div>
             
-            <h1 class="font-heading mb-4 text-gradient">
+            <h1 class="lesson-header-title">
                 {% if lang == 'tj' and lesson.title_tj %}{{ lesson.title_tj }}
                 {% elif lang == 'ru' and lesson.title_ru %}{{ lesson.title_ru }}
                 {% elif lang == 'en' and lesson.title_en %}{{ lesson.title_en }}
                 {% else %}{{ lesson.title }}{% endif %}
             </h1>
             
-            <div class="lesson-content fs-5">
+            <div class="lesson-content">
                 {% if lang == 'tj' and lesson.content_tj %}{{ lesson.content_tj|linebreaks }}
                 {% elif lang == 'ru' and lesson.content_ru %}{{ lesson.content_ru|linebreaks }}
                 {% elif lang == 'en' and lesson.content_en %}{{ lesson.content_en|linebreaks }}
