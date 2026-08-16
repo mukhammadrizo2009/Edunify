@@ -321,3 +321,49 @@ def course_create_step3(request, pk):
     }
     return render(request, 'courses/create_step3.html', context)
 
+
+@teacher_required
+def course_edit_view(request, pk):
+    course = get_object_or_404(Course, pk=pk, teacher=request.user)
+    categories = Category.objects.all().order_by('name')
+    lang = request.session.get('lang', 'en')
+
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        description = request.POST.get('description', '').strip()
+        category_id = request.POST.get('category')
+        thumbnail = request.FILES.get('thumbnail')
+        course_language = request.POST.get('course_language')
+
+        if title:
+            course.title = title
+        if description:
+            course.description = description
+        if category_id:
+            try:
+                course.category_id = int(category_id)
+            except ValueError:
+                pass
+        if course_language in ['ru', 'tj', 'en']:
+            course.language = course_language
+        if thumbnail:
+            course.thumbnail = thumbnail
+            
+        course.save()
+
+        if lang == 'ru':
+            msg = "Курс успешно обновлен."
+        elif lang == 'tj':
+            msg = "Курс бомуваффақият нав карда шуд."
+        else:
+            msg = "Course updated successfully."
+        messages.success(request, msg)
+        return redirect('dashboard')
+
+    context = {
+        'course': course,
+        'categories': categories,
+        'lang': lang,
+    }
+    return render(request, 'courses/course_edit.html', context)
+

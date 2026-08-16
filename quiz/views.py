@@ -24,6 +24,7 @@ def quiz_list_view(request):
     }
     return render(request, 'quiz/list.html', context)
 
+
 def teacher_required(view_func):
     """Faqat teacher yoki admin uchun decorator."""
     def wrapper(request, *args, **kwargs):
@@ -724,3 +725,44 @@ def student_ai_quiz_analysis(request, pk):
             'en': 'Error loading AI analysis.',
         }
         return JsonResponse({'error': err_msgs.get(lang, err_msgs['en'])}, status=500)
+
+
+@teacher_required
+def quiz_edit_view(request, pk):
+    quiz = get_object_or_404(Quiz, pk=pk, lesson__course__teacher=request.user)
+    lang = request.session.get('lang', 'en')
+
+    if request.method == 'POST':
+        title = request.POST.get('title', '').strip()
+        thumbnail = request.FILES.get('thumbnail')
+        passing_score = request.POST.get('passing_score')
+        quiz_language = request.POST.get('quiz_language')
+
+        if title:
+            quiz.title = title
+        if thumbnail:
+            quiz.thumbnail = thumbnail
+        if passing_score:
+            try:
+                quiz.passing_score = int(passing_score)
+            except ValueError:
+                pass
+        if quiz_language in ['ru', 'tj', 'en']:
+            quiz.language = quiz_language
+            
+        quiz.save()
+        
+        if lang == 'ru':
+            msg = "Тест успешно обновлен."
+        elif lang == 'tj':
+            msg = "Тест бомуваффақият нав карда шуд."
+        else:
+            msg = "Quiz updated successfully."
+        messages.success(request, msg)
+        return redirect('dashboard')
+        
+    context = {
+        'quiz': quiz,
+        'lang': lang,
+    }
+    return render(request, 'quiz/quiz_edit.html', context)

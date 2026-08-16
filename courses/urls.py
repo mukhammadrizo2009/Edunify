@@ -3,7 +3,7 @@ from django.views.generic import TemplateView
 from .views import (
     course_list_view, course_detail_view, enroll_view,
     lesson_detail_view, course_create_step1, course_create_step2, course_create_step3,
-    home_view
+    course_edit_view, home_view
 )
 
 urlpatterns = [
@@ -13,6 +13,7 @@ urlpatterns = [
     path('courses/create/', course_create_step1, name='course_create_step1'),
     path('courses/create/step2/', course_create_step2, name='course_create_step2'),
     path('courses/create/<int:pk>/lessons/', course_create_step3, name='course_create_step3'),
+    path('courses/<int:pk>/edit/', course_edit_view, name='course_edit'),
     # Dinamik URL'lar
     path('courses/<int:pk>/', course_detail_view, name='course_detail'),
     path('courses/<int:pk>/enroll/', enroll_view, name='enroll'),

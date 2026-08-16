@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     quiz_list_view, quiz_view, quiz_result_view, quiz_ai_feedback_view,
-    quiz_create_step1, quiz_create_step2, quiz_create_step3,
+    quiz_create_step1, quiz_create_step2, quiz_create_step3, quiz_edit_view,
     ai_quiz_generate_page, ai_quiz_generate_api, ai_quiz_save,
     student_ai_quiz_page, student_ai_quiz_generate,
     student_ai_quiz_submit, student_ai_quiz_result, student_ai_quiz_analysis,
@@ -16,6 +16,7 @@ urlpatterns = [
     path('create/', quiz_create_step1, name='quiz_create_step1'),
     path('create/step2/', quiz_create_step2, name='quiz_create_step2'),
     path('create/<int:pk>/questions/<int:num>/', quiz_create_step3, name='quiz_create_step3'),
+    path('<int:pk>/edit/', quiz_edit_view, name='quiz_edit'),
     # Teacher: AI bilan test yaratish
     path('ai-generate/', ai_quiz_generate_page, name='ai_quiz_generate'),
     path('ai-generate/api/', ai_quiz_generate_api, name='ai_quiz_generate_api'),

@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+{% block title %}{% if lang == 'ru' %}Редактирование теста{% elif lang == 'tj' %}Таҳрири тест{% else %}Edit Quiz{% endif %} | Edunify{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+<style>
+/* Tom Select Dark Mode Overrides */
+.ts-control {
+    background: var(--bg-darker) !important;
+    border: 1.5px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    color: var(--text-main) !important;
+    padding: 11px 14px !important;
+    font-size: 0.92rem !important;
+    box-shadow: none !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+    font-family: 'Inter', sans-serif !important;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+}
+.ts-control.focus {
+    border-color: #059669 !important;
+    box-shadow: 0 0 0 4px rgba(5,150,105,.12) !important;
+}
+.ts-control > input { color: var(--text-main) !important; font-size: 0.92rem; }
+.ts-control > input::placeholder { color: var(--text-muted) !important; }
+.ts-dropdown {
+    background: var(--bg-darker) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+    color: var(--text-main) !important;
+    margin-top: 6px !important;
+    padding: 6px !important;
+    font-size: 0.92rem !important;
+    z-index: 1000;
+}
+.ts-dropdown .option {
+    padding: 10px 14px !important;
+    border-radius: 8px !important;
+    cursor: pointer !important;
+    transition: background 0.2s ease, color 0.2s ease !important;
+    margin-bottom: 2px;
+}
+.ts-dropdown .active, .ts-dropdown .option:hover {
+    background: rgba(5,150,105,.15) !important;
+    color: #10b981 !important;
+}
+
+.create-wrap { max-width: 700px; margin: 0 auto; padding-top: 40px; padding-bottom: 60px; }
+.step-header { text-align: center; margin-bottom: 32px; }
+.step-header h1 {
+    font-family: 'Outfit', 'Inter', sans-serif; font-size: 1.8rem;
+    font-weight: 700; color: var(--text-main); margin-bottom: 6px;
+}
+
+.create-card {
+    background: var(--bg-card); border: 1px solid var(--border-color);
+    border-radius: 22px; overflow: hidden;
+    box-shadow: 0 8px 32px rgba(0,0,0,.06); margin-bottom: 20px;
+}
+.create-card-header {
+    background: linear-gradient(135deg, #059669, #0d9488);
+    padding: 18px 28px; display: flex; align-items: center; gap: 12px;
+}
+.create-card-header i { font-size: 1.4rem; color: rgba(255,255,255,.9); }
+.create-card-header h2 { font-family: 'Outfit', 'Inter', sans-serif; font-size: 1.05rem; font-weight: 700; color: #fff; margin: 0; }
+.create-card-body { padding: 28px; }
+
+.field-group { margin-bottom: 22px; }
+.field-label { display: flex; align-items: center; gap: 7px; font-size: 0.85rem; font-weight: 600; color: var(--text-main); margin-bottom: 8px; }
+.field-label i { color: #059669; font-size: 0.9rem; }
+.field-input {
+    width: 100%; background: var(--bg-darker); border: 1.5px solid var(--border-color);
+    color: var(--text-main); border-radius: 12px; padding: 11px 14px; font-size: 0.92rem;
+    transition: border-color 0.2s, box-shadow 0.2s; font-family: 'Inter', sans-serif;
+}
+.field-input:focus { outline: none; border-color: #059669; box-shadow: 0 0 0 3px rgba(5,150,105,.15); background: var(--bg-card); }
+.field-input::placeholder { color: var(--text-muted); }
+.field-hint { font-size: 0.76rem; color: var(--text-muted); margin-top: 5px; }
+
+.btn-next {
+    display: flex; align-items: center; justify-content: center; gap: 9px; width: 100%;
+    background: linear-gradient(135deg, #059669, #0d9488); color: #fff !important;
+    border: none; border-radius: 13px; padding: 14px 24px; font-size: 0.95rem; font-weight: 700;
+    cursor: pointer; transition: all 0.25s ease; box-shadow: 0 4px 16px rgba(5,150,105,.3);
+    font-family: 'Inter', sans-serif; margin-top: 8px;
+}
+.btn-next:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(5,150,105,.4); }
+.btn-back {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    color: var(--text-muted) !important; text-decoration: none;
+    font-size: 0.88rem; font-weight: 600; margin-bottom: 24px; transition: color 0.2s;
+}
+.btn-back:hover { color: #059669 !important; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="create-wrap">
+
+    <div class="step-header">
+        <h1><i class="bi bi-pencil-square" style="color:#059669;margin-right:8px;"></i>
+            {% if lang == 'ru' %}Редактирование теста{% elif lang == 'tj' %}Таҳрири тест{% else %}Edit Quiz{% endif %}
+        </h1>
+    </div>
+
+    <a href="{% url 'dashboard' %}" class="btn-back">
+        <i class="bi bi-arrow-left"></i>
+        {% if lang == 'ru' %}Назад в панель{% elif lang == 'tj' %}Бозгашт ба панел{% else %}Back to Dashboard{% endif %}
+    </a>
+
+    <form method="post" id="quizEditForm" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="create-card">
+            <div class="create-card-header">
+                <i class="bi bi-gear-fill"></i>
+                <h2>{% if lang == 'ru' %}Информация о тесте{% elif lang == 'tj' %}Маълумоти тест{% else %}Quiz Information{% endif %}</h2>
+            </div>
+            <div class="create-card-body">
+
+                <div class="field-group">
+                    <label class="field-label" for="id_title">
+                        <i class="bi bi-type"></i>
+                        {% if lang == 'ru' %}Название теста{% elif lang == 'tj' %}Номи тест{% else %}Quiz Title{% endif %}
+                    </label>
+                    <input type="text" id="id_title" name="title"
+                           class="field-input"
+                           value="{{ quiz.title }}"
+                           required>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="id_passing_score">
+                        <i class="bi bi-bullseye"></i>
+                        {% if lang == 'ru' %}Проходной балл (%){% elif lang == 'tj' %}Бали гузариш (%){% else %}Passing Score (%){% endif %}
+                    </label>
+                    <input type="number" id="id_passing_score" name="passing_score"
+                           class="field-input" min="1" max="100"
+                           value="{{ quiz.passing_score }}"
+                           required>
+                </div>
+
+                <div class="field-group">
+                    <label class="field-label" for="id_quiz_language">
+                        <i class="bi bi-translate"></i>
+                        {% if lang == 'ru' %}Язык теста{% elif lang == 'tj' %}Забони тест{% else %}Quiz Language{% endif %}
+                    </label>
+                    <select id="id_quiz_language" name="quiz_language" class="field-input" required>
+                        <option value="en" {% if quiz.language == 'en' %}selected{% endif %}>English</option>
+                        <option value="ru" {% if quiz.language == 'ru' %}selected{% endif %}>Русский</option>
+                        <option value="tj" {% if quiz.language == 'tj' %}selected{% endif %}>Тоҷикӣ</option>
+                    </select>
+                </div>
+
+                <div class="field-group" style="margin-bottom:0;">
+                    <label class="field-label" for="id_thumbnail">
+                        <i class="bi bi-image"></i>
+                        {% if lang == 'ru' %}Обложка теста (Изображение){% elif lang == 'tj' %}Обложкаи тест (Расм){% else %}Quiz Thumbnail (Image){% endif %}
+                    </label>
+                    {% if quiz.thumbnail %}
+                    <div style="margin-bottom: 10px;">
+                        <img src="{{ quiz.thumbnail.url }}" alt="Thumbnail" style="max-height: 100px; border-radius: 8px;">
+                    </div>
+                    {% endif %}
+                    <input type="file" id="id_thumbnail" name="thumbnail" class="field-input" accept="image/*">
+                    <div class="field-hint">
+                        {% if lang == 'ru' %}Загрузите новое изображение, чтобы изменить текущее.{% elif lang == 'tj' %}Барои иваз кардан расми нав бор кунед.{% else %}Upload a new image to change the current one.{% endif %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <button type="submit" class="btn-next" id="saveBtn">
+            <i class="bi bi-check-circle-fill"></i>
+            {% if lang == 'ru' %}Сохранить изменения{% elif lang == 'tj' %}Захира кардани тағйирот{% else %}Save Changes{% endif %}
+        </button>
+    </form>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    new TomSelect('#id_quiz_language', {
+        create: false,
+    });
+});
+
+document.getElementById('quizEditForm').addEventListener('submit', function() {
+    const btn = document.getElementById('saveBtn');
+    btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Loading...';
+    btn.disabled = true;
+});
+</script>
+{% endblock %}

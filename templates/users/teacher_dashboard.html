@@ -326,6 +326,34 @@
     flex-shrink: 0;
 }
 
+/* ── ROW ACTION BUTTONS ── */
+.row-actions {
+    display: flex; gap: 8px; align-items: center;
+}
+.row-btn {
+    width: 34px; height: 34px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.95rem; text-decoration: none;
+    transition: all 0.25s ease;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+.row-btn-edit { color: #10b981; }
+.row-btn-edit:hover {
+    background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.3);
+    color: #059669; transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16,185,129,0.15);
+}
+.row-btn-view { color: #3b82f6; }
+.row-btn-view:hover {
+    background: rgba(59,130,246,0.1); border-color: rgba(59,130,246,0.3);
+    color: #2563eb; transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(59,130,246,0.15);
+}
+[data-theme="dark"] .row-btn-edit:hover { color: #34d399; }
+[data-theme="dark"] .row-btn-view:hover { color: #60a5fa; }
+
 /* ── EMPTY STATE ── */
 .t-empty {
     text-align: center; padding: 32px 16px;
@@ -488,7 +516,7 @@
 
             {% if my_courses %}
                 {% for course in my_courses %}
-                <a href="{% url 'course_detail' course.pk %}" class="t-course-row">
+                <div class="t-course-row">
                     <div class="t-course-icon">
                         <i class="bi bi-play-circle-fill"></i>
                     </div>
@@ -502,12 +530,15 @@
                             {{ course.get_lessons_count }} {% if lang == 'ru' %}уроков{% elif lang == 'tj' %}дарс{% else %}lessons{% endif %}
                         </div>
                     </div>
-                    <div class="t-course-stats">
+                    <div class="t-course-stats me-3">
                         <div class="t-course-stat-num">{{ course.get_enrolled_count }}</div>
                         <div class="t-course-stat-lbl">{% if lang == 'ru' %}студентов{% elif lang == 'tj' %}донишҷӯ{% else %}students{% endif %}</div>
                     </div>
-                    <i class="bi bi-chevron-right text-muted ms-2" style="font-size:.8rem;"></i>
-                </a>
+                    <div class="row-actions">
+                        <a href="{% url 'course_edit' course.pk %}" class="row-btn row-btn-edit" title="Edit"><i class="bi bi-pencil-square"></i></a>
+                        <a href="{% url 'course_detail' course.pk %}" class="row-btn row-btn-view" title="View"><i class="bi bi-eye"></i></a>
+                    </div>
+                </div>
                 {% endfor %}
             {% else %}
                 <div class="t-empty">
@@ -546,8 +577,12 @@
                             {{ quiz.get_questions_count }} {% if lang == 'ru' %}вопросов{% elif lang == 'tj' %}савол{% else %}questions{% endif %}
                         </div>
                     </div>
-                    <div class="t-quiz-attempts">
+                    <div class="t-quiz-attempts me-3">
                         <i class="bi bi-person-fill me-1"></i>{{ quiz.results.count }} {% if lang == 'ru' %}попыток{% elif lang == 'tj' %}кӯшиш{% else %}attempts{% endif %}
+                    </div>
+                    <div class="row-actions">
+                        <a href="{% url 'quiz_edit' quiz.pk %}" class="row-btn row-btn-edit" title="Edit"><i class="bi bi-pencil-square"></i></a>
+                        <a href="{% url 'quiz' quiz.pk %}" class="row-btn row-btn-view" title="View"><i class="bi bi-eye"></i></a>
                     </div>
                 </div>
                 {% endfor %}
