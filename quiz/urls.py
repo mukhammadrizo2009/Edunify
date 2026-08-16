@@ -9,7 +9,7 @@ from .views import (
 
 urlpatterns = [
     path('', quiz_list_view, name='quiz_list'),
-    path('<str:slug>/', quiz_view, name='quiz'),
+    # <str:slug> moved to bottom to prevent masking other static paths
     path('result/<int:pk>/', quiz_result_view, name='quiz_result'),
     path('result/<int:pk>/ai-feedback/', quiz_ai_feedback_view, name='quiz_ai_feedback'),
     # Teacher: test yaratish
@@ -27,4 +27,6 @@ urlpatterns = [
     path('student-ai/submit/', student_ai_quiz_submit, name='student_ai_quiz_submit'),
     path('student-ai/result/<int:pk>/', student_ai_quiz_result, name='student_ai_quiz_result'),
     path('student-ai/result/<int:pk>/analysis/', student_ai_quiz_analysis, name='student_ai_quiz_analysis'),
+    # Catch-all slug must be at the very bottom
+    path('<str:slug>/', quiz_view, name='quiz'),
 ]
