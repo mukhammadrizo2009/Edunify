@@ -205,7 +205,7 @@ def ai_teacher_response(user_question, user_id, lang='en'):
         client = _get_client()
         prompt = f"{lang_force}\n\n{AI_TEACHER_PROMPT}\n\nStudent question: {user_question}"
         response = client.models.generate_content(
-            model='gemini-1.5-flash',
+            model='gemini-flash-latest',
             contents=prompt,
         )
         return response.text
@@ -261,7 +261,7 @@ Respond in EXACTLY this format (4 sentences max):
 IMPORTANT: Write ONLY in the language specified above. No more than 4 sentences.
 """
         response = client.models.generate_content(
-            model='gemini-1.5-flash',
+            model='gemini-flash-latest',
             contents=prompt,
         )
         return response.text
@@ -340,7 +340,7 @@ def generate_quiz_with_ai(teacher_prompt, lang='en'):
         )
 
         response = client.models.generate_content(
-            model='gemini-1.5-flash',
+            model='gemini-flash-latest',
             contents=full_prompt,
         )
 
@@ -482,7 +482,7 @@ def generate_student_quiz_with_ai(subject, topic, difficulty='medium', num_quest
         )
 
         response = client.models.generate_content(
-            model='gemini-1.5-flash',
+            model='gemini-flash-latest',
             contents=full_prompt,
         )
 
@@ -618,7 +618,7 @@ FAQAT quyidagi JSON formatda javob ber, boshqa hech narsa YOZMA:
 MUHIM: Faqat JSON qaytar, boshqa hech narsa yozma!
 """
         response = client.models.generate_content(
-            model='gemini-1.5-flash',
+            model='gemini-flash-latest',
             contents=prompt,
         )
 
